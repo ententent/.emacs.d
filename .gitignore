@@ -1,0 +1,6 @@
+.cache/
+auto-save-list/
+elpa/
+transient/
+.gitignore~
+init.el~
