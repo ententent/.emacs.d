@@ -6,6 +6,13 @@
                          ("melpa"  . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
 (package-initialize)
 
+;; exec-path-from-shell
+(use-package exec-path-from-shell
+  :ensure t
+  :config
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize)))
+
 ;; use-package
 ;; M-x package-install RET use-package
 (eval-when-compile
@@ -56,10 +63,19 @@
   :ensure t
   :after (treemacs lsp))
 
+;; cnfonts
 (use-package cnfonts
   :ensure t
   :config
   (cnfonts-mode 1))
+
+;; tex
+;; @source https://github.com/jwiegley/use-package/issues/379#issuecomment-246161500
+(use-package tex
+  :defer t
+  :ensure auctex
+  :config
+  (setq TeX-auto-save t))
 
 (provide 'init)
 ;;; init.el ends here
@@ -69,7 +85,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(cnfonts all-the-icons lsp-treemacs treemacs-projectile treemacs doom-themes use-package)))
+   '(exec-path-from-shell auctex cnfonts all-the-icons lsp-treemacs treemacs-projectile treemacs doom-themes use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
