@@ -56,6 +56,11 @@
   :ensure t
   :after (treemacs lsp))
 
+(use-package cnfonts
+  :ensure t
+  :config
+  (cnfonts-mode 1))
+
 (provide 'init)
 ;;; init.el ends here
 (custom-set-variables
@@ -64,7 +69,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(all-the-icons lsp-treemacs treemacs-projectile treemacs doom-themes use-package)))
+   '(cnfonts all-the-icons lsp-treemacs treemacs-projectile treemacs doom-themes use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
