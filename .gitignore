@@ -1,6 +1,14 @@
 .cache/
-auto-save-list/
-elpa/
-transient/
 .gitignore~
+all-the-icons/
+auto-save-list/
+bookmarks
+bookmarks~
+elpa/
+eshell/
+history
 init.el~
+projectile-bookmarks.eld
+recentf
+server/
+transient/
