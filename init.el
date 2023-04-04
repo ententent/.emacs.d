@@ -16,6 +16,14 @@
 
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 (require 'cdlatex)
+(add-to-list 'load-path "~/.emacs.d/mind-wave/")
+(require 'mind-wave)
+(add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-application-framework/")
+(require 'eaf)
+(require 'eaf-browser)
+(setq browse-url-browser-function 'eaf-open-browser)
+(require 'eaf-pdf-viewer)
+(require 'eaf-rss-reader)
 
 ;; exec-path-from-shell
 (use-package exec-path-from-shell
@@ -369,6 +377,12 @@
 (setq org-pretty-entities t)
 (setq org-pretty-entities-include-sub-superscripts nil)
 (setq org-highlight-latex-and-related '(native latex entities))
+;; XeLaTeX
+(add-hook 'LaTeX-mode-hook (lambda()
+  (add-to-list 'TeX-command-list '("XeLaTeX" "%`xelatex%(mode)%' %t" TeX-run-TeX nil t))
+  (setq TeX-command-default "XeLaTeX")
+  (setq TeX-save-query  nil )
+  (setq TeX-show-compilation t)))
 
 ;; line-number
 ;;; 开启行号后便于使用 M-g M-g 跳转到指定行
@@ -1132,69 +1146,6 @@ This function makes sure that dates are aligned for easy reading."
   (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
   )
 
-;; elfeed
-(use-package elfeed
-  :ensure t
-  :hook ((elfeed-new-entry . (lambda () (elfeed-make-tagger :feed-url "video" :add '(video))
-                               (elfeed-make-tagger :entry-title "图卦" :add '(pic)))))
-  :bind (("\e\e n" . elfeed)
-         :map elfeed-search-mode-map
-         ("g" . elfeed-update)
-         ("G" . elfeed-search-update--force)
-         ("o" . elfeed-default-browser-open)
-         :map elfeed-show-mode-map
-         ("M-v" . scroll-down-command)
-         ("j" . scroll-up-line)
-         ("k" . scroll-down-line))
-  :config
-  (setq elfeed-db-directory "~/.elfeed")
-  ;; capture template for elfeed
-  (with-eval-after-load 'org-capture
-    (add-to-list 'org-capture-templates '("r" "Elfeed RSS" entry (file+headline "capture.org" "Elfeed")
-                                          "* %:elfeed-entry-title :READ:\n%?\n%a"
-                                          :empty-lines-after 1
-                                          :prepend t))
-    (add-to-list 'org-capture-templates-contexts '("r" ((in-mode . "elfeed-show-mode")
-                                                        (in-mode . "elfeed-search-mode")))))
-  ;; ================================
-  ;; open entry with browser
-  ;; ================================
-  (defun elfeed-default-browser-open (&optional use-generic-p)
-    "open with default browser"
-    (interactive "P")
-    (let ((entries (elfeed-search-selected)))
-      (cl-loop for entry in entries
-               do (elfeed-untag entry 'unread)
-               when (elfeed-entry-link entry)
-               do (browse-url it))
-      (mapc #'elfeed-search-update-entry entries)
-      (unless (use-region-p) (forward-line))))
-  :custom
-  (elfeed-feeds '(
-                  ("https://remacs.cc/index.xml" emacs product)
-                  ))
-  (elfeed-use-curl t)
-  (elfeed-curl-max-connections 10)
-  (elfeed-enclosure-default-dir "~/Downloads/")
-  (elfeed-search-filter "@4-months-ago +")
-  (elfeed-sort-order 'descending)
-  (elfeed-search-clipboard-type 'CLIPBOARD)
-  (elfeed-search-title-max-width 100)
-  (elfeed-search-title-min-width 30)
-  (elfeed-search-trailing-width 25)
-  (elfeed-show-truncate-long-urls t)
-  (elfeed-show-unique-buffers t)
-  (elfeed-search-date-format '("%F %R" 16 :left))
-  )
-
-(use-package elfeed-goodies
-  :ensure t
-  :hook (after-init . elfeed-goodies/setup)
-  :config
-  ;; set elfeed show entry switch function
-  (setq elfeed-show-entry-switch #'elfeed-goodies/switch-pane) ; switch-to-buffer, pop-to-buffer
-  )
-
 (use-package undo-tree
   :ensure t
   :hook (after-init . global-undo-tree-mode)
@@ -1236,6 +1187,14 @@ This function makes sure that dates are aligned for easy reading."
   (setq magit-delta-hide-plus-minus-markers nil)
   )
 
+;; markdown-mode
+(use-package markdown-mode
+  :ensure t
+  :mode ("README\\.md\\'" . gfm-mode)
+  :init (setq markdown-command "multimarkdown")
+  :bind (:map markdown-mode-map
+         ("C-c C-e" . markdown-do)))
+
 (provide 'init)
 ;;; init.el ends here
 (custom-set-variables
@@ -1268,7 +1227,7 @@ This function makes sure that dates are aligned for easy reading."
 \\end{aligned}" "\\\\ ? &  &&")))
  '(cdlatex-paired-parens "$([{")
  '(package-selected-packages
-   '(magit-delta diff-hl magit denote crux undo-tree cal-china-x elfeed-goodies elfeed org-auto-tangle org-appear org-modern org-contrib keycast minions doom-modeline restart-emacs mwim marginalia dashboard which-key ivy counsel pdf-tools evil-collection evil-org evil grip-mode org-preview-html exec-path-from-shell auctex cnfonts all-the-icons lsp-treemacs treemacs-projectile treemacs doom-themes use-package))
+   '(magit-delta diff-hl magit denote crux undo-tree cal-china-x org-auto-tangle org-appear org-modern org-contrib keycast minions doom-modeline restart-emacs mwim marginalia dashboard which-key ivy counsel pdf-tools evil-collection evil-org evil grip-mode org-preview-html exec-path-from-shell auctex cnfonts all-the-icons lsp-treemacs treemacs-projectile treemacs doom-themes use-package))
  '(preview-default-option-list '("displaymath" "floats" "graphics" "textmath" "footnotes"))
  '(preview-gs-command "C:\\Program Files\\gs\\gs10.01.1\\bin\\gswin64c.exe"))
 (custom-set-faces
