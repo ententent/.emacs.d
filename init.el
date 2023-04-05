@@ -16,7 +16,7 @@
 
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 (require 'cdlatex)
-(add-to-list 'load-path "~/.emacs.d/mind-wave/")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/mind-wave/")
 (require 'mind-wave)
 (add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-application-framework/")
 (require 'eaf)
@@ -1197,13 +1197,29 @@ This function makes sure that dates are aligned for easy reading."
   (setq magit-delta-hide-plus-minus-markers nil)
   )
 
+;; posframe
+(use-package posframe
+  :ensure t)
 ;; markdown-mode
 (use-package markdown-mode
   :ensure t
   :mode ("README\\.md\\'" . gfm-mode)
   :init (setq markdown-command "multimarkdown")
   :bind (:map markdown-mode-map
-         ("C-c C-e" . markdown-do)))
+              ("C-c C-e" . markdown-do)))
+;; yasnippet
+(use-package yasnippet
+  :ensure t
+  :bind
+  ;; ("C-c y s" . yas-insert-snippet)
+  ;; ("C-c y v" . yas-visit-snippet-file)
+  :config
+  ;; (add-to-list 'yas-snippet-dirs "~/.emacs.d/snippets")
+  (yas-global-mode 1))
+;; lsp-bridge
+(add-to-list 'load-path "~/.emacs.d/site-lisp/lsp-bridge/")
+(require 'lsp-bridge)
+(global-lsp-bridge-mode)
 
 (provide 'init)
 ;;; init.el ends here
