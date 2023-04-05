@@ -20,7 +20,12 @@
 (require 'mind-wave)
 (add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-application-framework/")
 (require 'eaf)
+(setq eaf-proxy-type "http")
+(setq eaf-proxy-host "127.0.0.1")
+(setq eaf-proxy-port "7890")
 (require 'eaf-browser)
+(setq eaf-browser-continue-where-left-off t)
+(setq eaf-browser-enable-adblocker t)
 (setq browse-url-browser-function 'eaf-open-browser)
 (require 'eaf-pdf-viewer)
 (require 'eaf-rss-reader)
@@ -43,6 +48,9 @@
 
 ;; utils
 ;; 禁用一些GUI特性
+(menu-bar-mode -1)                      ; 关闭菜单栏
+(tool-bar-mode -1)                      ; 关闭工具栏
+(scroll-bar-mode -1)                    ; 关闭滚动条
 (setq use-dialog-box nil)               ; 鼠标操作不使用对话框
 (setq inhibit-default-init t)           ; 不加载 `default' 库
 (setq inhibit-startup-screen t)         ; 不加载启动画面
@@ -166,7 +174,7 @@
    ;; Global settings (defaults)
   (setq doom-themes-enable-bold nil    ; if nil, bold is universally disabled
 	doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'doom-acario-dark t)
+  (load-theme 'doom-peacock t)
   (doom-themes-treemacs-config))
 
 ;; all-the-icons
@@ -387,8 +395,10 @@
 ;; line-number
 ;;; 开启行号后便于使用 M-g M-g 跳转到指定行
 (global-linum-mode t)
-;; linum-mode与pdf-view不兼容，在pdf-tools启用时禁用linum-mode
+;;; linum-mode与pdf-view不兼容，在pdf-tools启用时禁用linum-mode
 (add-hook 'pdf-tools-enabled-hook (lambda () (linum-mode -1)))
+;;; highlight current line
+(global-hl-line-mode t)
 
 ;; doom-modeline
 (use-package doom-modeline
@@ -1226,6 +1236,8 @@ This function makes sure that dates are aligned for easy reading."
 ? &  &&
 \\end{aligned}" "\\\\ ? &  &&")))
  '(cdlatex-paired-parens "$([{")
+ '(custom-safe-themes
+   '("02f57ef0a20b7f61adce51445b68b2a7e832648ce2e7efb19d217b6454c1b644" "4fda8201465755b403a33e385cf0f75eeec31ca8893199266a6aeccb4adedfa4" default))
  '(package-selected-packages
    '(magit-delta diff-hl magit denote crux undo-tree cal-china-x org-auto-tangle org-appear org-modern org-contrib keycast minions doom-modeline restart-emacs mwim marginalia dashboard which-key ivy counsel pdf-tools evil-collection evil-org evil grip-mode org-preview-html exec-path-from-shell auctex cnfonts all-the-icons lsp-treemacs treemacs-projectile treemacs doom-themes use-package))
  '(preview-default-option-list '("displaymath" "floats" "graphics" "textmath" "footnotes"))

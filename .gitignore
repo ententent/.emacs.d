@@ -4,11 +4,17 @@ all-the-icons/
 auto-save-list/
 bookmarks
 bookmarks~
+eaf/
 elpa/
 eshell/
 history
 init.el~
+mind-wave/
+projectile.cache
 projectile-bookmarks.eld
 recentf
 server/
+site-lisp/
+tramp
 transient/
+url/
