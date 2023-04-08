@@ -1,5 +1,3 @@
-
-
 #+TITLE: Emacs配置文件
 #+AUTHOR: xiudi
 #+DATE: 2023/04/07 20:43:53
@@ -116,6 +114,7 @@
   (require 'init-research)
   (require 'init-eaf)
   (require 'init-ai)
+  (require 'init-shell)
   )
 #+END_SRC
 ** init.el 文件尾
@@ -1986,6 +1985,15 @@ This function makes sure that dates are aligned for easy reading."
 ** eaf-rss-reader
 #+BEGIN_SRC emacs-lisp
 (require 'eaf-rss-reader)
+;; 一些优质RSS订阅源
+;; http://blindwith.science/index.xml                 ;; Blind with Science
+;; https://remacs.cc/index.xml                        ;; remacs的世界
+;; https://manateelazycat.github.io/feed.xml          ;; manateeLazyCat
+;; http://feeds.feedburner.com/ruanyifeng             ;; Ruan YiFeng
+;; https://emacstalk.codeberg.page/podcast/index.xml  ;; EmacsTalk
+;; https://arxiv.org/rss/cs.CV                        ;; ArXiv CV
+;; https://superlioon.com/feed/                       ;; 即凉
+;; https://sachachua.com/blog/feed/                   ;; Sacha Chua
 #+END_SRC
 ** init-eaf.el 文件尾
 #+BEGIN_SRC emacs-lisp
@@ -2016,4 +2024,193 @@ This function makes sure that dates are aligned for easy reading."
 (provide 'init-ai)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init-ai.el ends here
+#+END_SRC
+* init-shell.el
+:PROPERTIES:
+:HEADER-ARGS: :tangle lisp/init-shell.el :mkdirp yes
+:END:
+** init-shell.el 文件头
+#+BEGIN_SRC emacs-lisp
+;;; init-shell.el --- (E)shell settings -*- lexical-binding: t -*-
+;;; Commentary:
+
+;;; Code:
+#+END_SRC
+** eshell 基本配置
+#+BEGIN_SRC emacs-lisp
+(use-package eshell
+  :ensure nil
+  :functions eshell/alias
+  :hook ((eshell-mode . (lambda ()
+                          (term-mode-common-init)
+                          ;; Remove cmd args word by word
+                          (modify-syntax-entry ?- "w")
+                          (visual-line-mode 1)
+                          (setenv "PAGER" "cat")))
+         )
+  :config
+  (defun term-mode-common-init ()
+    "The common initialization for term."
+    (setq-local scroll-margin 0)
+    (setq-local truncate-lines t)
+    )
+
+  ;; 在Emacs里输入vi，直接在buffer里打开文件
+  (defalias 'eshell/vi 'find-file)
+  (defalias 'eshell/vim 'find-file)
+
+  ;; 语法高亮显示
+  (defun eshell/bat (file)
+    "cat FILE with syntax highlight."
+    (with-temp-buffer
+      (insert-file-contents file)
+      (let ((buffer-file-name file))
+        (delay-mode-hooks
+          (set-auto-mode)
+          (font-lock-ensure)))
+      (buffer-string)))
+  (defalias 'eshell/cat 'eshell/bat)
+
+  ;; 交互式进入目录
+  (defun eshell/z ()
+    "cd to directory with completion."
+    (let ((dir (completing-read "Directory: " (ring-elements eshell-last-dir-ring) nil t)))
+      (eshell/cd dir)))
+
+  ;; 查找文件
+  (defun eshell/f (filename &optional dir)
+    "Search for files matching FILENAME in either DIR or the
+current directory."
+    (let ((cmd (concat
+                ;; using find
+                (executable-find "find")
+                " " (or dir ".")
+                " -not -path '*/.git*'"            ; ignore .git directory
+                " -and -not -path 'build'"         ; ignore cmake build directory
+                " -and -not -path '*/eln-cache*'"  ; ignore eln cache
+                " -and -type f -and -iname "
+                "'*" filename "*'")))
+      (eshell-command-result cmd)))
+
+  :custom
+  (eshell-banner-message
+   '(format "%s %s\n"
+            (propertize (format " %s " (string-trim (buffer-name)))
+                        'face 'mode-line-highlight)
+            (propertize (current-time-string)
+                        'face 'font-lock-keyword-face)))
+  (eshell-scroll-to-bottom-on-input 'all)
+  (eshell-scroll-to-bottom-on-output 'all)
+  (eshell-kill-on-exit t)
+  (eshell-kill-processes-on-exit t)
+  ;; Don't record command in history if starts with whitespace
+  (eshell-input-filter 'eshell-input-filter-initial-space)
+  (eshell-error-if-no-glob t)
+  (eshell-glob-case-insensitive t)
+  ;; set scripts
+  (eshell-rc-script (locate-user-emacs-file "etc/eshell/profile"))
+  (eshell-login-script (locate-user-emacs-file "etc/eshell/login"))
+  )
+#+END_SRC
+** eshell 的 alias
+#+BEGIN_SRC emacs-lisp :tangle etc/eshell/aliases
+alias ff find-file $1
+alias fo find-file-other-window $1
+alias d dired $1
+alias ll ls -alh
+alias l. ls -dh .*
+alias up eshell-up $1
+alias pk eshell-up-peek $1
+alias less view-file $1
+alias more view-file $1
+#+END_SRC
+** eshell 里的 C-d
++ 我们在使用 =iterm= 时，经常会使用 =C-d= 来结束窗口
++ 在 =Emacs= 里，这个快捷键绑定的是 =delete-char= 函数，通过以下设置令 =C-d= 更智能：
++ 当光标后面有字符的时候，删除光标后的字符，当没有字符的时候，直接退出当前 shell。
+#+BEGIN_SRC emacs-lisp
+(use-package em-rebind
+  :ensure nil
+  :commands eshell-delchar-or-maybe-eof)
+
+(use-package esh-mode
+  :ensure nil
+  :bind (:map eshell-mode-map
+              ("C-d" . eshell-delchar-or-maybe-eof)
+              ("C-r" . consult-history)
+              ("C-l" . eshell/clear))
+  )
+#+END_SRC
+** eshell 的命令历史
++ 扩大 =eshell= 的历史记录：
+#+BEGIN_SRC emacs-lisp
+(use-package em-hist
+  :ensure nil
+  :defer t
+  :custom
+  (eshell-history-size 1024)
+  (eshell-hist-ignoredups t)
+  (eshell-save-history-on-exit t))
+#+END_SRC
+** 有些使用term的命令
++ 命令如 top，我们还是使用 term
+#+BEGIN_SRC emacs-lisp
+;; following commands will run on term instead
+(use-package em-term
+  :ensure nil
+  :defer t
+  :custom
+  (eshell-visual-commands '("top" "htop" "less" "more"))
+  (eshell-visual-subcommands '(("git" "help" "lg" "log" "diff" "show")))
+  (eshell-visual-options '(("git" "--help" "--paginate")))
+  (eshell-destroy-buffer-when-process-dies t))
+#+END_SRC
+** 改变eshell的主题
++ [[https://github.com/xuchunyang/eshell-git-prompt][eshell-git-prompt]] 提供了数个好看的 =Eshell= 命令行主题
+#+BEGIN_SRC emacs-lisp
+(use-package eshell-git-prompt
+  :ensure t
+  :after esh-mode
+  :custom-face
+  (eshell-git-prompt-multiline2-dir-face ((t (:foreground "#c09035" :bold t))))
+  :config
+  (eshell-git-prompt-use-theme 'multiline2)
+  )
+#+END_SRC
+** eshell-syntac-highlighting 语法高亮
++ [[https://github.com/akreisher/eshell-syntax-highlighting][eshell-syntax-highlighting]] 为 =Eshell= 提供语法高亮
+#+BEGIN_SRC emacs-lisp
+(use-package eshell-syntax-highlighting
+  :after esh-mode
+  :ensure t
+  :hook (eshell-mode . eshell-syntax-highlighting-global-mode)
+  :custom-face
+  (eshell-syntax-highlighting-shell-command-face ((t (:foreground "#7cc77f" :bold t))))
+  )
+#+END_SRC
+** capf-autosuggest 自动补全
++ [[https://github.com/emacsmirror/capf-autosuggest][capf-autosuggest]] 提供 =Fish= 类似的 =Eshell= 命令自动补全功能
+#+BEGIN_SRC emacs-lisp
+(use-package capf-autosuggest
+  :ensure t
+  :hook ((eshell-mode comint-mod) . capf-autosuggest-mode)
+  )
+#+END_SRC
+** eshell-up 快速进入父目录
++ [[https://github.com/peterwvj/eshell-up][eshell-up]] 插件可快速进入当前文件夹的任何父文件夹
++ =up= 命令进入到当前文件夹的任意一级父目录
+#+BEGIN_SRC emacs-lisp
+(use-package eshell-up
+  :ensure t
+  :commands (eshell-up eshell-up-peek)
+  :config
+  ;; to print the matching parent directory before changing to it
+  (setq eshell-up-print-parent-dir t)
+  )
+#+END_SRC
+** init-shell.el 文件尾
+#+BEGIN_SRC emacs-lisp
+(provide 'init-shell)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; init-shell.el ends here
 #+END_SRC

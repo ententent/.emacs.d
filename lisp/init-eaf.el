@@ -18,6 +18,15 @@
 ;; (require 'eaf-pdf-viewer)
 
 (require 'eaf-rss-reader)
+;; 一些优质RSS订阅源
+;; http://blindwith.science/index.xml                 ;; Blind with Science
+;; https://remacs.cc/index.xml                        ;; remacs的世界
+;; https://manateelazycat.github.io/feed.xml          ;; manateeLazyCat
+;; http://feeds.feedburner.com/ruanyifeng             ;; Ruan YiFeng
+;; https://emacstalk.codeberg.page/podcast/index.xml  ;; EmacsTalk
+;; https://arxiv.org/rss/cs.CV                        ;; ArXiv CV
+;; https://superlioon.com/feed/                       ;; 即凉
+;; https://sachachua.com/blog/feed/                   ;; Sacha Chua
 
 (provide 'init-eaf)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
