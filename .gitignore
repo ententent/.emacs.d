@@ -9,6 +9,7 @@ elpa/
 eshell/
 history
 init.el~
+/lsp-bridge
 mind-wave/
 projectile.cache
 projectile-bookmarks.eld
