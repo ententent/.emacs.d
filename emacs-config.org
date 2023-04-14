@@ -106,6 +106,7 @@
 (with-temp-message ""
   (require 'init-ui)
   (require 'init-base)
+  (require 'init-dired)
   (require 'init-edit)
   (require 'init-org)
   (require 'init-completion)
@@ -146,7 +147,46 @@
   (load-theme 'doom-peacock t)
   (doom-themes-treemacs-config))
 #+END_SRC
+** cn-fonts 中文字体配置
+*** tumashu 开发的 [[https://github.com/tumashu/cnfonts][cnfonts]] 方便实现中英文字体等宽对齐
+#+BEGIN_SRC emacs-lisp
+(use-package cnfonts
+  :ensure t
+  :after all-the-icons
+  :hook (cnfonts-set-font-finish
+         . (lambda (fontsizes-list)
+             (set-fontset-font t 'unicode (font-spec :family "Noto Color Emoji") nil 'append)
+             (set-fontset-font t 'unicode (font-spec :family "Sarasa Term SC Nerd") nil 'append)
+             (set-fontset-font t 'unicode (font-spec :family "Noto Emoji") nil 'append)
+             (set-fontset-font t 'unicode (font-spec :family "all-the-icons") nil 'append)
+             (set-fontset-font t 'unicode (font-spec :family "file-icons") nil 'append)
+             (set-fontset-font t 'unicode (font-spec :family "Material Icons") nil 'append)
+             (set-fontset-font t 'unicode (font-spec :family "github-octicons") nil 'append)
+             (set-fontset-font t 'unicode (font-spec :family "FontAwesome") nil 'append)
+             (set-fontset-font t 'unicode (font-spec :family "Weather Icons") nil 'append)))
 
+  :custom
+  (cnfonts-personal-fontnames '(("PragmataPro Mono Liga" "Go Mono" "Fira Code" "Ubuntu Mono")
+
+                                ("M 盈黑 PRC W5" "方正聚珍新仿简繁" "苹方 常规" "微软雅黑" "苹方 中等" "M 盈黑 PRC W4" "PragmataPro Mono Liga")
+                                ("Simsun-ExtB" "方正聚珍新仿简繁" "PragmataPro Mono Liga")
+                                ("Noto Emoji" "Sarasa Term SC Nerd" "Segoe UI Emoji" "Segoe UI Symbol" "PragmataPro Mono Liga")))
+  :config
+  (cnfonts-enable))
+#+END_SRC
+*** 金色飞贼小米的配置
+# #+BEGIN_SRC emacs-lisp
+# (if (eq system-type 'windows-nt)
+#     (progn
+#       (set-face-attribute 'default nil :font "Fira Mono" :height 160) ;; 默认字体及字号. Fira Mono 需要另行安装
+#       (set-fontset-font "fontset-default" 'han "Kaiti") ;; 中文默认字体
+#       (set-fontset-font "fontset-default" 'mathematical "Cambria Math") ;; 数学符号默认字体
+#       ))
+# (setq inhibit-compacting-font-caches t) ;; 汉字显示问题
+# ;; 可变间距字体
+# (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono"  :height 150) ;; 固定间距字体. JetBrains Mono 需要另行安装
+# (set-face-attribute 'variable-pitch nil :font "Segoe Print" :height 160 :weight 'regular) ;; 可变间距字体
+# #+END_SRC
 ** 其他UI零散设置项
 #+begin_src emacs-lisp
 ;; 禁用一些GUI特性
@@ -350,6 +390,117 @@
 			  (projects . 10)))
   (dashboard-setup-startup-hook))
 #+END_SRC
+** shackle 窗口行为控制
++ 通过 [[https://depp.brause.cc/shackle/][shackle]] 插件自定义窗口的弹出行为，包括方向、大小、弹出方式等
+#+BEGIN_QUOTE
+其中，最重要的就是 shackle-rules 这个变量的配置，这个变量的配置主要有下面几个方面：
+
+CONDITION
+    条件，即这一条规则适用于满足什么样的条件才生效。这个条件可以是正则表达式，可以是字符串，可以是模式，如上面的例子， *eshell* 就是匹配到缓冲区名字是 *eshell* 时生效。
+:select
+    控制弹出 window 后是否选中
+:inhibit-window-quit
+    按“q”退出时，不删除这个缓冲区
+:size
+    0-1之间的数，控制 window 的百分比宽度或高度，如0.5就是指一半的宽度或高度
+:align
+    弹出的 window 往哪里看齐，可以取值为 t, ’left, ‘right, ‘below, ‘above
+:other
+    如果当前 frame 有多个 window，是否复用另外一个 window
+:popup
+    弹出一个新的 window，而不是复用当前 window
+:same
+    不弹出 window，复用当前 window
+:ignore
+    禁止显示该窗口
+#+END_QUOTE
+#+BEGIN_SRC emacs-lisp
+(use-package shackle
+  :ensure t
+  :hook (after-init . shackle-mode)
+  :init
+  (setq shackle-lighter "")
+  (setq shackle-select-reused-windows nil) ; default nil
+  (setq shackle-default-alignment 'below)  ; default below
+  (setq shackle-rules
+        ;; CONDITION(:regexp)            :select     :inhibit-window-quit   :size+:align|:other     :same|:popup
+        '((compilation-mode              :ignore t)
+          ("\\*Async Shell.*\\*" :regexp t :ignore t)
+          ("\\*corfu.*\\*"       :regexp t :ignore t)
+          ("*eshell*"                    :select t                          :size 0.4  :align t     :popup t)
+          (helpful-mode                  :select t                          :size 0.6  :align right :popup t)
+          ("*Messages*"                  :select t                          :size 0.4  :align t     :popup t)
+          ("*Calendar*"                  :select t                          :size 0.3  :align t     :popup t)
+          ("*info*"                      :select t                                                  :same t)
+          (magit-status-mode             :select t   :inhibit-window-quit t                         :same t)
+          (magit-log-mode                :select t   :inhibit-window-quit t                         :same t)
+          ))
+  )
+#+END_SRC
+** popper 窗口弹出行为管理
++ [[https://github.com/karthink/popper][popper]] 可以控制窗口的弹出行为，与 [[https://depp.brause.cc/shackle/][shackle]] 一起配合使用
++ 左下角显示了 =POP= 的字样，我们按下 =M-`= 可以一键关闭/打开这个窗口
+#+BEGIN_SRC emacs-lisp
+(use-package popper
+  :ensure t
+  :bind (("M-`"     . popper-toggle-latest)
+         ("M-<tab>" . popper-cycle)
+         ("M-\\"    . popper-toggle-type)
+         )
+  :init
+  (setq popper-reference-buffers
+        '("\\*Messages\\*"
+          "\\*Async Shell Command\\*"
+          help-mode
+          helpful-mode
+          occur-mode
+          pass-view-mode
+          "^\\*eshell.*\\*$" eshell-mode ;; eshell as a popup
+          "^\\*shell.*\\*$"  shell-mode  ;; shell as a popup
+          ("\\*corfu\\*" . hide)
+          (compilation-mode . hide)
+          ;; derived from `fundamental-mode' and fewer than 10 lines will be considered a popup
+          (lambda (buf) (with-current-buffer buf
+                          (and (derived-mode-p 'fundamental-mode)
+                               (< (count-lines (point-min) (point-max))
+                                  10))))
+          )
+        )
+  (popper-mode +1)
+  (popper-echo-mode +1)
+  :config
+  ;; group by project.el, projectile, directory or perspective
+  (setq popper-group-function nil)
+
+  ;; pop in child frame or not
+  (setq popper-display-function #'display-buffer-in-child-frame)
+
+  ;; use `shackle.el' to control popup
+  (setq popper-display-control nil)
+  )
+#+END_SRC
+** winner 窗口布局恢复
++ 通过 winner-undo 和 winner-redo 命令恢复或重做当前的窗口布局。
++ 通过 =C-x 1= 最大化某个窗口后，使用 =winner-undo= 恢复布局
+#+BEGIN_SRC emacs-lisp
+(use-package winner
+  :ensure nil
+  :hook (after-init . winner-mode)
+  :commands (winner-undo winner-redo)
+  :config
+  (setq winner-boring-buffers
+        '("*Completions*"
+          "*Compile-Log*"
+          "*inferior-lisp*"
+          "*Fuzzy Completions*"
+          "*Apropos*"
+          "*Help*"
+          "*cvs*"
+          "*Buffer List*"
+          "*Ibuffer*"
+          "*esh command on file*"))
+  )
+#+END_SRC
 ** init-ui.el 文件尾
 #+BEGIN_SRC emacs-lisp
 
@@ -452,8 +603,10 @@
 (add-to-list 'load-path "~/.emacs.d/site-lisp/auto-save/")
 (require 'auto-save)
 (auto-save-enable)
-(setq auto-save-silent t) ; quick save
-(setq auto-save-delete-trailing-whitespace t) ; automatically delete spaces at the end of the line when saving
+; quick save
+(setq auto-save-silent t)
+; automatically delete spaces at the end of the line when saving
+;; (setq auto-save-delete-trailing-whitespace t)
 #+END_SRC
 ** crux系统增强
 + [[https://github.com/bbatsov/crux][crux]] 提供一系列的增强，如移动增强、删除增强等。
@@ -511,6 +664,185 @@
 (provide 'init-base)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init-base.el ends here
+#+END_SRC
+* init-dired.el
+:PROPERTIES:
+:HEADER-ARGS: :tangle lisp/init-dired.el :mkdirp yes
+:END:
+** init-dired.el 文件头
+#+BEGIN_SRC emacs-lisp
+;;; init-dired.el --- Dired settings -*- lexical-binding: t -*-
+;;; Commentary:
+
+;;; Code:
+#+END_SRC
+** dired 基础配置
+#+BEGIN_SRC emacs-lisp
+(use-package dired
+  :ensure nil
+  :bind (:map dired-mode-map
+              ("C-<return>" . xah-open-in-external-app)
+              ("W" . dired-copy-path)
+              )
+  :config
+  ;; Enable the disabled dired commands
+  (put 'dired-find-alternate-file 'disabled nil)
+
+  ;; open files via external program based on file types, See:
+  ;; https://emacs.stackexchange.com/questions/3105/how-to-use-an-external-program-as-the-default-way-to-open-pdfs-from-emacs
+  (defun xdg-open (filename)
+    (interactive "fFilename: ")
+    (let ((process-connection-type))
+      (start-process "" nil (cond ((eq system-type 'gnu/linux) "xdg-open")
+                                  ((eq system-type 'darwin) "open")
+                                  ((eq system-type 'windows-nt) "start")
+                                  (t "")) (expand-file-name filename))))
+  ;; open files via external program when using find-file
+  (defun find-file-auto (orig-fun &rest args)
+    (let ((filename (car args)))
+      (if (cl-find-if
+           (lambda (regexp) (string-match regexp filename))
+           '(
+             ;; "\\.html?\\'"
+             "\\.xlsx?\\'"
+             "\\.pptx?\\'"
+             "\\.docx?\\'"
+             "\\.mp4\\'"
+             "\\.app\\'"
+             ))
+          (xdg-open filename)
+        (apply orig-fun args))))
+  (advice-add 'find-file :around 'find-file-auto)
+
+  (defun dired-copy-path ()
+    "In dired, copy file path to kill-buffer.
+At 2nd time it copy current directory to kill-buffer."
+    (interactive)
+    (let (path)
+      (setq path (dired-file-name-at-point))
+      (if (string= path (current-kill 0 1)) (setq path (dired-current-directory)))
+      (message path)
+      (kill-new path)))
+
+  (defun xah-open-in-external-app (&optional @fname)
+    "Open the current file or dired marked files in external app.
+The app is chosen from your OS's preference.
+
+When called in emacs lisp, if @fname is given, open that.
+
+URL `http://ergoemacs.org/emacs/emacs_dired_open_file_in_ext_apps.html'
+Version 2019-11-04"
+    (interactive)
+    (let* (
+           ($file-list
+            (if @fname
+                (progn (list @fname))
+              (if (or (string-equal major-mode "dired-mode")
+                      (string-equal major-mode "dirvish-mode"))
+                  (dired-get-marked-files)
+                (list (buffer-file-name)))))
+           ($do-it-p (if (<= (length $file-list) 5)
+                         t
+                       (y-or-n-p "Open more than 5 files? "))))
+      (when $do-it-p
+        (cond
+         ((string-equal system-type "windows-nt")
+          (mapc
+           (lambda ($fpath)
+             (w32-shell-execute "open" $fpath)) $file-list))
+         ((string-equal system-type "darwin")
+          (mapc
+           (lambda ($fpath)
+             (shell-command
+              (concat "open " (shell-quote-argument $fpath))))  $file-list))
+         ((string-equal system-type "gnu/linux")
+          (mapc
+           (lambda ($fpath) (let ((process-connection-type nil))
+                              (start-process "" nil "xdg-open" $fpath))) $file-list))))))
+  :custom
+  ;; (dired-recursive-deletes 'always)
+  (delete-by-moving-to-trash t)
+  (dired-dwim-target t)
+  (dired-bind-vm nil)
+  (dired-bind-man nil)
+  (dired-bind-info nil)
+  (dired-auto-revert-buffer t)
+  (dired-hide-details-hide-symlink-targets nil)
+  (dired-kill-when-opening-new-dired-buffer t)
+  (dired-listing-switches "-AFhlv"))
+
+(use-package dired-aux
+  :ensure nil
+  :bind (:map dired-mode-map
+              ("C-c +" . dired-create-empty-file))
+  :config
+  ;; with the help of `evil-collection', P is bound to `dired-do-print'.
+  (define-advice dired-do-print (:override (&optional _))
+    "Show/hide dotfiles."
+    (interactive)
+    (if (or (not (boundp 'dired-dotfiles-show-p)) dired-dotfiles-show-p)
+        (progn
+          (setq-local dired-dotfiles-show-p nil)
+          (dired-mark-files-regexp "^\\.")
+          (dired-do-kill-lines))
+      (revert-buffer)
+      (setq-local dired-dotfiles-show-p t)))
+  :custom
+  (dired-isearch-filenames 'dwim)
+  (dired-create-destination-dirs 'ask)
+  (dired-vc-rename-file t))
+
+(use-package dired-x
+  :ensure nil
+  :hook (dired-mode . dired-omit-mode)
+  :init
+  (setq dired-guess-shell-alist-user `((,(rx "."
+                                             (or
+                                              ;; Videos
+                                              "mp4" "avi" "mkv" "flv" "ogv" "ogg" "mov"
+                                              ;; Music
+                                              "wav" "mp3" "flac"
+                                              ;; Images
+                                              "jpg" "jpeg" "png" "gif" "xpm" "svg" "bmp"
+                                              ;; Docs
+                                              "pdf" "md" "djvu" "ps" "eps" "doc" "docx" "xls" "xlsx" "ppt" "pptx")
+                                             string-end)
+                                        ,(cond ((eq system-type 'gnu/linux) "xdg-open")
+                                               ((eq system-type 'darwin) "open")
+                                               ((eq system-type 'windows-nt) "start")
+                                               (t "")))))
+  :custom
+  (dired-omit-verbose nil)
+  (dired-omit-files (rx string-start
+                        (or ".DS_Store"
+                            ".cache"
+                            ".vscode"
+                            ".ccls-cache" ".clangd")
+                        string-end))
+  ;; Dont prompt about killing buffer visiting delete file
+  (dired-clean-confirm-killing-deleted-buffers nil)
+  )
+#+END_SRC
+** diredfl 多彩美化
++ 默认的 Dired 只有两种颜色以区分文件和文件夹，使用 [[https://github.com/purcell/diredfl][diredfl]] 插件让Dired变得多彩
+#+BEGIN_SRC emacs-lisp
+(use-package diredfl
+  :ensure t
+  :hook (dired-mode . diredfl-mode))
+#+END_SRC
+** all-the-icons-dired 图标美化
++ 使用 [[https://github.com/jtbm37/all-the-icons-dired][all-the-icons-dired]] 插件为Dired添加好看的图标
+#+BEGIN_SRC emacs-lisp
+(use-package all-the-icons-dired
+  :ensure t
+  :hook (dired-mode . all-the-icons-dired-mode)
+  )
+#+END_SRC
+** init-dired.el 文件尾
+#+BEGIN_SRC emacs-lisp
+(provide 'init-dired)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; init-dired.el ends here
 #+END_SRC
 * init-edit.el
 :PROPERTIES:
@@ -573,6 +905,7 @@
 #+BEGIN_SRC emacs-lisp
   ;; org
   (use-package org
+    :defer t ;; 延迟加载
     :ensure nil
     :mode ("\\.org\\'" . org-mode)
     :hook ((org-mode . visual-line-mode)
@@ -594,6 +927,9 @@
     (org-block-begin-line ((t (:underline t :background unspecified))))
     (org-block-end-line ((t (:overline t :underline nil :background unspecified))))
     :config
+    ;; 打开 cdlatex
+    (add-hook 'org-mode-hook #'org-cdlatex-mode)
+    (add-hook 'org-mode-hook (lambda () (setq truncate-lines nil)))
     ;; ================================
     ;; 在org mode里美化字符串
     ;; ================================
@@ -614,10 +950,10 @@
                       ("#+attr_org:"      . "🄞")
                       ("#+name:"          . "🄝")         ; 127261
                       ("#+caption:"       . "🄒")         ; 127250
-                      ("#+date:"          . "📅")         ; 128197
-                      ("#+author:"        . "💁")         ; 128100
-                      ("#+setupfile:"     . 128221)       ; 📝
-                      ("#+email:"         . 128231)       ; 📧
+					  ("#+date:"          . "📅")         ; 128197
+					  ("#+author:"        . "💁")         ; 128100
+					  ("#+setupfile:"     . 128221)       ; 📝
+					  ("#+email:"         . 128231)       ; 📧📧
                       ("#+startup:"       . 10034)        ; ✲
                       ("#+options:"       . 9965)         ; ⛭
                       ("#+title:"         . 10162)        ; ➲
@@ -692,7 +1028,7 @@
     (org-fontify-quote-and-verse-blocks t)
     ;; 隐藏宏标记
     (org-hide-macro-markers t)
-    ;; 隐藏强调标签
+    ;; 隐藏强调标签, 如=,~,*,_等, 与org-appear配合
     (org-hide-emphasis-markers t)
     ;; 以UTF-8显示，LaTeX 代码的 prettify
     (org-pretty-entities t)
@@ -993,7 +1329,7 @@
   (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
   )
 #+END_SRC
-** Org mode
+** Org-src
 代码块基础设置
 #+BEGIN_SRC emacs-lisp
 (use-package org-src
@@ -1405,6 +1741,7 @@ This function makes sure that dates are aligned for easy reading."
                   ("zyi" . 1) ("zer" . 2) ("zsan" . 3)
                   ("zsi" . 4) ("zwu" . 5) ("zliu" . 6)
                   ("zr" . 0) ("zq" . 0)
+
                   ("zy" . 1) ("ze" . 2) ("zs" . 3)
                   ("zsi" . 4) ("zw" . 5) ("zl" . 6))
                 parse-time-weekdays)))
@@ -1531,6 +1868,28 @@ This function makes sure that dates are aligned for easy reading."
                    (eq old-tick (buffer-chars-modified-tick)))
           (ignore-errors (yas-next-field))))))
 #+END_SRC
+** vertico
+#+BEGIN_SRC emacs-lisp
+(defun my/minibuffer-backward-kill (arg)
+  "When minibuffer is completing a file name delete up to parent
+folder, otherwise delete a word"
+  (interactive "p")
+  (if minibuffer-completing-file-name
+      ;; Borrowed from https://github.com/raxod502/selectrum/issues/498#issuecomment-803283608
+      (if (string-match-p "/." (minibuffer-contents))
+          (zap-up-to-char (- arg) ?/)
+        (delete-minibuffer-contents))
+    (delete-word (- arg))))
+
+(use-package vertico
+  :defer 1
+  :custom
+  (verticle-cycle t)
+  :config
+  (vertico-mode)
+  :bind (:map minibuffer-local-map
+              ("M-h" .  my/minibuffer-backward-kill)))
+#+END_SRC
 ** marginalia
 + marginalia 插件给迷你缓冲区的补全候选条目添加一些提示。
 #+BEGIN_SRC emacs-lisp
@@ -1540,6 +1899,24 @@ This function makes sure that dates are aligned for easy reading."
   :hook (after-init . marginalia-mode)
   :custom
   (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil)))
+#+END_SRC
+** orderless
+#+BEGIN_SRC emacs-lisp
+(use-package orderless
+  :defer 1
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-defaults nil)
+  (completion-category-overrides '((file (styles partial-completion)))))
+#+END_SRC
+** all-the-icons-completion
++ 借助 [[https://github.com/iyefrat/all-the-icons-completion][all-the-icons-completion]] 插件为迷你缓冲区的补全系统添加美观图标
+#+BEGIN_SRC emacs-lisp
+(use-package all-the-icons-completion
+  :ensure t
+  :hook ((after-init . all-the-icons-completion-mode)
+         (marginalia-mode . all-the-icons-completion-marginalia-setup))
+  )
 #+END_SRC
 ** posframe
 + tumashu 开发的 [[https://github.com/tumashu/posframe][posframe]] 插件支持 posframe 的弹出
@@ -1589,14 +1966,6 @@ This function makes sure that dates are aligned for easy reading."
 (use-package restart-emacs
   :ensure t)
 #+END_SRC
-** cn-fonts 中文字体配置
-+ tumashu 开发的 [[https://github.com/tumashu/cnfonts][cnfonts]] 方便实现中英文字体等宽对齐
-#+BEGIN_SRC emacs-lisp
-(use-package cnfonts
-  :ensure t
-  :config
-  (cnfonts-mode 1))
-#+END_SRC
 ** which-key 快捷键
 + [[https://github.com/justbur/emacs-which-key][which-key]] 插件将提示快捷键
 #+BEGIN_SRC emacs-lisp
@@ -1639,6 +2008,17 @@ This function makes sure that dates are aligned for easy reading."
                      ;; ;; LibreTranslate
                      ;; fanyi-libre-provider
                      )))
+#+END_SRC
+** Beancount 复式簿记法
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path "~/.emacs.d/lisp/")
+(require 'beancount)
+(add-to-list 'auto-mode-alist '("\\.bean\\'" . beancount-mode))
+;; (add-hook 'beancount-mode-hook
+;;   (lambda () (setq-local electric-indent-chars nil)))
+(add-hook 'beancount-mode-hook #'outline-minor-mode)
+(define-key beancount-mode-map (kbd "C-c C-n") #'outline-next-visible-heading)
+(define-key beancount-mode-map (kbd "C-c C-p") #'outline-previous-visible-heading)
 #+END_SRC
 ** init-tools.el 文件尾
 #+BEGIN_SRC emacs-lisp
@@ -1869,25 +2249,29 @@ This function makes sure that dates are aligned for easy reading."
 ;; customize prettify
 ;; https://en.wikipedia.org/wiki/Mathematical_operators_and_symbols_in_Unicode
 ;; 可加入原列表中没有的编码、简化常用命令
-(require 'tex-mode)
+(require 'tex-mode) ;; 载入 tex--prettify-symbols-alist 变量
 (defun my/more-prettified-symbols ()
+  (mapc (lambda (pair) (delete pair tex--prettify-symbols-alist))
+        '(("\\supset" . 8835)))
   (mapc (lambda (pair) (cl-pushnew pair tex--prettify-symbols-alist))
-        '(("\\Z" . 8484) ;; 大多数人在latex中会用 \Z, \Q, \N, \R 表示数域
+        '(("\\Z" . 8484)
           ("\\Q" . 8474)
           ("\\N" . 8469)
           ("\\R" . 8477)
           ("\\eps" . 949)
+          ("\\inf" . #x22C0) 
+          ("\\sup". #x22C1)
           ("\\ONE" . #x1D7D9)
           ("\\mathbb{S}" . #x1D54A)
-          ("\\PP" . #x2119) ;; 个人需要, 经常要使用P和E的数学字体
-          ("\\P" . #x1D5AF )
+          ("\\PP" . #x2119)
+          ("\\Ps" . #x1D5AF )
           ("\\Pp" . #x1D40F)
           ("\\E" . #x1D5A4)
           ("\\Ee" . #x1D404)
           ("\\EE" . #x1D53C )
           ("\\Fc" . #x2131)
           ("\\Nc" . #x1D4A9))))
-(my/more-prettified-symbols)
+(my/more-prettified-symbols) ;; 读入自定义 prettify 符号
 #+END_SRC
 ** XeLaTeX 支持
 #+BEGIN_SRC emacs-lisp
@@ -1920,13 +2304,21 @@ This function makes sure that dates are aligned for easy reading."
 (define-key pdf-annot-minor-mode-map (kbd "C-a s") 'pdf-annot-add-squiggly-markup-annotation) ;; squiggly
 (define-key pdf-annot-minor-mode-map (kbd "C-a u") 'pdf-annot-add-underline-markup-annotation) ;; underline
 (define-key pdf-annot-minor-mode-map (kbd "C-a d") 'pdf-annot-delete) ;; delete
+;; 禁用 =pdf-tools= 有关文件的本地化编译
+(setq native-comp-deferred-compilation-deny-list '(".*pdf.*"))
+;; 夜间模式设置绿色底色
+(setq pdf-view-midnight-colors '("#000000" . "#9bCD9b"))
+;; 默认夜间模式
+(add-hook 'pdf-view-mode-hook 'pdf-view-midnight-minor-mode)
 ;; 打开PDF时自动缩放
 (add-hook 'pdf-view-mode-hook 'pdf-view-fit-width-to-window)
 #+END_SRC
 ** org-download
 #+BEGIN_SRC emacs-lisp
+;; 对于Windows系统，需要安装ImageMagick，并保证magick.exe在PATH变量的路径中
+;;; 用msys2安装: pacman -S mingw-w64-x86_64-imagemagick
 (use-package org-download
-  :ensure async ;; 因为不是从melpa安装org-download，需要手动保证async安装
+  :ensure async ;; 因为不是从melpa安装，需要手动保证async安装
   :defer t ;; 延迟加载
   :load-path "~/.emacs.d/lisp/"
   :bind
@@ -1935,15 +2327,24 @@ This function makes sure that dates are aligned for easy reading."
   :custom
   (org-download-heading-lvl 1) ;; 用一级标题给截图文件命名
   :config
-  (setq-default org-download-image-dir "./img")) ;; 用同级 ./img 目录放置截图文件
+  ;; 用同级 ./img 目录放置截图文件
+  (setq-default org-download-image-dir "./img"))
 #+END_SRC
 ** org-noter
 #+BEGIN_SRC emacs-lisp
-(add-hook 'org-mode-hook #'org-cdlatex-mode) ;; 打开 cdlatex
-(add-hook 'org-mode-hook (lambda () (setq truncate-lines nil)))
-
 (use-package org-noter
-  :ensure t)
+  :ensure t
+  :custom
+  (org-noter-notes-search-path '("~/org/notes/")) ;; 默认笔记路径。设置后从pdf文件中使用=org-noter=命令，会自动在该墓中寻找与文件同名的=.org=笔记文件
+  (org-noter-auto-save-last-location t) ;; 自动保存上次阅读位置
+  (org-noter-max-short-selected-text-length 20) ;; 修改长/短文本标准，默认为80
+  (org-noter-default-heading-title "第 $p$ 页的笔记") ;; 默认短标题格式
+  (org-noter-highlight-selected-text t) ;; 选中文字后插入笔记自动高亮
+  :bind
+  (("C-c n n" . org-noter) ;; 与org-roam配合，打开org-noter的快捷键
+   :map org-noter-doc-mode-map ;; 加入左手键位
+   ("e" . org-noter-insert-note)
+   ("M-e" . org-noter-insert-precise-note)))
 #+END_SRC
 ** init-research.el 文件尾
 #+BEGIN_SRC emacs-lisp
@@ -2209,6 +2610,9 @@ alias more view-file $1
   )
 #+END_SRC
 ** init-shell.el 文件尾
+:PROPERTIES:
+:NOTER_DOCUMENT: d:/research/LFRS/Literature/foundationModel/VLP/Masked Autoencoders Are Scalable Vision Learners.pdf
+:END:
 #+BEGIN_SRC emacs-lisp
 (provide 'init-shell)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

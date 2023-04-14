@@ -44,6 +44,7 @@
 (with-temp-message ""
   (require 'init-ui)
   (require 'init-base)
+  (require 'init-dired)
   (require 'init-edit)
   (require 'init-org)
   (require 'init-completion)
@@ -58,16 +59,3 @@
 (provide 'init)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init.el ends here
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(eshell-up capf-autosuggest eshell-syntax-highlighting eshell-git-prompt yasnippet which-key use-package-ensure-system-package undo-tree treemacs-projectile restart-emacs rainbow-delimiters pdf-tools org-preview-html org-noter org-modern org-contrib org-auto-tangle org-appear no-littering mwim minions marginalia magit-delta lsp-treemacs keycast grip-mode fanyi exec-path-from-shell evil-org evil-collection elfeed-goodies doom-themes doom-modeline diminish diff-hl denote dashboard crux counsel-projectile cnfonts cal-china-x auctex all-the-icons)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )

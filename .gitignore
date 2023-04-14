@@ -6,6 +6,7 @@ bookmarks
 bookmarks~
 eaf/
 elpa/
+emacs-application-framework/
 eshell/
 history
 init.el~
@@ -15,7 +16,6 @@ projectile.cache
 projectile-bookmarks.eld
 recentf
 server/
-site-lisp/
 tramp
 transient/
 url/

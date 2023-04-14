@@ -5,6 +5,7 @@
 
   ;; org
   (use-package org
+    :defer t ;; 延迟加载
     :ensure nil
     :mode ("\\.org\\'" . org-mode)
     :hook ((org-mode . visual-line-mode)
@@ -26,6 +27,9 @@
     (org-block-begin-line ((t (:underline t :background unspecified))))
     (org-block-end-line ((t (:overline t :underline nil :background unspecified))))
     :config
+    ;; 打开 cdlatex
+    (add-hook 'org-mode-hook #'org-cdlatex-mode)
+    (add-hook 'org-mode-hook (lambda () (setq truncate-lines nil)))
     ;; ================================
     ;; 在org mode里美化字符串
     ;; ================================
@@ -46,10 +50,10 @@
                       ("#+attr_org:"      . "🄞")
                       ("#+name:"          . "🄝")         ; 127261
                       ("#+caption:"       . "🄒")         ; 127250
-                      ("#+date:"          . "📅")         ; 128197
-                      ("#+author:"        . "💁")         ; 128100
-                      ("#+setupfile:"     . 128221)       ; 📝
-                      ("#+email:"         . 128231)       ; 📧
+					  ("#+date:"          . "📅")         ; 128197
+					  ("#+author:"        . "💁")         ; 128100
+					  ("#+setupfile:"     . 128221)       ; 📝
+					  ("#+email:"         . 128231)       ; 📧📧
                       ("#+startup:"       . 10034)        ; ✲
                       ("#+options:"       . 9965)         ; ⛭
                       ("#+title:"         . 10162)        ; ➲
@@ -124,7 +128,7 @@
     (org-fontify-quote-and-verse-blocks t)
     ;; 隐藏宏标记
     (org-hide-macro-markers t)
-    ;; 隐藏强调标签
+    ;; 隐藏强调标签, 如=,~,*,_等, 与org-appear配合
     (org-hide-emphasis-markers t)
     ;; 以UTF-8显示，LaTeX 代码的 prettify
     (org-pretty-entities t)
@@ -813,6 +817,7 @@ This function makes sure that dates are aligned for easy reading."
                   ("zyi" . 1) ("zer" . 2) ("zsan" . 3)
                   ("zsi" . 4) ("zwu" . 5) ("zliu" . 6)
                   ("zr" . 0) ("zq" . 0)
+
                   ("zy" . 1) ("ze" . 2) ("zs" . 3)
                   ("zsi" . 4) ("zw" . 5) ("zl" . 6))
                 parse-time-weekdays)))

@@ -72,8 +72,10 @@
 (add-to-list 'load-path "~/.emacs.d/site-lisp/auto-save/")
 (require 'auto-save)
 (auto-save-enable)
-(setq auto-save-silent t) ; quick save
-(setq auto-save-delete-trailing-whitespace t) ; automatically delete spaces at the end of the line when saving
+; quick save
+(setq auto-save-silent t)
+; automatically delete spaces at the end of the line when saving
+;; (setq auto-save-delete-trailing-whitespace t)
 
 ;; crux
 (use-package crux

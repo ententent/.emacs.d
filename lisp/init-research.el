@@ -42,25 +42,29 @@
 ;; customize prettify
 ;; https://en.wikipedia.org/wiki/Mathematical_operators_and_symbols_in_Unicode
 ;; 可加入原列表中没有的编码、简化常用命令
-(require 'tex-mode)
+(require 'tex-mode) ;; 载入 tex--prettify-symbols-alist 变量
 (defun my/more-prettified-symbols ()
+  (mapc (lambda (pair) (delete pair tex--prettify-symbols-alist))
+        '(("\\supset" . 8835)))
   (mapc (lambda (pair) (cl-pushnew pair tex--prettify-symbols-alist))
-        '(("\\Z" . 8484) ;; 大多数人在latex中会用 \Z, \Q, \N, \R 表示数域
+        '(("\\Z" . 8484)
           ("\\Q" . 8474)
           ("\\N" . 8469)
           ("\\R" . 8477)
           ("\\eps" . 949)
+          ("\\inf" . #x22C0) 
+          ("\\sup". #x22C1)
           ("\\ONE" . #x1D7D9)
           ("\\mathbb{S}" . #x1D54A)
-          ("\\PP" . #x2119) ;; 个人需要, 经常要使用P和E的数学字体
-          ("\\P" . #x1D5AF )
+          ("\\PP" . #x2119)
+          ("\\Ps" . #x1D5AF )
           ("\\Pp" . #x1D40F)
           ("\\E" . #x1D5A4)
           ("\\Ee" . #x1D404)
           ("\\EE" . #x1D53C )
           ("\\Fc" . #x2131)
           ("\\Nc" . #x1D4A9))))
-(my/more-prettified-symbols)
+(my/more-prettified-symbols) ;; 读入自定义 prettify 符号
 
 (add-hook 'LaTeX-mode-hook (lambda()
   (add-to-list 'TeX-command-list '("XeLaTeX" "%`xelatex%(mode)%' %t" TeX-run-TeX nil t))
@@ -89,11 +93,19 @@
 (define-key pdf-annot-minor-mode-map (kbd "C-a s") 'pdf-annot-add-squiggly-markup-annotation) ;; squiggly
 (define-key pdf-annot-minor-mode-map (kbd "C-a u") 'pdf-annot-add-underline-markup-annotation) ;; underline
 (define-key pdf-annot-minor-mode-map (kbd "C-a d") 'pdf-annot-delete) ;; delete
+;; 禁用 =pdf-tools= 有关文件的本地化编译
+(setq native-comp-deferred-compilation-deny-list '(".*pdf.*"))
+;; 夜间模式设置绿色底色
+(setq pdf-view-midnight-colors '("#000000" . "#9bCD9b"))
+;; 默认夜间模式
+(add-hook 'pdf-view-mode-hook 'pdf-view-midnight-minor-mode)
 ;; 打开PDF时自动缩放
 (add-hook 'pdf-view-mode-hook 'pdf-view-fit-width-to-window)
 
+;; 对于Windows系统，需要安装ImageMagick，并保证magick.exe在PATH变量的路径中
+;;; 用msys2安装: pacman -S mingw-w64-x86_64-imagemagick
 (use-package org-download
-  :ensure async ;; 因为不是从melpa安装org-download，需要手动保证async安装
+  :ensure async ;; 因为不是从melpa安装，需要手动保证async安装
   :defer t ;; 延迟加载
   :load-path "~/.emacs.d/lisp/"
   :bind
@@ -102,13 +114,22 @@
   :custom
   (org-download-heading-lvl 1) ;; 用一级标题给截图文件命名
   :config
-  (setq-default org-download-image-dir "./img")) ;; 用同级 ./img 目录放置截图文件
-
-(add-hook 'org-mode-hook #'org-cdlatex-mode) ;; 打开 cdlatex
-(add-hook 'org-mode-hook (lambda () (setq truncate-lines nil)))
+  ;; 用同级 ./img 目录放置截图文件
+  (setq-default org-download-image-dir "./img"))
 
 (use-package org-noter
-  :ensure t)
+  :ensure t
+  :custom
+  (org-noter-notes-search-path '("~/org/notes/")) ;; 默认笔记路径。设置后从pdf文件中使用=org-noter=命令，会自动在该墓中寻找与文件同名的=.org=笔记文件
+  (org-noter-auto-save-last-location t) ;; 自动保存上次阅读位置
+  (org-noter-max-short-selected-text-length 20) ;; 修改长/短文本标准，默认为80
+  (org-noter-default-heading-title "第 $p$ 页的笔记") ;; 默认短标题格式
+  (org-noter-highlight-selected-text t) ;; 选中文字后插入笔记自动高亮
+  :bind
+  (("C-c n n" . org-noter) ;; 与org-roam配合，打开org-noter的快捷键
+   :map org-noter-doc-mode-map ;; 加入左手键位
+   ("e" . org-noter-insert-note)
+   ("M-e" . org-noter-insert-precise-note)))
 
 (provide 'init-research)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
