@@ -37,6 +37,13 @@
 (use-package bind-key
   :ensure t)
 
+;; 安装 benchmark-init, 优化Emacs启动速度
+(require 'benchmark-init-modes)
+(require 'benchmark-init)
+(benchmark-init/activate)
+;;; To disable collection of benchmark data after init is done.
+(add-hook 'after-init-hook 'benchmark-init/deactivate)
+
 ;; 将lisp目录放在加载路径之前以提高启动速度
 (let ((dir (locate-user-emacs-file "lisp")))
   (add-to-list 'load-path (file-name-as-directory dir)))

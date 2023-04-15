@@ -16,7 +16,9 @@
 
   ;; 设置垃圾回收参数
   (setq gc-cons-threshold most-positive-fixnum)
-  (setq gc-cons-percentage 0.6)
+  ;;; (setq gc-cons-percentage 0.6)
+  ;; 清空避免加载远程文件的时候分析文件
+  (setq file-name-handler-alist nil)
 
   ;; 启动早期不加载`package.el'包管理器
   (setq package-enable-at-startup nil)
@@ -58,7 +60,6 @@
 ;;; Code:
 #+END_SRC
 ** package 包管理配置
-** package包管理配置
 #+begin_src emacs-lisp
 (require 'package)
 (setq package-check-signature nil)
@@ -95,6 +96,13 @@
   :ensure t)
 (use-package bind-key
   :ensure t)
+
+;; 安装 benchmark-init, 优化Emacs启动速度
+(require 'benchmark-init-modes)
+(require 'benchmark-init)
+(benchmark-init/activate)
+;;; To disable collection of benchmark data after init is done.
+(add-hook 'after-init-hook 'benchmark-init/deactivate)
 #+END_SRC
 ** 加载各模块化配置
 #+BEGIN_SRC emacs-lisp
@@ -185,6 +193,7 @@
 (set-fontset-font "fontset-default" 'han "Kaiti")
 ;;;(set-fontset-font t 'han (font-spec :family "霞鹜文楷" :weight 'bold))
 ;; 数学符号默认字体 @ https://wiki.archlinuxcn.org/zh-hans/%E5%BE%AE%E8%BD%AF%E5%AD%97%E4%BD%93
+;; 保证 Unicode 数学符号可以正确显示
 (set-fontset-font "fontset-default" 'mathematical "Cambria Math")
 ;; 汉字间距显示问题
 (setq inhibit-compacting-font-caches t)
@@ -195,129 +204,136 @@
 #+END_SRC
 ** 其他UI零散设置项
 #+begin_src emacs-lisp
-;; 禁用一些GUI特性
-(setq use-dialog-box nil)               ; 鼠标操作不使用对话框
-(setq inhibit-default-init t)           ; 不加载 `default' 库
-(setq inhibit-startup-screen t)         ; 不加载启动画面
-(setq inhibit-startup-message t)        ; 不加载启动消息
-(setq inhibit-startup-buffer-menu t)    ; 不显示缓冲区列表
+  ;; 禁用一些GUI特性
+  (setq use-dialog-box nil)               ; 鼠标操作不使用对话框
+  (setq inhibit-default-init t)           ; 不加载 `default' 库
+  (setq inhibit-startup-screen t)         ; 不加载启动画面
+  (setq inhibit-startup-message t)        ; 不加载启动消息
+  (setq inhibit-startup-buffer-menu t)    ; 不显示缓冲区列表
 
-;; 草稿缓冲区默认文字设置
-(setq initial-scratch-message (concat ";; Happy hacking, "
-                                      (capitalize user-login-name) " - Emacs ♥ you!\n\n"))
+  ;; 草稿缓冲区默认文字设置
+  (setq initial-scratch-message (concat ";; Happy hacking, "
+                                        (capitalize user-login-name) " - Emacs ♥ you!\n\n"))
 
-;; 设置缓冲区的文字方向为从左到右
-(setq bidi-paragraph-direction 'left-to-right)
-;; 禁止使用双向括号算法
-;; (setq bidi-inhibit-bpa t)
+  ;; 设置缓冲区的文字方向为从左到右
+  (setq bidi-paragraph-direction 'left-to-right)
+  ;; 禁止使用双向括号算法
+  ;; (setq bidi-inhibit-bpa t)
 
-;; 设置自动折行宽度为80个字符，默认值为70
-(setq-default fill-column 80)
+  ;; 设置自动折行宽度为80个字符，默认值为70
+  (setq-default fill-column 80)
 
-;; 设置大文件阈值为100MB，默认10MB
-(setq large-file-warning-threshold 100000000)
+  ;; 设置大文件阈值为100MB，默认10MB
+  (setq large-file-warning-threshold 100000000)
 
-;; 以16进制显示字节数
-(setq display-raw-bytes-as-hex t)
-;; 有输入时禁止 `fontification' 相关的函数钩子，能让滚动更顺滑
-(setq redisplay-skip-fontification-on-input t)
+  ;; 以16进制显示字节数
+  (setq display-raw-bytes-as-hex t)
+  ;; 有输入时禁止 `fontification' 相关的函数钩子，能让滚动更顺滑
+  (setq redisplay-skip-fontification-on-input t)
 
-;; 禁止响铃
-(setq ring-bell-function 'ignore)
+  ;; 禁止响铃
+  (setq ring-bell-function 'ignore)
 
-;; 禁止闪烁光标
-(blink-cursor-mode -1)
+  ;; 禁止闪烁光标
+  (blink-cursor-mode -1)
 
-;; 在光标处而非鼠标所在位置粘贴
-(setq mouse-yank-at-point t)
+  ;; 在光标处而非鼠标所在位置粘贴
+  (setq mouse-yank-at-point t)
 
-;; 拷贝粘贴设置
-(setq select-enable-primary nil)        ; 选择文字时不拷贝
-(setq select-enable-clipboard t)        ; 拷贝时使用剪贴板
+  ;; 拷贝粘贴设置
+  (setq select-enable-primary nil)        ; 选择文字时不拷贝
+  (setq select-enable-clipboard t)        ; 拷贝时使用剪贴板
 
-;; 鼠标滚动设置
-(setq scroll-step 2)
-(setq scroll-margin 2)
-(setq hscroll-step 2)
-(setq hscroll-margin 2)
-(setq scroll-conservatively 101)
-(setq scroll-up-aggressively 0.01)
-(setq scroll-down-aggressively 0.01)
-(setq scroll-preserve-screen-position 'always)
+  ;; 鼠标滚动设置
+  (setq scroll-step 2)
+  (setq scroll-margin 2)
+  (setq hscroll-step 2)
+  (setq hscroll-margin 2)
+  (setq scroll-conservatively 101)
+  (setq scroll-up-aggressively 0.01)
+  (setq scroll-down-aggressively 0.01)
+  (setq scroll-preserve-screen-position 'always)
 
-;; 对于高的行禁止自动垂直滚动
-(setq auto-window-vscroll nil)
+  ;; 对于高的行禁止自动垂直滚动
+  (setq auto-window-vscroll nil)
 
-;; 设置新分屏打开的位置的阈值
-(setq split-width-threshold (assoc-default 'width default-frame-alist))
-(setq split-height-threshold nil)
+  ;; 设置新分屏打开的位置的阈值
+  (setq split-width-threshold (assoc-default 'width default-frame-alist))
+  (setq split-height-threshold nil)
 
-;; TAB键设置，在Emacs里不使用TAB键，所有的TAB默认为4个空格
-(setq-default indent-tabs-mode nil)
-(setq-default tab-width 4)
+  ;; TAB键设置，在Emacs里不使用TAB键，所有的TAB默认为4个空格
+  (setq-default indent-tabs-mode nil)
+  (setq-default tab-width 4)
 
-;; yes或no提示设置，通过下面这个函数设置当缓冲区名字匹配到预设的字符串时自动回答yes
-(setq original-y-or-n-p 'y-or-n-p)
-(defalias 'original-y-or-n-p (symbol-function 'y-or-n-p))
-(defun default-yes-sometimes (prompt)
-  "automatically say y when buffer name match following string"
-  (if (or
-	   (string-match "has a running process" prompt)
-	   (string-match "does not exist; create" prompt)
-	   (string-match "modified; kill anyway" prompt)
-	   (string-match "Delete buffer using" prompt)
-	   (string-match "Kill buffer of" prompt)
-	   (string-match "still connected.  Kill it?" prompt)
-	   (string-match "Shutdown the client's kernel" prompt)
-	   (string-match "kill them and exit anyway" prompt)
-	   (string-match "Revert buffer from file" prompt)
-	   (string-match "Kill Dired buffer of" prompt)
-	   (string-match "delete buffer using" prompt)
-       (string-match "Kill all pass entry" prompt)
-       (string-match "for all cursors" prompt)
-	   (string-match "Do you want edit the entry" prompt))
-	  t
-    (original-y-or-n-p prompt)))
-(defalias 'yes-or-no-p 'default-yes-sometimes)
-(defalias 'y-or-n-p 'default-yes-sometimes)
+  ;; yes或no提示设置，通过下面这个函数设置当缓冲区名字匹配到预设的字符串时自动回答yes
+  (setq original-y-or-n-p 'y-or-n-p)
+  (defalias 'original-y-or-n-p (symbol-function 'y-or-n-p))
+  (defun default-yes-sometimes (prompt)
+    "automatically say y when buffer name match following string"
+    (if (or
+         (string-match "has a running process" prompt)
+         (string-match "does not exist; create" prompt)
+         (string-match "modified; kill anyway" prompt)
+         (string-match "Delete buffer using" prompt)
+         (string-match "Kill buffer of" prompt)
+         (string-match "still connected.  Kill it?" prompt)
+         (string-match "Shutdown the client's kernel" prompt)
+         (string-match "kill them and exit anyway" prompt)
+         (string-match "Revert buffer from file" prompt)
+         (string-match "Kill Dired buffer of" prompt)
+         (string-match "delete buffer using" prompt)
+         (string-match "Kill all pass entry" prompt)
+         (string-match "for all cursors" prompt)
+         (string-match "Do you want edit the entry" prompt))
+        t
+      (original-y-or-n-p prompt)))
+  (defalias 'yes-or-no-p 'default-yes-sometimes)
+  (defalias 'y-or-n-p 'default-yes-sometimes)
 
-;; 设置剪贴板历史长度300，默认为60
-(setq kill-ring-max 200)
+  ;; 设置剪贴板历史长度300，默认为60
+  (setq kill-ring-max 200)
 
-;; 在剪贴板里不存储重复内容
-(setq kill-do-not-save-duplicates t)
+  ;; 在剪贴板里不存储重复内容
+  (setq kill-do-not-save-duplicates t)
 
-;; 设置位置记录长度为6，默认为16
-;; 可以使用 `counsel-mark-ring' or `consult-mark' (C-x j) 来访问光标位置记录
-;; 使用 C-x C-SPC 执行 `pop-global-mark' 直接跳转到上一个全局位置处
-;; 使用 C-u C-SPC 跳转到本地位置处
-(setq mark-ring-max 6)
-(setq global-mark-ring-max 6)
+  ;; 设置位置记录长度为6，默认为16
+  ;; 可以使用 `counsel-mark-ring' or `consult-mark' (C-x j) 来访问光标位置记录
+  ;; 使用 C-x C-SPC 执行 `pop-global-mark' 直接跳转到上一个全局位置处
+  ;; 使用 C-u C-SPC 跳转到本地位置处
+  (setq mark-ring-max 6)
+  (setq global-mark-ring-max 6)
 
-;; 设置 emacs-lisp 的限制
-(setq max-lisp-eval-depth 10000)        ; 默认值为 800
-(setq max-specpdl-size 10000)           ; 默认值为 1600
+  ;; 设置 emacs-lisp 的限制
+  (setq max-lisp-eval-depth 10000)        ; 默认值为 800
+  (setq max-specpdl-size 10000)           ; 默认值为 1600
 
-;; 启用 `list-timers', `list-threads' 这两个命令
-(put 'list-timers 'disabled nil)
-(put 'list-threads 'disabled nil)
+  ;; 启用 `list-timers', `list-threads' 这两个命令
+  (put 'list-timers 'disabled nil)
+  (put 'list-threads 'disabled nil)
 
-;; 在命令行里支持鼠标
-(xterm-mouse-mode 1)
+  ;; 在命令行里支持鼠标
+  (xterm-mouse-mode 1)
 
-;; 退出Emacs时进行确认
-(setq confirm-kill-emacs 'y-or-n-p)
+  ;; 退出Emacs时进行确认
+  (setq confirm-kill-emacs 'y-or-n-p)
 
-;; 在模式栏上显示当前光标的列号
-(column-number-mode t)
+  ;; 开启Emacs的视觉换行模式
+  (visual-line-mode 1)
 
-;; 行号设置
-;;; 开启行号后便于使用 M-g M-g 跳转到指定行
-(global-linum-mode t)
-;;; linum-mode与pdf-view不兼容，在pdf-tools启用时禁用linum-mode
-(add-hook 'pdf-tools-enabled-hook (lambda () (linum-mode -1)))
-;;; highlight current line
-(global-hl-line-mode t)
+  ;; 在模式栏上显示当前光标的列号
+  (column-number-mode t)
+
+  ;; 开启行号后便于使用 M-g M-g 跳转到指定行
+  (global-display-line-numbers-mode t)
+  ;; Disable line numbers for some modes
+  (dolist (mode '(org-mode-hook
+                  term-mode-hook
+                  eshell-mode-hook
+                  pdf-view-mode-hook
+                  eww-mode-hook))
+    (add-hook mode (lambda () (display-line-numbers-mode 0))))
+  ;;; highlight current line
+  (global-hl-line-mode t)
 #+end_src
 
 ** 编码设置
@@ -547,6 +563,10 @@ CONDITION
 ;;; Commentary:
 
 ;;; Code:
+#+END_SRC
+** 关闭警告
+#+BEGIN_SRC emacs-lisp
+(setq warning-minimum-level :error)
 #+END_SRC
 ** no-littering让配置目录变简洁
 #+BEGIN_SRC emacs-lisp
@@ -1898,28 +1918,6 @@ This function makes sure that dates are aligned for easy reading."
                    (eq old-tick (buffer-chars-modified-tick)))
           (ignore-errors (yas-next-field))))))
 #+END_SRC
-** vertico
-#+BEGIN_SRC emacs-lisp
-(defun my/minibuffer-backward-kill (arg)
-  "When minibuffer is completing a file name delete up to parent
-folder, otherwise delete a word"
-  (interactive "p")
-  (if minibuffer-completing-file-name
-      ;; Borrowed from https://github.com/raxod502/selectrum/issues/498#issuecomment-803283608
-      (if (string-match-p "/." (minibuffer-contents))
-          (zap-up-to-char (- arg) ?/)
-        (delete-minibuffer-contents))
-    (delete-word (- arg))))
-
-(use-package vertico
-  :defer 1
-  :custom
-  (verticle-cycle t)
-  :config
-  (vertico-mode)
-  :bind (:map minibuffer-local-map
-              ("M-h" .  my/minibuffer-backward-kill)))
-#+END_SRC
 ** marginalia
 + marginalia 插件给迷你缓冲区的补全候选条目添加一些提示。
 #+BEGIN_SRC emacs-lisp
@@ -2261,41 +2259,18 @@ folder, otherwise delete a word"
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 (require 'cdlatex)
 #+END_SRC
-** TeX 基础配置
+** LaTeX 模式设置
 #+BEGIN_SRC emacs-lisp
-;; tex
-;; @source https://github.com/jwiegley/use-package/issues/379#issuecomment-246161500
-(use-package tex
-  :defer t
-  :ensure auctex
-  :config
-  (setq TeX-auto-save t))
-;; 编译时问询主文件名称
-(setq-default TeX-master nil)
-;; 对新文件自动解析(usepackage, bibliograph, newtheorem等信息)
-(setq TeX-parse-selt t)
-;; PDF正向搜索相关设置
-(setq TeX-PDF-mode t)
-(setq TeX-source-correlate-mode t)
-(setq TeX-source-correlate-method 'synctex)
-;; 使用pdf-tools打开PDF
-(setq TeX-view-program-selection '((output-pdf "PDF Tools")))
-;; 完成编译后刷新PDF文件
-(add-hook 'TeX-after-compilation-finished-functions
-	  #'TeX-revert-document-buffer)
 ;; 打开TeX文件时应执行的命令
 (defun my-latex-hook ()
-  (turn-on-cdlatex) ;; 加载cdlatex
-  (turn-on-reftex) ;; 加载reftex
-  (prettify-symbols-mode t) ;; 加载prettify-symbols-mode
-  (outline-minor-mode) ;; 加载outline-mode
-  (outline-hide-body)) ;; 打开文件时只显示章节标题
-(add-hook 'LaTeX-mode-hook 'my-latex-hook)
-;; prettify
-;; 保证 Unicode 数学符号可以正确显示
-(set-fontset-font "fontset-default" 'mathematical "Cambria Math")
-;; 自动展开光标附近的宏命令
-(setq prettify-symbols-unprettify-at-point t)
+  (turn-on-cdlatex)          ;; 加载cdlatex
+  (turn-on-reftex)           ;; 加载reftex
+  (prettify-symbols-mode t)  ;; 加载prettify-symbols-mode
+  (outline-minor-mode)       ;; 加载outline-mode
+  (outline-hide-body))       ;; 打开文件时只显示章节标题
+#+END_SRC
+** Prettify
+#+BEGIN_SRC emacs-lisp
 ;; customize prettify
 ;; https://en.wikipedia.org/wiki/Mathematical_operators_and_symbols_in_Unicode
 ;; 可加入原列表中没有的编码、简化常用命令
@@ -2322,13 +2297,38 @@ folder, otherwise delete a word"
           ("\\Fc" . #x2131)
           ("\\Nc" . #x1D4A9))))
 (my/more-prettified-symbols) ;; 读入自定义 prettify 符号
+
+(setq prettify-symbols-unprettify-at-point t)  ;; 自动展开光标附近的宏命令
 #+END_SRC
-** XeLaTeX 支持
+** TeX 基础配置
 #+BEGIN_SRC emacs-lisp
-(add-hook 'LaTeX-mode-hook (lambda()
+;; tex
+;; @source https://github.com/jwiegley/use-package/issues/379#issuecomment-246161500
+(use-package tex
+  :defer t
+  :ensure auctex
+  :custom
+  ;; 对新文件自动解析 (usepackage, bibliograph, newtheorem) 等信息
+  (TeX-parse-selt t)
+  (TeX-PDF-mode t)
+  ;; 正向与反向搜索设置
+  (TeX-source-correlate-mode t)
+  (TeX-source-correlate-method 'synctex)
+  ;; 使用pdf-tools打开PDF
+  (TeX-view-program-selection '((output-pdf "PDF Tools")))
+  :config
+  (setq TeX-auto-save t)
+  ;; 编译时问询主文件名称
+  (setq-default TeX-master t)                               
+  ;; 编译后更新pdf文件
+  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+  ;; 加载LaTeX模式设置
+  (add-hook 'LaTeX-mode-hook 'my-latex-hook)
+  ;; XeLaTeX 支持
+  (add-hook 'LaTeX-mode-hook (lambda()
   (add-to-list 'TeX-command-list '("XeLaTeX" "%`xelatex%(mode)%' %t" TeX-run-TeX nil t))
   (setq TeX-save-query  nil )
-  (setq TeX-show-compilation t)))
+  (setq TeX-show-compilation t))))
 #+END_SRC
 ** pdf-tools PDF阅读器
 #+BEGIN_SRC emacs-lisp
@@ -2340,28 +2340,30 @@ folder, otherwise delete a word"
 ;;;; pacman -S mingw-w64-x86_64-texlive-full
 ;;;; pacman -S mingw-w64-x86_64-emacs-pdf-toool-s-server
 ;;;; add E:\Scoop\apps\msys2\current\mingw64\bin to environment variable
-(pdf-tools-install)
-(define-key pdf-view-mode-map
-  "d" 'pdf-view-next-page-command) ;; 向后翻页
-(define-key pdf-view-mode-map
-  "a" 'pdf-view-previous-page-command) ;; 向前翻页
-(define-key pdf-view-mode-map
-  "s" 'pdf-view-scroll-up-or-next-page) ;; 向下滑动
-(define-key pdf-view-mode-map
-  "w" 'pdf-view-scroll-down-or-previous-page) ;;向上滑动
-(require 'pdf-annot)
-(define-key pdf-annot-minor-mode-map (kbd "C-a a") 'pdf-annot-add-highlight-markup-annotation) ;; highlight
-(define-key pdf-annot-minor-mode-map (kbd "C-a s") 'pdf-annot-add-squiggly-markup-annotation) ;; squiggly
-(define-key pdf-annot-minor-mode-map (kbd "C-a u") 'pdf-annot-add-underline-markup-annotation) ;; underline
-(define-key pdf-annot-minor-mode-map (kbd "C-a d") 'pdf-annot-delete) ;; delete
-;; 禁用 =pdf-tools= 有关文件的本地化编译
-(setq native-comp-deferred-compilation-deny-list '(".*pdf.*"))
-;; 夜间模式设置绿色底色
-(setq pdf-view-midnight-colors '("#000000" . "#9bCD9b"))
-;; 默认夜间模式
-(add-hook 'pdf-view-mode-hook 'pdf-view-midnight-minor-mode)
-;; 打开PDF时自动缩放
-(add-hook 'pdf-view-mode-hook 'pdf-view-fit-width-to-window)
+(use-package pdf-tools
+  :mode ("\\.pdf\\'" . pdf-view-mode)                           ;; pdf 文件默认打开方式
+  :bind
+  (:map pdf-view-mode-map
+        ("d" . pdf-view-next-page-command)                      ;; 向后翻页
+        ("a" . pdf-view-previous-page-command)                  ;; 向前翻页
+        ("s" . pdf-view-scroll-up-or-next-page)                 ;; 向下滑动
+        ("w" . pdf-view-scroll-down-or-previous-page)           ;; 向上滑动
+   :map pdf-history-minor-mode-map
+        ("b" . pdf-history-backward)
+   :map pdf-annot-minor-mode-map
+        ("C-a a" . pdf-annot-add-highlight-markup-annotation)
+        ("C-a s" . pdf-annot-add-squiggly-markup-annotation)
+        ("C-a u" . pdf-annot-add-underline-markup-annotation)
+        ("C-a d" . pdf-annot-delete))
+  :custom
+  (pdf-view-midnight-colors '("#000000" . "#9bCD9b"))           ;; 夜间模式设置绿色底色
+  (native-comp-deferred-compilation-deny-list '(".*pdf.*"))     ;; 禁用 =pdf-tools= 有关文件的本地编译
+  :config
+  (require 'pdf-annot)                                          ;; 设置 pdf-annot-minor-mode-map
+  (require 'pdf-history)                                        ;; 设置 pdf-history-minor-mode-map
+  (add-hook 'pdf-view-mode-hook 'pdf-view-midnight-minor-mode)  ;; 默认夜间模式
+  (add-hook 'pdf-view-mode-hook 'pdf-view-fit-width-to-window)  ;; 打开PDF时自动缩放
+  (pdf-tools-install))
 #+END_SRC
 ** org-download
 #+BEGIN_SRC emacs-lisp
@@ -2384,6 +2386,7 @@ folder, otherwise delete a word"
 #+BEGIN_SRC emacs-lisp
 (use-package org-noter
   :ensure t
+  :defer t
   :custom
   (org-noter-notes-search-path '("~/org/notes/")) ;; 默认笔记路径。设置后从pdf文件中使用=org-noter=命令，会自动在该墓中寻找与文件同名的=.org=笔记文件
   (org-noter-auto-save-last-location t) ;; 自动保存上次阅读位置
@@ -2431,7 +2434,7 @@ folder, otherwise delete a word"
 ;; eaf-rss-reader
 ;;; 一些优质RSS订阅源
 ;;; https://manateelazycat.github.io/feed.xml          ;; manateeLazyCat
-;;; https://superlioon.com/feed/                       ;; 即凉
+;;; https://superliooon.com/feed/                      ;; 即凉
 ;;; http://blindwith.science/index.xml                 ;; Blind with Science
 ;;; https://remacs.cc/index.xml                        ;; remacs的世界
 ;;; https://www.bmpi.dev/index.xml                     ;; BMPI

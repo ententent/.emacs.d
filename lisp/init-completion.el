@@ -25,26 +25,6 @@
                    (eq old-tick (buffer-chars-modified-tick)))
           (ignore-errors (yas-next-field))))))
 
-(defun my/minibuffer-backward-kill (arg)
-  "When minibuffer is completing a file name delete up to parent
-folder, otherwise delete a word"
-  (interactive "p")
-  (if minibuffer-completing-file-name
-      ;; Borrowed from https://github.com/raxod502/selectrum/issues/498#issuecomment-803283608
-      (if (string-match-p "/." (minibuffer-contents))
-          (zap-up-to-char (- arg) ?/)
-        (delete-minibuffer-contents))
-    (delete-word (- arg))))
-
-(use-package vertico
-  :defer 1
-  :custom
-  (verticle-cycle t)
-  :config
-  (vertico-mode)
-  :bind (:map minibuffer-local-map
-              ("M-h" .  my/minibuffer-backward-kill)))
-
 ;; minibuffer helpful annotations
 (use-package marginalia
   :ensure t

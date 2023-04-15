@@ -3,6 +3,8 @@
 
 ;;; Code:
 
+(setq warning-minimum-level :error)
+
 (use-package no-littering
   :ensure t)
 

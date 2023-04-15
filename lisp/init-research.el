@@ -6,39 +6,14 @@
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 (require 'cdlatex)
 
-;; tex
-;; @source https://github.com/jwiegley/use-package/issues/379#issuecomment-246161500
-(use-package tex
-  :defer t
-  :ensure auctex
-  :config
-  (setq TeX-auto-save t))
-;; 编译时问询主文件名称
-(setq-default TeX-master nil)
-;; 对新文件自动解析(usepackage, bibliograph, newtheorem等信息)
-(setq TeX-parse-selt t)
-;; PDF正向搜索相关设置
-(setq TeX-PDF-mode t)
-(setq TeX-source-correlate-mode t)
-(setq TeX-source-correlate-method 'synctex)
-;; 使用pdf-tools打开PDF
-(setq TeX-view-program-selection '((output-pdf "PDF Tools")))
-;; 完成编译后刷新PDF文件
-(add-hook 'TeX-after-compilation-finished-functions
-	  #'TeX-revert-document-buffer)
 ;; 打开TeX文件时应执行的命令
 (defun my-latex-hook ()
-  (turn-on-cdlatex) ;; 加载cdlatex
-  (turn-on-reftex) ;; 加载reftex
-  (prettify-symbols-mode t) ;; 加载prettify-symbols-mode
-  (outline-minor-mode) ;; 加载outline-mode
-  (outline-hide-body)) ;; 打开文件时只显示章节标题
-(add-hook 'LaTeX-mode-hook 'my-latex-hook)
-;; prettify
-;; 保证 Unicode 数学符号可以正确显示
-(set-fontset-font "fontset-default" 'mathematical "Cambria Math")
-;; 自动展开光标附近的宏命令
-(setq prettify-symbols-unprettify-at-point t)
+  (turn-on-cdlatex)          ;; 加载cdlatex
+  (turn-on-reftex)           ;; 加载reftex
+  (prettify-symbols-mode t)  ;; 加载prettify-symbols-mode
+  (outline-minor-mode)       ;; 加载outline-mode
+  (outline-hide-body))       ;; 打开文件时只显示章节标题
+
 ;; customize prettify
 ;; https://en.wikipedia.org/wiki/Mathematical_operators_and_symbols_in_Unicode
 ;; 可加入原列表中没有的编码、简化常用命令
@@ -66,10 +41,35 @@
           ("\\Nc" . #x1D4A9))))
 (my/more-prettified-symbols) ;; 读入自定义 prettify 符号
 
-(add-hook 'LaTeX-mode-hook (lambda()
+(setq prettify-symbols-unprettify-at-point t)  ;; 自动展开光标附近的宏命令
+
+;; tex
+;; @source https://github.com/jwiegley/use-package/issues/379#issuecomment-246161500
+(use-package tex
+  :defer t
+  :ensure auctex
+  :custom
+  ;; 对新文件自动解析 (usepackage, bibliograph, newtheorem) 等信息
+  (TeX-parse-selt t)
+  (TeX-PDF-mode t)
+  ;; 正向与反向搜索设置
+  (TeX-source-correlate-mode t)
+  (TeX-source-correlate-method 'synctex)
+  ;; 使用pdf-tools打开PDF
+  (TeX-view-program-selection '((output-pdf "PDF Tools")))
+  :config
+  (setq TeX-auto-save t)
+  ;; 编译时问询主文件名称
+  (setq-default TeX-master t)                               
+  ;; 编译后更新pdf文件
+  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+  ;; 加载LaTeX模式设置
+  (add-hook 'LaTeX-mode-hook 'my-latex-hook)
+  ;; XeLaTeX 支持
+  (add-hook 'LaTeX-mode-hook (lambda()
   (add-to-list 'TeX-command-list '("XeLaTeX" "%`xelatex%(mode)%' %t" TeX-run-TeX nil t))
   (setq TeX-save-query  nil )
-  (setq TeX-show-compilation t)))
+  (setq TeX-show-compilation t))))
 
 ;; pdf-tools
 ;;; Windows Installation
@@ -79,28 +79,30 @@
 ;;;; pacman -S mingw-w64-x86_64-texlive-full
 ;;;; pacman -S mingw-w64-x86_64-emacs-pdf-toool-s-server
 ;;;; add E:\Scoop\apps\msys2\current\mingw64\bin to environment variable
-(pdf-tools-install)
-(define-key pdf-view-mode-map
-  "d" 'pdf-view-next-page-command) ;; 向后翻页
-(define-key pdf-view-mode-map
-  "a" 'pdf-view-previous-page-command) ;; 向前翻页
-(define-key pdf-view-mode-map
-  "s" 'pdf-view-scroll-up-or-next-page) ;; 向下滑动
-(define-key pdf-view-mode-map
-  "w" 'pdf-view-scroll-down-or-previous-page) ;;向上滑动
-(require 'pdf-annot)
-(define-key pdf-annot-minor-mode-map (kbd "C-a a") 'pdf-annot-add-highlight-markup-annotation) ;; highlight
-(define-key pdf-annot-minor-mode-map (kbd "C-a s") 'pdf-annot-add-squiggly-markup-annotation) ;; squiggly
-(define-key pdf-annot-minor-mode-map (kbd "C-a u") 'pdf-annot-add-underline-markup-annotation) ;; underline
-(define-key pdf-annot-minor-mode-map (kbd "C-a d") 'pdf-annot-delete) ;; delete
-;; 禁用 =pdf-tools= 有关文件的本地化编译
-(setq native-comp-deferred-compilation-deny-list '(".*pdf.*"))
-;; 夜间模式设置绿色底色
-(setq pdf-view-midnight-colors '("#000000" . "#9bCD9b"))
-;; 默认夜间模式
-(add-hook 'pdf-view-mode-hook 'pdf-view-midnight-minor-mode)
-;; 打开PDF时自动缩放
-(add-hook 'pdf-view-mode-hook 'pdf-view-fit-width-to-window)
+(use-package pdf-tools
+  :mode ("\\.pdf\\'" . pdf-view-mode)                           ;; pdf 文件默认打开方式
+  :bind
+  (:map pdf-view-mode-map
+        ("d" . pdf-view-next-page-command)                      ;; 向后翻页
+        ("a" . pdf-view-previous-page-command)                  ;; 向前翻页
+        ("s" . pdf-view-scroll-up-or-next-page)                 ;; 向下滑动
+        ("w" . pdf-view-scroll-down-or-previous-page)           ;; 向上滑动
+   :map pdf-history-minor-mode-map
+        ("b" . pdf-history-backward)
+   :map pdf-annot-minor-mode-map
+        ("C-a a" . pdf-annot-add-highlight-markup-annotation)
+        ("C-a s" . pdf-annot-add-squiggly-markup-annotation)
+        ("C-a u" . pdf-annot-add-underline-markup-annotation)
+        ("C-a d" . pdf-annot-delete))
+  :custom
+  (pdf-view-midnight-colors '("#000000" . "#9bCD9b"))           ;; 夜间模式设置绿色底色
+  (native-comp-deferred-compilation-deny-list '(".*pdf.*"))     ;; 禁用 =pdf-tools= 有关文件的本地编译
+  :config
+  (require 'pdf-annot)                                          ;; 设置 pdf-annot-minor-mode-map
+  (require 'pdf-history)                                        ;; 设置 pdf-history-minor-mode-map
+  (add-hook 'pdf-view-mode-hook 'pdf-view-midnight-minor-mode)  ;; 默认夜间模式
+  (add-hook 'pdf-view-mode-hook 'pdf-view-fit-width-to-window)  ;; 打开PDF时自动缩放
+  (pdf-tools-install))
 
 ;; 对于Windows系统，需要安装ImageMagick，并保证magick.exe在PATH变量的路径中
 ;;; 用msys2安装: pacman -S mingw-w64-x86_64-imagemagick
@@ -119,6 +121,7 @@
 
 (use-package org-noter
   :ensure t
+  :defer t
   :custom
   (org-noter-notes-search-path '("~/org/notes/")) ;; 默认笔记路径。设置后从pdf文件中使用=org-noter=命令，会自动在该墓中寻找与文件同名的=.org=笔记文件
   (org-noter-auto-save-last-location t) ;; 自动保存上次阅读位置
