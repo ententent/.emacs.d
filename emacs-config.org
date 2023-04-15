@@ -2004,24 +2004,24 @@ folder, otherwise delete a word"
 #+END_SRC
 ** emacs-rime
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path "~/.emacs.d/emacs-rime/")
-(require 'rime)
+;; (add-to-list 'load-path "~/.emacs.d/emacs-rime/")
+;; (require 'rime)
 
-;; 雾凇拼音
-;;; https://emacs-china.org/t/emacs-rime/24125
-;;; https://github.com/iDvel/rime-ice
+;; ;; 雾凇拼音
+;; ;;; https://emacs-china.org/t/emacs-rime/24125
+;; ;;; https://github.com/iDvel/rime-ice
 
-;;; Code:
-(setq rime-user-data-dir "~/.local/share/fcitx5/rime")
+;; ;;; Code:
+;; (setq rime-user-data-dir "~/.local/share/fcitx5/rime")
 
-(setq rime-posframe-properties
-      (list :background-color "#333333"
-            :foreground-color "#dcdccc"
-            :font "WenQuanYi Micro Hei Mono-14"
-            :internal-border-width 10))
+;; (setq rime-posframe-properties
+;;       (list :background-color "#333333"
+;;             :foreground-color "#dcdccc"
+;;             :font "WenQuanYi Micro Hei Mono-14"
+;;             :internal-border-width 10))
 
-(setq default-input-method "rime"
-      rime-show-candidate 'posframe)
+;; (setq default-input-method "rime"
+;;       rime-show-candidate 'posframe)
 #+END_SRC
 ** fanyi 在线词典
 #+BEGIN_SRC emacs-lisp
@@ -2413,7 +2413,7 @@ folder, otherwise delete a word"
 
 ;;; Code:
 #+END_SRC
-** eaf Core
+** emacs-application-framework
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-application-framework/")
 (require 'eaf)
@@ -2421,67 +2421,51 @@ folder, otherwise delete a word"
 (setq eaf-proxy-type "http")
 (setq eaf-proxy-host "127.0.0.1")
 (setq eaf-proxy-port "7890")
-#+END_SRC
-** eaf-browser
-#+BEGIN_SRC emacs-lisp
+
+;; eaf-browser
 (require 'eaf-browser)
 (setq eaf-browser-continue-where-left-off t)
 (setq eaf-browser-enable-adblocker t)
 (setq browse-url-browser-function 'eaf-open-browser)
-#+END_SRC
-** eaf-rss-reader
-#+BEGIN_SRC emacs-lisp
+
+;; eaf-rss-reader
+;;; 一些优质RSS订阅源
+;;; https://manateelazycat.github.io/feed.xml          ;; manateeLazyCat
+;;; https://superlioon.com/feed/                       ;; 即凉
+;;; http://blindwith.science/index.xml                 ;; Blind with Science
+;;; https://remacs.cc/index.xml                        ;; remacs的世界
+;;; https://www.bmpi.dev/index.xml                     ;; BMPI
+;;; http://feeds.feedburner.com/ruanyifeng             ;; Ruan YiFeng
+;;; https://emacstalk.codeberg.page/podcast/index.xml  ;; EmacsTalk
+;;; https://arxiv.org/rss/cs.CV                        ;; ArXiv CV
+;;; https://sachachua.com/blog/feed/                   ;; Sacha Chua
+;;; https://byvoid.com/zhs/feed.xml                    ;; byvoid
+;;; https://www.skyue.com/feed                         ;; skyue
 (require 'eaf-rss-reader)
-;; 一些优质RSS订阅源
-;; https://manateelazycat.github.io/feed.xml          ;; manateeLazyCat
-;; https://superlioon.com/feed/                       ;; 即凉
-;; http://blindwith.science/index.xml                 ;; Blind with Science
-;; https://remacs.cc/index.xml                        ;; remacs的世界
-;; https://www.bmpi.dev/index.xml                     ;; BMPI
-;; http://feeds.feedburner.com/ruanyifeng             ;; Ruan YiFeng
-;; https://emacstalk.codeberg.page/podcast/index.xml  ;; EmacsTalk
-;; https://arxiv.org/rss/cs.CV                        ;; ArXiv CV
-;; https://sachachua.com/blog/feed/                   ;; Sacha Chua
-#+END_SRC
-** eaf-git
-#+BEGIN_SRC emacs-lisp
+
+;; eaf-git
 (require 'eaf-git)
-#+END_SRC
-** eaf-terminal
-#+BEGIN_SRC emacs-lisp
-(require 'eaf-terminal)
-#+END_SRC
-** eaf-system-monitor
-#+BEGIN_SRC emacs-lisp
-(require 'eaf-system-monitor)
-#+END_SRC
-** eaf-file-manager
-#+BEGIN_SRC emacs-lisp
-(require 'eaf-file-manager)
-#+END_SRC
-** eaf-markdown-previewer
-#+BEGIN_SRC emacs-lisp
-(require 'eaf-markdown-previewer)
-#+END_SRC
-** eaf-org-previewer
-#+BEGIN_SRC emacs-lisp
-(require 'eaf-org-previewer)
-#+END_SRC
-** eaf-pdf-viewer
-#+BEGIN_SRC emacs-lisp
-;; (require 'eaf-pdf-viewer)
-#+END_SRC
-** eaf-image-viewer
-#+BEGIN_SRC emacs-lisp
+;; eaf-pdf-viewer
+(require 'eaf-pdf-viewer)
+;; eaf-image-viewer
 (require 'eaf-image-viewer)
-#+END_SRC
-** eaf-music-player
-#+BEGIN_SRC emacs-lisp
-(require 'eaf-music-player)
-#+END_SRC
-** eaf-video-player
-#+BEGIN_SRC emacs-lisp
+;; eaf-video-player
 (require 'eaf-video-player)
+;; eaf-music-player
+(require 'eaf-music-player)
+
+; 下列应用在Windows平台未通过编译, 在Manjaro平台编译成功
+
+;; eaf-terminal
+(require 'eaf-terminal)
+;; eaf-file-manager
+(require 'eaf-file-manager)
+;; eaf-system-monitor
+(require 'eaf-system-monitor)
+;; eaf-markdown-previewer
+(require 'eaf-markdown-previewer)
+;; eaf-org-previewer
+(require 'eaf-org-previewer)
 #+END_SRC
 ** init-eaf.el 文件尾
 #+BEGIN_SRC emacs-lisp
