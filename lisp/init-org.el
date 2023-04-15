@@ -32,34 +32,35 @@
     (add-hook 'org-mode-hook (lambda () (setq truncate-lines nil)))
     ;; ================================
     ;; 在org mode里美化字符串
+    ;; https://symbl.cc/cn/
     ;; ================================
     (defun my/org-prettify-symbols ()
       (setq prettify-symbols-alist
             (mapcan (lambda (x) (list x (cons (upcase (car x)) (cdr x))))
                     '(
-                      ;; ("[ ]"              . 9744)         ; ☐
-                      ;; ("[X]"              . 9745)         ; ☑
-                      ;; ("[-]"              . 8863)         ; ⊟
+                      ("[ ]"              . 9744)         ; ☐
+                      ("[X]"              . 9745)         ; ☑
+                      ("[-]"              . 8863)         ; ⊟
                       ("#+begin_src"      . 9998)         ; ✎
                       ("#+end_src"        . 9633)         ; □
-                      ("#+begin_example"  . 129083)       ; 🠻
-                      ("#+end_example"    . 129081)       ; 🠹
+                      ("#+begin_example"  . 20363)        ; 例
+                      ("#+end_example"    . 20363)        ; 例
                       ("#+results:"       . 9776)         ; ☰
-                      ("#+attr_latex:"    . "🄛")
-                      ("#+attr_html:"     . "🄗")
-                      ("#+attr_org:"      . "🄞")
-                      ("#+name:"          . "🄝")         ; 127261
-                      ("#+caption:"       . "🄒")         ; 127250
-					  ("#+date:"          . "📅")         ; 128197
-					  ("#+author:"        . "💁")         ; 128100
+                      ("#+attr_latex:"    . 127259)       ; 🄛
+                      ("#+attr_html:"     . 127255)       ; 🄗
+                      ("#+attr_org:"      . 127262)       ; 🄞
+                      ("#+name:"          . 127261)       ; 🄝
+                      ("#+caption:"       . 127250)       ; 🄒
+					  ("#+date:"          . 128197)       ; 📅
+					  ("#+author:"        . 128214)       ; 📖
 					  ("#+setupfile:"     . 128221)       ; 📝
-					  ("#+email:"         . 128231)       ; 📧📧
+					  ("#+email:"         . 128231)       ; 📧
                       ("#+startup:"       . 10034)        ; ✲
-                      ("#+options:"       . 9965)         ; ⛭
-                      ("#+title:"         . 10162)        ; ➲
-                      ("#+subtitle:"      . 11146)        ; ⮊
+                      ("#+options:"       . 9881)         ; ⚙
+                      ("#+title:"         . 39064)        ; 题
+                      ("#+subtitle:"      . 21103)        ; 副
                       ("#+downloaded:"    . 8650)         ; ⇊
-                      ("#+language:"      . 128441)       ; 🖹
+                      ("#+language:"      . 25991)        ; 文
                       ("#+begin_quote"    . 187)          ; »
                       ("#+end_quote"      . 171)          ; «
                       ("#+begin_results"  . 8943)         ; ⋯

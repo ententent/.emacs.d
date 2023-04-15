@@ -12,29 +12,44 @@
   (load-theme 'doom-peacock t)
   (doom-themes-treemacs-config))
 
-(use-package cnfonts
-  :ensure t
-  :after all-the-icons
-  :hook (cnfonts-set-font-finish
-         . (lambda (fontsizes-list)
-             (set-fontset-font t 'unicode (font-spec :family "Noto Color Emoji") nil 'append)
-             (set-fontset-font t 'unicode (font-spec :family "Sarasa Term SC Nerd") nil 'append)
-             (set-fontset-font t 'unicode (font-spec :family "Noto Emoji") nil 'append)
-             (set-fontset-font t 'unicode (font-spec :family "all-the-icons") nil 'append)
-             (set-fontset-font t 'unicode (font-spec :family "file-icons") nil 'append)
-             (set-fontset-font t 'unicode (font-spec :family "Material Icons") nil 'append)
-             (set-fontset-font t 'unicode (font-spec :family "github-octicons") nil 'append)
-             (set-fontset-font t 'unicode (font-spec :family "FontAwesome") nil 'append)
-             (set-fontset-font t 'unicode (font-spec :family "Weather Icons") nil 'append)))
+;; (use-package cnfonts
+;;   :ensure t
+;;   :after all-the-icons
+;;   :hook (cnfonts-set-font-finish
+;;          . (lambda (fontsizes-list)
+;;              (set-fontset-font t 'unicode (font-spec :family "Noto Color Emoji") nil 'append)
+;;              (set-fontset-font t 'unicode (font-spec :family "Sarasa Term SC Nerd") nil 'append)
+;;              (set-fontset-font t 'unicode (font-spec :family "Noto Emoji") nil 'append)
+;;              (set-fontset-font t 'unicode (font-spec :family "all-the-icons") nil 'append)
+;;              (set-fontset-font t 'unicode (font-spec :family "file-icons") nil 'append)
+;;              (set-fontset-font t 'unicode (font-spec :family "Material Icons") nil 'append)
+;;              (set-fontset-font t 'unicode (font-spec :family "github-octicons") nil 'append)
+;;              (set-fontset-font t 'unicode (font-spec :family "FontAwesome") nil 'append)
+;;              (set-fontset-font t 'unicode (font-spec :family "Weather Icons") nil 'append)))
 
-  :custom
-  (cnfonts-personal-fontnames '(("PragmataPro Mono Liga" "Go Mono" "Fira Code" "Ubuntu Mono")
+;;   :custom
+;;   (cnfonts-personal-fontnames '(("Fira Mono" "JetBrains Mono" "Ubuntu Mono")
+;;                                 ("霞鹜文楷" "微软雅黑")
+;;                                 ("Simsun-ExtB" "方正聚珍新仿简繁" "PragmataPro Mono Liga")
+;;                                 ("Noto Emoji" "Sarasa Term SC Nerd" "Segoe UI Emoji" "Segoe UI Symbol" "Segoe Print")))
+;;   :config
+;;   (cnfonts-enable))
 
-                                ("M 盈黑 PRC W5" "方正聚珍新仿简繁" "苹方 常规" "微软雅黑" "苹方 中等" "M 盈黑 PRC W4" "PragmataPro Mono Liga")
-                                ("Simsun-ExtB" "方正聚珍新仿简繁" "PragmataPro Mono Liga")
-                                ("Noto Emoji" "Sarasa Term SC Nerd" "Segoe UI Emoji" "Segoe UI Symbol" "PragmataPro Mono Liga")))
-  :config
-  (cnfonts-enable))
+;; 默认字体和字号 @ https://fonts.google.com/specimen/Fira+Mono
+;;; sudo mv * /usr/share/fonts/TTF
+;;; sudo fc-cache -f -v
+(set-face-attribute 'default nil :font "Fira Mono" :height 160)
+;; 中文默认字体 @ https://mrswolf.github.io/my-manjaro-log/
+(set-fontset-font "fontset-default" 'han "Kaiti")
+;;;(set-fontset-font t 'han (font-spec :family "霞鹜文楷" :weight 'bold))
+;; 数学符号默认字体 @ https://wiki.archlinuxcn.org/zh-hans/%E5%BE%AE%E8%BD%AF%E5%AD%97%E4%BD%93
+(set-fontset-font "fontset-default" 'mathematical "Cambria Math")
+;; 汉字间距显示问题
+(setq inhibit-compacting-font-caches t)
+;; 固定间距字体 @ https://www.jetbrains.com/lp/mono/
+(set-face-attribute 'fixed-pitch nil :font "JetBrains Mono"  :height 150)
+;; 可变间距字体
+(set-face-attribute 'variable-pitch nil :font "Segoe UI Emoji" :height 160 :weight 'regular)
 
 ;; 禁用一些GUI特性
 (setq use-dialog-box nil)               ; 鼠标操作不使用对话框
@@ -159,6 +174,22 @@
 (add-hook 'pdf-tools-enabled-hook (lambda () (linum-mode -1)))
 ;;; highlight current line
 (global-hl-line-mode t)
+
+;; 配置所有的编码为UTF-8，参考：
+;; https://thraxys.wordpress.com/2016/01/13/utf-8-in-emacs-everywhere-forever/
+(setq locale-coding-system 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-selection-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-language-environment 'utf-8)
+(set-clipboard-coding-system 'utf-8)
+(set-file-name-coding-system 'utf-8)
+(set-buffer-file-coding-system 'utf-8)
+(prefer-coding-system 'utf-8)
+(modify-coding-system-alist 'process "*" 'utf-8)
+(when (display-graphic-p)
+  (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
 
 (use-package doom-modeline
   :ensure t

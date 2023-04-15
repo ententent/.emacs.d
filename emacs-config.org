@@ -58,10 +58,10 @@
 ;;; Code:
 #+END_SRC
 ** package 包管理配置
-
 ** package包管理配置
 #+begin_src emacs-lisp
 (require 'package)
+(setq package-check-signature nil)
 (setq package-archives
 	  '(("gnu"          . "http://1.15.88.122/gnu/")
 	    ("melpa"        . "http://1.15.88.122/melpa/")
@@ -147,46 +147,52 @@
   (load-theme 'doom-peacock t)
   (doom-themes-treemacs-config))
 #+END_SRC
-** cn-fonts 中文字体配置
-*** tumashu 开发的 [[https://github.com/tumashu/cnfonts][cnfonts]] 方便实现中英文字体等宽对齐
+** 字体配置
+*** cn-fonts
+- tumashu 开发的 [[https://github.com/tumashu/cnfonts][cnfonts]] 方便实现中英文字体等宽对齐
 #+BEGIN_SRC emacs-lisp
-(use-package cnfonts
-  :ensure t
-  :after all-the-icons
-  :hook (cnfonts-set-font-finish
-         . (lambda (fontsizes-list)
-             (set-fontset-font t 'unicode (font-spec :family "Noto Color Emoji") nil 'append)
-             (set-fontset-font t 'unicode (font-spec :family "Sarasa Term SC Nerd") nil 'append)
-             (set-fontset-font t 'unicode (font-spec :family "Noto Emoji") nil 'append)
-             (set-fontset-font t 'unicode (font-spec :family "all-the-icons") nil 'append)
-             (set-fontset-font t 'unicode (font-spec :family "file-icons") nil 'append)
-             (set-fontset-font t 'unicode (font-spec :family "Material Icons") nil 'append)
-             (set-fontset-font t 'unicode (font-spec :family "github-octicons") nil 'append)
-             (set-fontset-font t 'unicode (font-spec :family "FontAwesome") nil 'append)
-             (set-fontset-font t 'unicode (font-spec :family "Weather Icons") nil 'append)))
+;; (use-package cnfonts
+;;   :ensure t
+;;   :after all-the-icons
+;;   :hook (cnfonts-set-font-finish
+;;          . (lambda (fontsizes-list)
+;;              (set-fontset-font t 'unicode (font-spec :family "Noto Color Emoji") nil 'append)
+;;              (set-fontset-font t 'unicode (font-spec :family "Sarasa Term SC Nerd") nil 'append)
+;;              (set-fontset-font t 'unicode (font-spec :family "Noto Emoji") nil 'append)
+;;              (set-fontset-font t 'unicode (font-spec :family "all-the-icons") nil 'append)
+;;              (set-fontset-font t 'unicode (font-spec :family "file-icons") nil 'append)
+;;              (set-fontset-font t 'unicode (font-spec :family "Material Icons") nil 'append)
+;;              (set-fontset-font t 'unicode (font-spec :family "github-octicons") nil 'append)
+;;              (set-fontset-font t 'unicode (font-spec :family "FontAwesome") nil 'append)
+;;              (set-fontset-font t 'unicode (font-spec :family "Weather Icons") nil 'append)))
 
-  :custom
-  (cnfonts-personal-fontnames '(("PragmataPro Mono Liga" "Go Mono" "Fira Code" "Ubuntu Mono")
-
-                                ("M 盈黑 PRC W5" "方正聚珍新仿简繁" "苹方 常规" "微软雅黑" "苹方 中等" "M 盈黑 PRC W4" "PragmataPro Mono Liga")
-                                ("Simsun-ExtB" "方正聚珍新仿简繁" "PragmataPro Mono Liga")
-                                ("Noto Emoji" "Sarasa Term SC Nerd" "Segoe UI Emoji" "Segoe UI Symbol" "PragmataPro Mono Liga")))
-  :config
-  (cnfonts-enable))
+;;   :custom
+;;   (cnfonts-personal-fontnames '(("Fira Mono" "JetBrains Mono" "Ubuntu Mono")
+;;                                 ("霞鹜文楷" "微软雅黑")
+;;                                 ("Simsun-ExtB" "方正聚珍新仿简繁" "PragmataPro Mono Liga")
+;;                                 ("Noto Emoji" "Sarasa Term SC Nerd" "Segoe UI Emoji" "Segoe UI Symbol" "Segoe Print")))
+;;   :config
+;;   (cnfonts-enable))
 #+END_SRC
 *** 金色飞贼小米的配置
-# #+BEGIN_SRC emacs-lisp
-# (if (eq system-type 'windows-nt)
-#     (progn
-#       (set-face-attribute 'default nil :font "Fira Mono" :height 160) ;; 默认字体及字号. Fira Mono 需要另行安装
-#       (set-fontset-font "fontset-default" 'han "Kaiti") ;; 中文默认字体
-#       (set-fontset-font "fontset-default" 'mathematical "Cambria Math") ;; 数学符号默认字体
-#       ))
-# (setq inhibit-compacting-font-caches t) ;; 汉字显示问题
-# ;; 可变间距字体
-# (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono"  :height 150) ;; 固定间距字体. JetBrains Mono 需要另行安装
-# (set-face-attribute 'variable-pitch nil :font "Segoe Print" :height 160 :weight 'regular) ;; 可变间距字体
-# #+END_SRC
+- 参考链接[[https://emacs-china.org/t/emacs/22193][为emacs正确配置英文、中文、符号字体的正确方式？]]
+#+BEGIN_SRC emacs-lisp
+;; 默认字体和字号 @ https://fonts.google.com/specimen/Fira+Mono
+;;; sudo mv * /usr/share/fonts/TTF
+;;; sudo fc-cache -f -v
+(set-face-attribute 'default nil :font "Fira Mono" :height 160)
+;; 中文默认字体 @ https://mrswolf.github.io/my-manjaro-log/
+(set-fontset-font "fontset-default" 'han "Kaiti")
+;;;(set-fontset-font t 'han (font-spec :family "霞鹜文楷" :weight 'bold))
+;; 数学符号默认字体 @ https://wiki.archlinuxcn.org/zh-hans/%E5%BE%AE%E8%BD%AF%E5%AD%97%E4%BD%93
+(set-fontset-font "fontset-default" 'mathematical "Cambria Math")
+;; 汉字间距显示问题
+(setq inhibit-compacting-font-caches t)
+;; 固定间距字体 @ https://www.jetbrains.com/lp/mono/
+(set-face-attribute 'fixed-pitch nil :font "JetBrains Mono"  :height 150)
+;; 可变间距字体
+(set-face-attribute 'variable-pitch nil :font "Segoe UI Emoji" :height 160 :weight 'regular)
+#+END_SRC
 ** 其他UI零散设置项
 #+begin_src emacs-lisp
 ;; 禁用一些GUI特性
@@ -314,6 +320,28 @@
 (global-hl-line-mode t)
 #+end_src
 
+** 编码设置
+- Windows所使用的编码方式与Manjaro不同，导致中文字体无法正确显示
+  - =M-x revert-buffer-with-coding-system RET gbk=
+  - =M-x set-buffer-file-coding-system RET utf-8=
+- 统一使用UTF-8编码
+#+BEGIN_SRC emacs-lisp
+;; 配置所有的编码为UTF-8，参考：
+;; https://thraxys.wordpress.com/2016/01/13/utf-8-in-emacs-everywhere-forever/
+(setq locale-coding-system 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-selection-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-language-environment 'utf-8)
+(set-clipboard-coding-system 'utf-8)
+(set-file-name-coding-system 'utf-8)
+(set-buffer-file-coding-system 'utf-8)
+(prefer-coding-system 'utf-8)
+(modify-coding-system-alist 'process "*" 'utf-8)
+(when (display-graphic-p)
+  (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
+#+END_SRC
 ** 模式栏设置
 *** doom-modeline插件
 + [[https://github.com/seagle0128/doom-modeline][doom-modeline]] 是一个模式栏美化插件。
@@ -586,7 +614,8 @@ CONDITION
                      "/TAGS\\'"
                      "COMMIT_EDITMSG\\'")))
 #+END_SRC
-** undo-tree撤销设置
+** undo-tree
+- 撤销设置
 #+BEGIN_SRC emacs-lisp
 (use-package undo-tree
   :ensure t
@@ -932,34 +961,35 @@ Version 2019-11-04"
     (add-hook 'org-mode-hook (lambda () (setq truncate-lines nil)))
     ;; ================================
     ;; 在org mode里美化字符串
+    ;; https://symbl.cc/cn/
     ;; ================================
     (defun my/org-prettify-symbols ()
       (setq prettify-symbols-alist
             (mapcan (lambda (x) (list x (cons (upcase (car x)) (cdr x))))
                     '(
-                      ;; ("[ ]"              . 9744)         ; ☐
-                      ;; ("[X]"              . 9745)         ; ☑
-                      ;; ("[-]"              . 8863)         ; ⊟
+                      ("[ ]"              . 9744)         ; ☐
+                      ("[X]"              . 9745)         ; ☑
+                      ("[-]"              . 8863)         ; ⊟
                       ("#+begin_src"      . 9998)         ; ✎
                       ("#+end_src"        . 9633)         ; □
-                      ("#+begin_example"  . 129083)       ; 🠻
-                      ("#+end_example"    . 129081)       ; 🠹
+                      ("#+begin_example"  . 20363)        ; 例
+                      ("#+end_example"    . 20363)        ; 例
                       ("#+results:"       . 9776)         ; ☰
-                      ("#+attr_latex:"    . "🄛")
-                      ("#+attr_html:"     . "🄗")
-                      ("#+attr_org:"      . "🄞")
-                      ("#+name:"          . "🄝")         ; 127261
-                      ("#+caption:"       . "🄒")         ; 127250
-					  ("#+date:"          . "📅")         ; 128197
-					  ("#+author:"        . "💁")         ; 128100
+                      ("#+attr_latex:"    . 127259)       ; 🄛
+                      ("#+attr_html:"     . 127255)       ; 🄗
+                      ("#+attr_org:"      . 127262)       ; 🄞
+                      ("#+name:"          . 127261)       ; 🄝
+                      ("#+caption:"       . 127250)       ; 🄒
+					  ("#+date:"          . 128197)       ; 📅
+					  ("#+author:"        . 128214)       ; 📖
 					  ("#+setupfile:"     . 128221)       ; 📝
-					  ("#+email:"         . 128231)       ; 📧📧
+					  ("#+email:"         . 128231)       ; 📧
                       ("#+startup:"       . 10034)        ; ✲
-                      ("#+options:"       . 9965)         ; ⛭
-                      ("#+title:"         . 10162)        ; ➲
-                      ("#+subtitle:"      . 11146)        ; ⮊
+                      ("#+options:"       . 9881)         ; ⚙
+                      ("#+title:"         . 39064)        ; 题
+                      ("#+subtitle:"      . 21103)        ; 副
                       ("#+downloaded:"    . 8650)         ; ⇊
-                      ("#+language:"      . 128441)       ; 🖹
+                      ("#+language:"      . 25991)        ; 文
                       ("#+begin_quote"    . 187)          ; »
                       ("#+end_quote"      . 171)          ; «
                       ("#+begin_results"  . 8943)         ; ⋯
@@ -1330,7 +1360,7 @@ Version 2019-11-04"
   )
 #+END_SRC
 ** Org-src
-代码块基础设置
+- 代码块基础设置
 #+BEGIN_SRC emacs-lisp
 (use-package org-src
   :ensure nil
@@ -1940,7 +1970,6 @@ folder, otherwise delete a word"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init-completion.el ends here
 #+END_SRC
-
 * init-tools.el
 :PROPERTIES:
 :HEADER-ARGS: :tangle lisp/init-tools.el :mkdirp yes
@@ -1972,6 +2001,27 @@ folder, otherwise delete a word"
 (use-package which-key
   :ensure t
   :init (which-key-mode))
+#+END_SRC
+** emacs-rime
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path "~/.emacs.d/emacs-rime/")
+(require 'rime)
+
+;; 雾凇拼音
+;;; https://emacs-china.org/t/emacs-rime/24125
+;;; https://github.com/iDvel/rime-ice
+
+;;; Code:
+(setq rime-user-data-dir "~/.local/share/fcitx5/rime")
+
+(setq rime-posframe-properties
+      (list :background-color "#333333"
+            :foreground-color "#dcdccc"
+            :font "WenQuanYi Micro Hei Mono-14"
+            :internal-border-width 10))
+
+(setq default-input-method "rime"
+      rime-show-candidate 'posframe)
 #+END_SRC
 ** fanyi 在线词典
 #+BEGIN_SRC emacs-lisp
@@ -2059,8 +2109,8 @@ folder, otherwise delete a word"
 ;; On Windows, after downloading the fonts, one needs to manually install them
 ;; M-x package-install RET all-the-icons
 ;; restart-emacs, M-x all-the-icons-install-fonts
-(when (display-graphic-p)
-  (require 'all-the-icons))
+(use-package all-the-icons
+  :if (display-graphic-p))
 
 ;; depend on all-the-icons
 (use-package treemacs
@@ -2379,22 +2429,59 @@ folder, otherwise delete a word"
 (setq eaf-browser-enable-adblocker t)
 (setq browse-url-browser-function 'eaf-open-browser)
 #+END_SRC
-** eaf-pdf-reader
-#+BEGIN_SRC emacs-lisp
-;; (require 'eaf-pdf-viewer)
-#+END_SRC
 ** eaf-rss-reader
 #+BEGIN_SRC emacs-lisp
 (require 'eaf-rss-reader)
 ;; 一些优质RSS订阅源
+;; https://manateelazycat.github.io/feed.xml          ;; manateeLazyCat
+;; https://superlioon.com/feed/                       ;; 即凉
 ;; http://blindwith.science/index.xml                 ;; Blind with Science
 ;; https://remacs.cc/index.xml                        ;; remacs的世界
-;; https://manateelazycat.github.io/feed.xml          ;; manateeLazyCat
+;; https://www.bmpi.dev/index.xml                     ;; BMPI
 ;; http://feeds.feedburner.com/ruanyifeng             ;; Ruan YiFeng
 ;; https://emacstalk.codeberg.page/podcast/index.xml  ;; EmacsTalk
 ;; https://arxiv.org/rss/cs.CV                        ;; ArXiv CV
-;; https://superlioon.com/feed/                       ;; 即凉
 ;; https://sachachua.com/blog/feed/                   ;; Sacha Chua
+#+END_SRC
+** eaf-git
+#+BEGIN_SRC emacs-lisp
+(require 'eaf-git)
+#+END_SRC
+** eaf-terminal
+#+BEGIN_SRC emacs-lisp
+(require 'eaf-terminal)
+#+END_SRC
+** eaf-system-monitor
+#+BEGIN_SRC emacs-lisp
+(require 'eaf-system-monitor)
+#+END_SRC
+** eaf-file-manager
+#+BEGIN_SRC emacs-lisp
+(require 'eaf-file-manager)
+#+END_SRC
+** eaf-markdown-previewer
+#+BEGIN_SRC emacs-lisp
+(require 'eaf-markdown-previewer)
+#+END_SRC
+** eaf-org-previewer
+#+BEGIN_SRC emacs-lisp
+(require 'eaf-org-previewer)
+#+END_SRC
+** eaf-pdf-viewer
+#+BEGIN_SRC emacs-lisp
+;; (require 'eaf-pdf-viewer)
+#+END_SRC
+** eaf-image-viewer
+#+BEGIN_SRC emacs-lisp
+(require 'eaf-image-viewer)
+#+END_SRC
+** eaf-music-player
+#+BEGIN_SRC emacs-lisp
+(require 'eaf-music-player)
+#+END_SRC
+** eaf-video-player
+#+BEGIN_SRC emacs-lisp
+(require 'eaf-video-player)
 #+END_SRC
 ** init-eaf.el 文件尾
 #+BEGIN_SRC emacs-lisp

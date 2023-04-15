@@ -4,6 +4,7 @@
 ;;; Code:
 
 (require 'package)
+(setq package-check-signature nil)
 (setq package-archives
 	  '(("gnu"          . "http://1.15.88.122/gnu/")
 	    ("melpa"        . "http://1.15.88.122/melpa/")

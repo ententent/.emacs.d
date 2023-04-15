@@ -20,8 +20,8 @@
 ;; On Windows, after downloading the fonts, one needs to manually install them
 ;; M-x package-install RET all-the-icons
 ;; restart-emacs, M-x all-the-icons-install-fonts
-(when (display-graphic-p)
-  (require 'all-the-icons))
+(use-package all-the-icons
+  :if (display-graphic-p))
 
 ;; depend on all-the-icons
 (use-package treemacs
