@@ -20,3 +20,6 @@ tramp
 transient/
 url/
 var/
+var/savehist.el
+var/save-place.el
+var/recentf-save.el
