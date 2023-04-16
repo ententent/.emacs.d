@@ -200,7 +200,7 @@
 ;; 固定间距字体 @ https://www.jetbrains.com/lp/mono/
 (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono"  :height 150)
 ;; 可变间距字体
-(set-face-attribute 'variable-pitch nil :font "Segoe UI Emoji" :height 160 :weight 'regular)
+;; (set-face-attribute 'variable-pitch nil :font "Segoe UI Emoji" :height 160 :weight 'regular)
 #+END_SRC
 ** 其他UI零散设置项
 #+begin_src emacs-lisp
@@ -676,7 +676,7 @@ CONDITION
   (defalias 'rename-file-and-buffer #'crux-rename-file-and-buffer))
 #+END_SRC
 ** ivy增强
-+ 参考 [[https://zhuanlan.zhihu.com/p/441612281][专业Emacs入门（五）：插件篇——功能优化类]]
+- 参考 [[https://zhuanlan.zhihu.com/p/441612281][专业 Emacs 入门（五）：插件篇——功能优化类]]
 #+BEGIN_SRC emacs-lisp
 (use-package counsel
   :ensure t)
@@ -1918,6 +1918,15 @@ This function makes sure that dates are aligned for easy reading."
                    (eq old-tick (buffer-chars-modified-tick)))
           (ignore-errors (yas-next-field))))))
 #+END_SRC
+** orderless
+#+BEGIN_SRC emacs-lisp
+(use-package orderless
+  :defer 1
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-defaults nil)
+  (completion-category-overrides '((file (styles partial-completion)))))
+#+END_SRC
 ** marginalia
 + marginalia 插件给迷你缓冲区的补全候选条目添加一些提示。
 #+BEGIN_SRC emacs-lisp
@@ -1927,15 +1936,6 @@ This function makes sure that dates are aligned for easy reading."
   :hook (after-init . marginalia-mode)
   :custom
   (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil)))
-#+END_SRC
-** orderless
-#+BEGIN_SRC emacs-lisp
-(use-package orderless
-  :defer 1
-  :custom
-  (completion-styles '(orderless basic))
-  (completion-category-defaults nil)
-  (completion-category-overrides '((file (styles partial-completion)))))
 #+END_SRC
 ** all-the-icons-completion
 + 借助 [[https://github.com/iyefrat/all-the-icons-completion][all-the-icons-completion]] 插件为迷你缓冲区的补全系统添加美观图标
@@ -2107,6 +2107,9 @@ This function makes sure that dates are aligned for easy reading."
 ;; On Windows, after downloading the fonts, one needs to manually install them
 ;; M-x package-install RET all-the-icons
 ;; restart-emacs, M-x all-the-icons-install-fonts
+;; (setq url-proxy-services
+;;       '(("http" . "127.0.0.1:7890")
+;;         ("https" . "127.0.0.1:7890")))
 (use-package all-the-icons
   :if (display-graphic-p))
 
@@ -2254,83 +2257,36 @@ This function makes sure that dates are aligned for easy reading."
 
 ;;; Code:
 #+END_SRC
-** 加载 cdLaTeX
+** org-roam
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path "~/.emacs.d/lisp/")
-(require 'cdlatex)
-#+END_SRC
-** LaTeX 模式设置
-#+BEGIN_SRC emacs-lisp
-;; 打开TeX文件时应执行的命令
-(defun my-latex-hook ()
-  (turn-on-cdlatex)          ;; 加载cdlatex
-  (turn-on-reftex)           ;; 加载reftex
-  (prettify-symbols-mode t)  ;; 加载prettify-symbols-mode
-  (outline-minor-mode)       ;; 加载outline-mode
-  (outline-hide-body))       ;; 打开文件时只显示章节标题
-#+END_SRC
-** Prettify
-#+BEGIN_SRC emacs-lisp
-;; customize prettify
-;; https://en.wikipedia.org/wiki/Mathematical_operators_and_symbols_in_Unicode
-;; 可加入原列表中没有的编码、简化常用命令
-(require 'tex-mode) ;; 载入 tex--prettify-symbols-alist 变量
-(defun my/more-prettified-symbols ()
-  (mapc (lambda (pair) (delete pair tex--prettify-symbols-alist))
-        '(("\\supset" . 8835)))
-  (mapc (lambda (pair) (cl-pushnew pair tex--prettify-symbols-alist))
-        '(("\\Z" . 8484)
-          ("\\Q" . 8474)
-          ("\\N" . 8469)
-          ("\\R" . 8477)
-          ("\\eps" . 949)
-          ("\\inf" . #x22C0) 
-          ("\\sup". #x22C1)
-          ("\\ONE" . #x1D7D9)
-          ("\\mathbb{S}" . #x1D54A)
-          ("\\PP" . #x2119)
-          ("\\Ps" . #x1D5AF )
-          ("\\Pp" . #x1D40F)
-          ("\\E" . #x1D5A4)
-          ("\\Ee" . #x1D404)
-          ("\\EE" . #x1D53C )
-          ("\\Fc" . #x2131)
-          ("\\Nc" . #x1D4A9))))
-(my/more-prettified-symbols) ;; 读入自定义 prettify 符号
-
-(setq prettify-symbols-unprettify-at-point t)  ;; 自动展开光标附近的宏命令
-#+END_SRC
-** TeX 基础配置
-#+BEGIN_SRC emacs-lisp
-;; tex
-;; @source https://github.com/jwiegley/use-package/issues/379#issuecomment-246161500
-(use-package tex
-  :defer t
-  :ensure auctex
+;; 卡片笔记法的 org-roam 实践
+(use-package org-roam
+  :ensure t
   :custom
-  ;; 对新文件自动解析 (usepackage, bibliograph, newtheorem) 等信息
-  (TeX-parse-selt t)
-  (TeX-PDF-mode t)
-  ;; 正向与反向搜索设置
-  (TeX-source-correlate-mode t)
-  (TeX-source-correlate-method 'synctex)
-  ;; 使用pdf-tools打开PDF
-  (TeX-view-program-selection '((output-pdf "PDF Tools")))
+  (org-roam-directory "~/org/roam-notes/")         ;; 默认笔记目录
+  (org-roam-dailies-directory "daily/")            ;; 默认日记目录，默认笔记目录的相对路径
+  (org-roam-db-gc-threshold most-positive-fixnum)  ;; 提升性能
+  :bind (("C-c n f" . org-roam-node-find)          ;; 通过关键字查找笔记并跳转
+         ("C-c n i" . org-roam-node-insert)        ;; 插入一条笔记的链接或创建一条笔记
+         ("C-c n c" . org-roam-capture)            ;; 根据预设模板创建 org 格式的笔记
+         ("C-c n l" . org-roam-buffer-toggle)      ;; 显示后链窗口
+         ("C-c n u" . org-roam-ui-mode))           ;; 浏览器中可视化
+  :bind-keymap
+  ("C-c n d" . org-roam-dailies-map)               ;; 日记菜单
   :config
-  (setq TeX-auto-save t)
-  ;; 编译时问询主文件名称
-  (setq-default TeX-master t)                               
-  ;; 编译后更新pdf文件
-  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
-  ;; 加载LaTeX模式设置
-  (add-hook 'LaTeX-mode-hook 'my-latex-hook)
-  ;; XeLaTeX 支持
-  (add-hook 'LaTeX-mode-hook (lambda()
-  (add-to-list 'TeX-command-list '("XeLaTeX" "%`xelatex%(mode)%' %t" TeX-run-TeX nil t))
-  (setq TeX-save-query  nil )
-  (setq TeX-show-compilation t))))
+  (require 'org-roam-dailies)                      ;; 启用日记功能
+  (org-roam-db-autosync-mode))                     ;; 启动时自动同步数据库
+
+(use-package org-roam-ui
+  :ensure t
+  :after org-roam
+  :custom
+  (org-roam-ui-sync-theme t)                       ;; 同步 Emacs 主题
+  (org-roam-ui-follow t)                           ;; 笔记节点跟随
+  (org-roam-ui-update-on-save t))
 #+END_SRC
-** pdf-tools PDF阅读器
+** org-noter
+*** pdf-tools
 #+BEGIN_SRC emacs-lisp
 ;; pdf-tools
 ;;; Windows Installation
@@ -2365,7 +2321,24 @@ This function makes sure that dates are aligned for easy reading."
   (add-hook 'pdf-view-mode-hook 'pdf-view-fit-width-to-window)  ;; 打开PDF时自动缩放
   (pdf-tools-install))
 #+END_SRC
-** org-download
+*** org-noter
+#+BEGIN_SRC emacs-lisp
+(use-package org-noter
+  :ensure t
+  :defer t
+  :custom
+  (org-noter-notes-search-path '("~/org/notes/")) ;; 默认笔记路径。设置后从pdf文件中使用=org-noter=命令，会自动在该墓中寻找与文件同名的=.org=笔记文件
+  (org-noter-auto-save-last-location t) ;; 自动保存上次阅读位置
+  (org-noter-max-short-selected-text-length 20) ;; 修改长/短文本标准，默认为80
+  (org-noter-default-heading-title "第 $p$ 页的笔记") ;; 默认短标题格式
+  (org-noter-highlight-selected-text t) ;; 选中文字后插入笔记自动高亮
+  :bind
+  (("C-c n n" . org-noter) ;; 与org-roam配合，打开org-noter的快捷键
+   :map org-noter-doc-mode-map ;; 加入左手键位
+   ("e" . org-noter-insert-note)
+   ("M-e" . org-noter-insert-precise-note)))
+#+END_SRC
+*** org-download
 #+BEGIN_SRC emacs-lisp
 ;; 对于Windows系统，需要安装ImageMagick，并保证magick.exe在PATH变量的路径中
 ;;; 用msys2安装: pacman -S mingw-w64-x86_64-imagemagick
@@ -2382,22 +2355,80 @@ This function makes sure that dates are aligned for easy reading."
   ;; 用同级 ./img 目录放置截图文件
   (setq-default org-download-image-dir "./img"))
 #+END_SRC
-** org-noter
+*** LaTeX
+**** TeX Core
 #+BEGIN_SRC emacs-lisp
-(use-package org-noter
-  :ensure t
+;; 打开 TeX 文件时应执行的命令
+(defun my-latex-hook ()
+  (turn-on-cdlatex)          ;; 加载cdlatex
+  (turn-on-reftex)           ;; 加载reftex
+  (prettify-symbols-mode t)  ;; 加载prettify-symbols-mode
+  (outline-minor-mode)       ;; 加载outline-mode
+  (outline-hide-body))       ;; 打开文件时只显示章节标题
+
+;; tex
+;; @source https://github.com/jwiegley/use-package/issues/379#issuecomment-246161500
+(use-package tex
   :defer t
+  :ensure auctex
   :custom
-  (org-noter-notes-search-path '("~/org/notes/")) ;; 默认笔记路径。设置后从pdf文件中使用=org-noter=命令，会自动在该墓中寻找与文件同名的=.org=笔记文件
-  (org-noter-auto-save-last-location t) ;; 自动保存上次阅读位置
-  (org-noter-max-short-selected-text-length 20) ;; 修改长/短文本标准，默认为80
-  (org-noter-default-heading-title "第 $p$ 页的笔记") ;; 默认短标题格式
-  (org-noter-highlight-selected-text t) ;; 选中文字后插入笔记自动高亮
-  :bind
-  (("C-c n n" . org-noter) ;; 与org-roam配合，打开org-noter的快捷键
-   :map org-noter-doc-mode-map ;; 加入左手键位
-   ("e" . org-noter-insert-note)
-   ("M-e" . org-noter-insert-precise-note)))
+  ;; 对新文件自动解析 (usepackage, bibliograph, newtheorem) 等信息
+  (TeX-parse-selt t)
+  (TeX-PDF-mode t)
+  ;; 正向与反向搜索设置
+  (TeX-source-correlate-mode t)
+  (TeX-source-correlate-method 'synctex)
+  ;; 使用pdf-tools打开PDF
+  (TeX-view-program-selection '((output-pdf "PDF Tools")))
+  :config
+  (setq TeX-auto-save t)
+  ;; 编译时问询主文件名称
+  (setq-default TeX-master t)                               
+  ;; 编译后更新pdf文件
+  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+  ;; 加载LaTeX模式设置
+  (add-hook 'LaTeX-mode-hook 'my-latex-hook)
+  ;; XeLaTeX 支持
+  (add-hook 'LaTeX-mode-hook (lambda()
+  (add-to-list 'TeX-command-list '("XeLaTeX" "%`xelatex%(mode)%' %t" TeX-run-TeX nil t))
+  (setq TeX-save-query  nil )
+  (setq TeX-show-compilation t))))
+#+END_SRC
+**** cdLaTeX
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path "~/.emacs.d/lisp/")
+(require 'cdlatex)
+#+END_SRC
+**** Prettify
+#+BEGIN_SRC emacs-lisp
+;; customize prettify
+;; https://en.wikipedia.org/wiki/Mathematical_operators_and_symbols_in_Unicode
+;; 可加入原列表中没有的编码、简化常用命令
+(require 'tex-mode) ;; 载入 tex--prettify-symbols-alist 变量
+(defun my/more-prettified-symbols ()
+  (mapc (lambda (pair) (delete pair tex--prettify-symbols-alist))
+        '(("\\supset" . 8835)))
+  (mapc (lambda (pair) (cl-pushnew pair tex--prettify-symbols-alist))
+        '(("\\Z" . 8484)
+          ("\\Q" . 8474)
+          ("\\N" . 8469)
+          ("\\R" . 8477)
+          ("\\eps" . 949)
+          ("\\inf" . #x22C0) 
+          ("\\sup". #x22C1)
+          ("\\ONE" . #x1D7D9)
+          ("\\mathbb{S}" . #x1D54A)
+          ("\\PP" . #x2119)
+          ("\\Ps" . #x1D5AF )
+          ("\\Pp" . #x1D40F)
+          ("\\E" . #x1D5A4)
+          ("\\Ee" . #x1D404)
+          ("\\EE" . #x1D53C )
+          ("\\Fc" . #x2131)
+          ("\\Nc" . #x1D4A9))))
+(my/more-prettified-symbols) ;; 读入自定义 prettify 符号
+
+(setq prettify-symbols-unprettify-at-point t)  ;; 自动展开光标附近的宏命令
 #+END_SRC
 ** init-research.el 文件尾
 #+BEGIN_SRC emacs-lisp
@@ -2438,7 +2469,7 @@ This function makes sure that dates are aligned for easy reading."
 ;;; http://blindwith.science/index.xml                 ;; Blind with Science
 ;;; https://remacs.cc/index.xml                        ;; remacs的世界
 ;;; https://www.bmpi.dev/index.xml                     ;; BMPI
-;;; http://feeds.feedburner.com/ruanyifeng             ;; Ruan YiFeng
+;;; http://www.ruanyifeng.com/blog/atom.xml            ;; Ruan YiFeng
 ;;; https://emacstalk.codeberg.page/podcast/index.xml  ;; EmacsTalk
 ;;; https://arxiv.org/rss/cs.CV                        ;; ArXiv CV
 ;;; https://sachachua.com/blog/feed/                   ;; Sacha Chua
@@ -2456,8 +2487,6 @@ This function makes sure that dates are aligned for easy reading."
 (require 'eaf-video-player)
 ;; eaf-music-player
 (require 'eaf-music-player)
-
-; 下列应用在Windows平台未通过编译, 在Manjaro平台编译成功
 
 ;; eaf-terminal
 (require 'eaf-terminal)

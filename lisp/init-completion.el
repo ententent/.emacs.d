@@ -25,19 +25,19 @@
                    (eq old-tick (buffer-chars-modified-tick)))
           (ignore-errors (yas-next-field))))))
 
-;; minibuffer helpful annotations
-(use-package marginalia
-  :ensure t
-  :hook (after-init . marginalia-mode)
-  :custom
-  (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil)))
-
 (use-package orderless
   :defer 1
   :custom
   (completion-styles '(orderless basic))
   (completion-category-defaults nil)
   (completion-category-overrides '((file (styles partial-completion)))))
+
+;; minibuffer helpful annotations
+(use-package marginalia
+  :ensure t
+  :hook (after-init . marginalia-mode)
+  :custom
+  (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil)))
 
 (use-package all-the-icons-completion
   :ensure t

@@ -19,11 +19,11 @@
 ;; eaf-rss-reader
 ;;; 一些优质RSS订阅源
 ;;; https://manateelazycat.github.io/feed.xml          ;; manateeLazyCat
-;;; https://superlioon.com/feed/                       ;; 即凉
+;;; https://superliooon.com/feed/                      ;; 即凉
 ;;; http://blindwith.science/index.xml                 ;; Blind with Science
 ;;; https://remacs.cc/index.xml                        ;; remacs的世界
 ;;; https://www.bmpi.dev/index.xml                     ;; BMPI
-;;; http://feeds.feedburner.com/ruanyifeng             ;; Ruan YiFeng
+;;; http://www.ruanyifeng.com/blog/atom.xml            ;; Ruan YiFeng
 ;;; https://emacstalk.codeberg.page/podcast/index.xml  ;; EmacsTalk
 ;;; https://arxiv.org/rss/cs.CV                        ;; ArXiv CV
 ;;; https://sachachua.com/blog/feed/                   ;; Sacha Chua
@@ -41,8 +41,6 @@
 (require 'eaf-video-player)
 ;; eaf-music-player
 (require 'eaf-music-player)
-
-; 下列应用在Windows平台未通过编译, 在Manjaro平台编译成功
 
 ;; eaf-terminal
 (require 'eaf-terminal)

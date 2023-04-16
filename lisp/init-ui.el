@@ -50,7 +50,7 @@
 ;; 固定间距字体 @ https://www.jetbrains.com/lp/mono/
 (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono"  :height 150)
 ;; 可变间距字体
-(set-face-attribute 'variable-pitch nil :font "Segoe UI Emoji" :height 160 :weight 'regular)
+;; (set-face-attribute 'variable-pitch nil :font "Segoe UI Emoji" :height 160 :weight 'regular)
 
   ;; 禁用一些GUI特性
   (setq use-dialog-box nil)               ; 鼠标操作不使用对话框

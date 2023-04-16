@@ -1,14 +1,18 @@
 ;;; -*- coding: utf-8; mode: lisp-data -*-
-(("/home/mawen/.emacs.d/emacs-config.org" . 86469)
- ("/home/mawen/.emacs.d/mind-wave/mind_wave.py" . 982)
- ("/home/mawen/.zshrc" . 564)
- ("/home/mawen/.emacs.d/mind-wave/" . 546)
+(("/home/mawen/org/roam-notes/20230416164742-org_roam.org" . 276)
+ ("/home/mawen/.emacs.d/emacs-config.org" . 80004)
+ ("/home/mawen/org/roam-notes/20230416163915-emacs.org" . 194)
  ("/home/mawen/.emacs.d/var/treemacs/persist.org" . 73)
- ("/home/mawen/aioWriting/notes/computer/recipe/Emacs/LaTeX/LaTeX.org" . 1330)
- ("/home/mawen/org/recipe/breakfast.org" . 1064)
- ("/home/mawen/org/Beancount/txs/2023.bean" . 1863)
- ("/home/mawen/.emacs.d/emacs-rime/" . 989)
- ("/home/mawen/Documents/(MultiPath++) Efficient Information Fusion and Trajectory Aggregation for Behavior Prediction.org" . 224)
- ("/home/mawen/.emacs.d/elpa/pdf-tools-20230322.1541/pdf-tools-autoloads.el" . 20678)
- ("/home/mawen/.emacs.d/elpa/tablist-20230321.705/tablist-autoloads.el" . 1352)
- ("/home/mawen/.emacs.d/elpa/markdown-mode-20230326.954/markdown-mode-autoloads.el" . 1689))
+ ("/home/mawen/org/Beancount/accounts/Expenses.bean" . 701)
+ ("/home/mawen/org/notes/"
+  (dired-filename . "/home/mawen/org/notes/img"))
+ ("/home/mawen/org/"
+  (dired-filename . "/home/mawen/org/notes"))
+ ("/home/mawen/Videos/"
+  (dired-filename . "/home/mawen/Videos/【从零搭建Emacs个人知识库】什么是双链笔记与 org-roam 初体验.flv"))
+ ("/home/mawen/"
+  (dired-filename . "/home/mawen/Videos"))
+ ("/home/mawen/.emacs.d/mind-wave/mind_wave.py" . 991)
+ ("/home/mawen/.emacs.d/mind-wave/chatgpt_api_key.txt" . 52)
+ ("/home/mawen/.emacs.d/lisp/json.el" . 31364)
+ ("/home/mawen/.emacs.d/mind-wave/" . 546))

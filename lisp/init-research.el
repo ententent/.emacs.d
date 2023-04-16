@@ -3,73 +3,31 @@
 
 ;;; Code:
 
-(add-to-list 'load-path "~/.emacs.d/lisp/")
-(require 'cdlatex)
-
-;; 打开TeX文件时应执行的命令
-(defun my-latex-hook ()
-  (turn-on-cdlatex)          ;; 加载cdlatex
-  (turn-on-reftex)           ;; 加载reftex
-  (prettify-symbols-mode t)  ;; 加载prettify-symbols-mode
-  (outline-minor-mode)       ;; 加载outline-mode
-  (outline-hide-body))       ;; 打开文件时只显示章节标题
-
-;; customize prettify
-;; https://en.wikipedia.org/wiki/Mathematical_operators_and_symbols_in_Unicode
-;; 可加入原列表中没有的编码、简化常用命令
-(require 'tex-mode) ;; 载入 tex--prettify-symbols-alist 变量
-(defun my/more-prettified-symbols ()
-  (mapc (lambda (pair) (delete pair tex--prettify-symbols-alist))
-        '(("\\supset" . 8835)))
-  (mapc (lambda (pair) (cl-pushnew pair tex--prettify-symbols-alist))
-        '(("\\Z" . 8484)
-          ("\\Q" . 8474)
-          ("\\N" . 8469)
-          ("\\R" . 8477)
-          ("\\eps" . 949)
-          ("\\inf" . #x22C0) 
-          ("\\sup". #x22C1)
-          ("\\ONE" . #x1D7D9)
-          ("\\mathbb{S}" . #x1D54A)
-          ("\\PP" . #x2119)
-          ("\\Ps" . #x1D5AF )
-          ("\\Pp" . #x1D40F)
-          ("\\E" . #x1D5A4)
-          ("\\Ee" . #x1D404)
-          ("\\EE" . #x1D53C )
-          ("\\Fc" . #x2131)
-          ("\\Nc" . #x1D4A9))))
-(my/more-prettified-symbols) ;; 读入自定义 prettify 符号
-
-(setq prettify-symbols-unprettify-at-point t)  ;; 自动展开光标附近的宏命令
-
-;; tex
-;; @source https://github.com/jwiegley/use-package/issues/379#issuecomment-246161500
-(use-package tex
-  :defer t
-  :ensure auctex
+;; 卡片笔记法的 org-roam 实践
+(use-package org-roam
+  :ensure t
   :custom
-  ;; 对新文件自动解析 (usepackage, bibliograph, newtheorem) 等信息
-  (TeX-parse-selt t)
-  (TeX-PDF-mode t)
-  ;; 正向与反向搜索设置
-  (TeX-source-correlate-mode t)
-  (TeX-source-correlate-method 'synctex)
-  ;; 使用pdf-tools打开PDF
-  (TeX-view-program-selection '((output-pdf "PDF Tools")))
+  (org-roam-directory "~/org/roam-notes/")         ;; 默认笔记目录
+  (org-roam-dailies-directory "daily/")            ;; 默认日记目录，默认笔记目录的相对路径
+  (org-roam-db-gc-threshold most-positive-fixnum)  ;; 提升性能
+  :bind (("C-c n f" . org-roam-node-find)          ;; 通过关键字查找笔记并跳转
+         ("C-c n i" . org-roam-node-insert)        ;; 插入一条笔记的链接或创建一条笔记
+         ("C-c n c" . org-roam-capture)            ;; 根据预设模板创建 org 格式的笔记
+         ("C-c n l" . org-roam-buffer-toggle)      ;; 显示后链窗口
+         ("C-c n u" . org-roam-ui-mode))           ;; 浏览器中可视化
+  :bind-keymap
+  ("C-c n d" . org-roam-dailies-map)               ;; 日记菜单
   :config
-  (setq TeX-auto-save t)
-  ;; 编译时问询主文件名称
-  (setq-default TeX-master t)                               
-  ;; 编译后更新pdf文件
-  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
-  ;; 加载LaTeX模式设置
-  (add-hook 'LaTeX-mode-hook 'my-latex-hook)
-  ;; XeLaTeX 支持
-  (add-hook 'LaTeX-mode-hook (lambda()
-  (add-to-list 'TeX-command-list '("XeLaTeX" "%`xelatex%(mode)%' %t" TeX-run-TeX nil t))
-  (setq TeX-save-query  nil )
-  (setq TeX-show-compilation t))))
+  (require 'org-roam-dailies)                      ;; 启用日记功能
+  (org-roam-db-autosync-mode))                     ;; 启动时自动同步数据库
+
+(use-package org-roam-ui
+  :ensure t
+  :after org-roam
+  :custom
+  (org-roam-ui-sync-theme t)                       ;; 同步 Emacs 主题
+  (org-roam-ui-follow t)                           ;; 笔记节点跟随
+  (org-roam-ui-update-on-save t))
 
 ;; pdf-tools
 ;;; Windows Installation
@@ -104,6 +62,21 @@
   (add-hook 'pdf-view-mode-hook 'pdf-view-fit-width-to-window)  ;; 打开PDF时自动缩放
   (pdf-tools-install))
 
+(use-package org-noter
+  :ensure t
+  :defer t
+  :custom
+  (org-noter-notes-search-path '("~/org/notes/")) ;; 默认笔记路径。设置后从pdf文件中使用=org-noter=命令，会自动在该墓中寻找与文件同名的=.org=笔记文件
+  (org-noter-auto-save-last-location t) ;; 自动保存上次阅读位置
+  (org-noter-max-short-selected-text-length 20) ;; 修改长/短文本标准，默认为80
+  (org-noter-default-heading-title "第 $p$ 页的笔记") ;; 默认短标题格式
+  (org-noter-highlight-selected-text t) ;; 选中文字后插入笔记自动高亮
+  :bind
+  (("C-c n n" . org-noter) ;; 与org-roam配合，打开org-noter的快捷键
+   :map org-noter-doc-mode-map ;; 加入左手键位
+   ("e" . org-noter-insert-note)
+   ("M-e" . org-noter-insert-precise-note)))
+
 ;; 对于Windows系统，需要安装ImageMagick，并保证magick.exe在PATH变量的路径中
 ;;; 用msys2安装: pacman -S mingw-w64-x86_64-imagemagick
 (use-package org-download
@@ -119,20 +92,73 @@
   ;; 用同级 ./img 目录放置截图文件
   (setq-default org-download-image-dir "./img"))
 
-(use-package org-noter
-  :ensure t
+;; 打开 TeX 文件时应执行的命令
+(defun my-latex-hook ()
+  (turn-on-cdlatex)          ;; 加载cdlatex
+  (turn-on-reftex)           ;; 加载reftex
+  (prettify-symbols-mode t)  ;; 加载prettify-symbols-mode
+  (outline-minor-mode)       ;; 加载outline-mode
+  (outline-hide-body))       ;; 打开文件时只显示章节标题
+
+;; tex
+;; @source https://github.com/jwiegley/use-package/issues/379#issuecomment-246161500
+(use-package tex
   :defer t
+  :ensure auctex
   :custom
-  (org-noter-notes-search-path '("~/org/notes/")) ;; 默认笔记路径。设置后从pdf文件中使用=org-noter=命令，会自动在该墓中寻找与文件同名的=.org=笔记文件
-  (org-noter-auto-save-last-location t) ;; 自动保存上次阅读位置
-  (org-noter-max-short-selected-text-length 20) ;; 修改长/短文本标准，默认为80
-  (org-noter-default-heading-title "第 $p$ 页的笔记") ;; 默认短标题格式
-  (org-noter-highlight-selected-text t) ;; 选中文字后插入笔记自动高亮
-  :bind
-  (("C-c n n" . org-noter) ;; 与org-roam配合，打开org-noter的快捷键
-   :map org-noter-doc-mode-map ;; 加入左手键位
-   ("e" . org-noter-insert-note)
-   ("M-e" . org-noter-insert-precise-note)))
+  ;; 对新文件自动解析 (usepackage, bibliograph, newtheorem) 等信息
+  (TeX-parse-selt t)
+  (TeX-PDF-mode t)
+  ;; 正向与反向搜索设置
+  (TeX-source-correlate-mode t)
+  (TeX-source-correlate-method 'synctex)
+  ;; 使用pdf-tools打开PDF
+  (TeX-view-program-selection '((output-pdf "PDF Tools")))
+  :config
+  (setq TeX-auto-save t)
+  ;; 编译时问询主文件名称
+  (setq-default TeX-master t)                               
+  ;; 编译后更新pdf文件
+  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+  ;; 加载LaTeX模式设置
+  (add-hook 'LaTeX-mode-hook 'my-latex-hook)
+  ;; XeLaTeX 支持
+  (add-hook 'LaTeX-mode-hook (lambda()
+  (add-to-list 'TeX-command-list '("XeLaTeX" "%`xelatex%(mode)%' %t" TeX-run-TeX nil t))
+  (setq TeX-save-query  nil )
+  (setq TeX-show-compilation t))))
+
+(add-to-list 'load-path "~/.emacs.d/lisp/")
+(require 'cdlatex)
+
+;; customize prettify
+;; https://en.wikipedia.org/wiki/Mathematical_operators_and_symbols_in_Unicode
+;; 可加入原列表中没有的编码、简化常用命令
+(require 'tex-mode) ;; 载入 tex--prettify-symbols-alist 变量
+(defun my/more-prettified-symbols ()
+  (mapc (lambda (pair) (delete pair tex--prettify-symbols-alist))
+        '(("\\supset" . 8835)))
+  (mapc (lambda (pair) (cl-pushnew pair tex--prettify-symbols-alist))
+        '(("\\Z" . 8484)
+          ("\\Q" . 8474)
+          ("\\N" . 8469)
+          ("\\R" . 8477)
+          ("\\eps" . 949)
+          ("\\inf" . #x22C0) 
+          ("\\sup". #x22C1)
+          ("\\ONE" . #x1D7D9)
+          ("\\mathbb{S}" . #x1D54A)
+          ("\\PP" . #x2119)
+          ("\\Ps" . #x1D5AF )
+          ("\\Pp" . #x1D40F)
+          ("\\E" . #x1D5A4)
+          ("\\Ee" . #x1D404)
+          ("\\EE" . #x1D53C )
+          ("\\Fc" . #x2131)
+          ("\\Nc" . #x1D4A9))))
+(my/more-prettified-symbols) ;; 读入自定义 prettify 符号
+
+(setq prettify-symbols-unprettify-at-point t)  ;; 自动展开光标附近的宏命令
 
 (provide 'init-research)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
