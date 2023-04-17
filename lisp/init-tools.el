@@ -16,24 +16,30 @@
   :ensure t
   :init (which-key-mode))
 
-;; (add-to-list 'load-path "~/.emacs.d/emacs-rime/")
-;; (require 'rime)
+;; dependency
+;; sudo apt install fcitx5 fcitx5-* librime-dev
+;; cd ~/.local/share/fcitx5/rime
+;; mv rime rime_bak/
+;; git clone https://github.com/iDvel/rime-ice --depth=1
+;; mv rime-ice rime/
+(add-to-list 'load-path "~/.emacs.d/emacs-rime/")
+(require 'rime)
 
-;; ;; 雾凇拼音
-;; ;;; https://emacs-china.org/t/emacs-rime/24125
-;; ;;; https://github.com/iDvel/rime-ice
+;; 雾凇拼音
+;;; https://emacs-china.org/t/emacs-rime/24125
+;;; https://github.com/iDvel/rime-ice
 
-;; ;;; Code:
-;; (setq rime-user-data-dir "~/.local/share/fcitx5/rime")
+;;; Code:
+(setq rime-user-data-dir "~/.local/share/fcitx5/rime")
 
-;; (setq rime-posframe-properties
-;;       (list :background-color "#333333"
-;;             :foreground-color "#dcdccc"
-;;             :font "WenQuanYi Micro Hei Mono-14"
-;;             :internal-border-width 10))
+(setq rime-posframe-properties
+      (list :background-color "#333333"
+            :foreground-color "#dcdccc"
+            ;;:font "WenQuanYi Micro Hei Mono-14"
+            :internal-border-width 10))
 
-;; (setq default-input-method "rime"
-;;       rime-show-candidate 'posframe)
+(setq default-input-method "rime"
+      rime-show-candidate 'posframe)
 
 (use-package fanyi
   :ensure t
