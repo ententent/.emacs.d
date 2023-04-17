@@ -107,7 +107,7 @@
 
     :custom
     ;; 设置Org mode的目录
-    (org-directory "~/org")
+    (org-directory "~/org/agenda")
     ;; 设置笔记的默认存储位置
     (org-default-notes-file (expand-file-name "capture.org" org-directory))
     ;; 启用一些子模块
@@ -713,7 +713,7 @@ This function makes sure that dates are aligned for easy reading."
   (org-agenda-files
    (list (expand-file-name "tasks.org" org-directory)
          (expand-file-name "diary.org" org-directory)
-         (expand-file-name "phd.org" org-directory)
+         (expand-file-name "thesis.org" org-directory)
          (expand-file-name "habits.org" org-directory)
          (expand-file-name "mail.org" org-directory)
          (expand-file-name "emacs-config.org" user-emacs-directory)

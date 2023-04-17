@@ -7,7 +7,7 @@
 (use-package org-roam
   :ensure t
   :custom
-  (org-roam-directory "~/org/roam-notes/")         ;; 默认笔记目录
+  (org-roam-directory "~/org/roam/")               ;; 默认笔记目录
   (org-roam-dailies-directory "daily/")            ;; 默认日记目录，默认笔记目录的相对路径
   (org-roam-db-gc-threshold most-positive-fixnum)  ;; 提升性能
   :bind (("C-c n f" . org-roam-node-find)          ;; 通过关键字查找笔记并跳转
@@ -37,6 +37,7 @@
 ;;;; pacman -S mingw-w64-x86_64-texlive-full
 ;;;; pacman -S mingw-w64-x86_64-emacs-pdf-toool-s-server
 ;;;; add E:\Scoop\apps\msys2\current\mingw64\bin to environment variable
+;;;; pdf-tools-install
 (use-package pdf-tools
   :mode ("\\.pdf\\'" . pdf-view-mode)                           ;; pdf 文件默认打开方式
   :bind

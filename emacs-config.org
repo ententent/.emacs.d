@@ -1054,7 +1054,7 @@ Version 2019-11-04"
 
     :custom
     ;; 设置Org mode的目录
-    (org-directory "~/org")
+    (org-directory "~/org/agenda")
     ;; 设置笔记的默认存储位置
     (org-default-notes-file (expand-file-name "capture.org" org-directory))
     ;; 启用一些子模块
@@ -1679,7 +1679,7 @@ This function makes sure that dates are aligned for easy reading."
   (org-agenda-files
    (list (expand-file-name "tasks.org" org-directory)
          (expand-file-name "diary.org" org-directory)
-         (expand-file-name "phd.org" org-directory)
+         (expand-file-name "thesis.org" org-directory)
          (expand-file-name "habits.org" org-directory)
          (expand-file-name "mail.org" org-directory)
          (expand-file-name "emacs-config.org" user-emacs-directory)
@@ -2061,7 +2061,7 @@ This function makes sure that dates are aligned for easy reading."
                      ;; fanyi-libre-provider
                      )))
 #+END_SRC
-** Beancount 复式簿记法
+** beancount 复式簿记法
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 (require 'beancount)
@@ -2267,7 +2267,7 @@ This function makes sure that dates are aligned for easy reading."
 (use-package org-roam
   :ensure t
   :custom
-  (org-roam-directory "~/org/roam-notes/")         ;; 默认笔记目录
+  (org-roam-directory "~/org/roam/")               ;; 默认笔记目录
   (org-roam-dailies-directory "daily/")            ;; 默认日记目录，默认笔记目录的相对路径
   (org-roam-db-gc-threshold most-positive-fixnum)  ;; 提升性能
   :bind (("C-c n f" . org-roam-node-find)          ;; 通过关键字查找笔记并跳转
@@ -2300,6 +2300,7 @@ This function makes sure that dates are aligned for easy reading."
 ;;;; pacman -S mingw-w64-x86_64-texlive-full
 ;;;; pacman -S mingw-w64-x86_64-emacs-pdf-toool-s-server
 ;;;; add E:\Scoop\apps\msys2\current\mingw64\bin to environment variable
+;;;; pdf-tools-install
 (use-package pdf-tools
   :mode ("\\.pdf\\'" . pdf-view-mode)                           ;; pdf 文件默认打开方式
   :bind
@@ -2484,7 +2485,7 @@ This function makes sure that dates are aligned for easy reading."
 ;; eaf-git
 (require 'eaf-git)
 ;; eaf-pdf-viewer
-(require 'eaf-pdf-viewer)
+;;; (require 'eaf-pdf-viewer)
 ;; eaf-image-viewer
 (require 'eaf-image-viewer)
 ;; eaf-video-player
