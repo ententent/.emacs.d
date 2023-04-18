@@ -52,9 +52,9 @@
   :after (treemacs lsp))
 
 ;; magit
-;;; scoop install git
-;;; scoop install delta @ https://github.com/dandavison/delta
-;;; fix ~/.gitconfig
+;; DEPENDENCY @ https://github.com/dandavison/delta
+;; INSTALL delta @ https://dandavison.github.io/delta/installation.html
+;; EDIT ~/.gitconfig @ https://dandavison.github.io/delta/get-started.html
 (use-package magit
   :ensure t
   :hook (git-commit-mode . flyspell-mode)

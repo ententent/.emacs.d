@@ -66,17 +66,26 @@
 (use-package org-noter
   :ensure t
   :defer t
-  :custom
-  (org-noter-notes-search-path '("~/org/notes/")) ;; 默认笔记路径。设置后从pdf文件中使用=org-noter=命令，会自动在该墓中寻找与文件同名的=.org=笔记文件
-  (org-noter-auto-save-last-location t) ;; 自动保存上次阅读位置
-  (org-noter-max-short-selected-text-length 20) ;; 修改长/短文本标准，默认为80
-  (org-noter-default-heading-title "第 $p$ 页的笔记") ;; 默认短标题格式
-  (org-noter-highlight-selected-text t) ;; 选中文字后插入笔记自动高亮
   :bind
-  (("C-c n n" . org-noter) ;; 与org-roam配合，打开org-noter的快捷键
-   :map org-noter-doc-mode-map ;; 加入左手键位
+  ;; 与org-roam配合，打开org-noter的快捷键
+  (("C-c n n" . org-noter)
+   ;; 加入左手键位
+   :map org-noter-doc-mode-map
    ("e" . org-noter-insert-note)
-   ("M-e" . org-noter-insert-precise-note)))
+   ("M-e" . org-noter-insert-precise-note))
+  :custom
+  ;; 选中文字后插入笔记自动高亮
+  (org-noter-highlight-selected-text t)
+  ;; 默认笔记路径。设置后从 pdf 文件中使用 =org-noter= 命令，会自动在该墓中寻找与文件同名的 =.org= 笔记文件
+  (org-noter-notes-search-path '("~/org/roam/ref/"))
+  ;; 将文档和笔记分割为两个大小相等的窗口
+  (org-noter-doc-split-fraction '(0.5 . 0.5))
+  ;; 自动保存上次阅读位置
+  (org-noter-auto-save-last-location t)
+  ;; 修改长/短文本标准，默认为80
+  (org-noter-max-short-selected-text-length 20)
+  ;; 默认短标题格式
+  (org-noter-default-heading-title "第 $p$ 页的笔记"))
 
 ;; 对于Windows系统，需要安装ImageMagick，并保证magick.exe在PATH变量的路径中
 ;;; 用msys2安装: pacman -S mingw-w64-x86_64-imagemagick

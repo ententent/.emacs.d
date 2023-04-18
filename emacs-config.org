@@ -185,22 +185,23 @@
 *** 金色飞贼小米的配置
 - 参考链接[[https://emacs-china.org/t/emacs/22193][为emacs正确配置英文、中文、符号字体的正确方式？]]
 #+BEGIN_SRC emacs-lisp
+;; sudo mv * /usr/share/fonts/truetype
+;; sudo fc-cache -f -v
+;; fc-list | grep Kaiti
+;; https://einverne.github.io/post/2015/10/install-fonts-under-linux.html
+
 ;; 默认字体和字号 @ https://fonts.google.com/specimen/Fira+Mono
-;;; sudo mv * /usr/share/fonts/TTF
-;;; sudo fc-cache -f -v
 (set-face-attribute 'default nil :font "Fira Mono" :height 160)
 ;; 中文默认字体 @ https://mrswolf.github.io/my-manjaro-log/
 (set-fontset-font "fontset-default" 'han "Kaiti")
-;;;(set-fontset-font t 'han (font-spec :family "霞鹜文楷" :weight 'bold))
-;; 数学符号默认字体 @ https://wiki.archlinuxcn.org/zh-hans/%E5%BE%AE%E8%BD%AF%E5%AD%97%E4%BD%93
-;; 保证 Unicode 数学符号可以正确显示
-(set-fontset-font "fontset-default" 'mathematical "Cambria Math")
 ;; 汉字间距显示问题
 (setq inhibit-compacting-font-caches t)
+;; 数学符号默认字体，保证 Unicode 数学符号可以正确显示
+(set-fontset-font "fontset-default" 'mathematical "Cambria Math")
 ;; 固定间距字体 @ https://www.jetbrains.com/lp/mono/
 (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono"  :height 150)
 ;; 可变间距字体
-;; (set-face-attribute 'variable-pitch nil :font "Segoe UI Emoji" :height 160 :weight 'regular)
+(set-face-attribute 'variable-pitch nil :font "Segoe Print" :height 160 :weight 'regular)
 #+END_SRC
 ** 其他UI零散设置项
 #+begin_src emacs-lisp
@@ -2143,12 +2144,12 @@ This function makes sure that dates are aligned for easy reading."
   :after (treemacs lsp))
 #+END_SRC
 ** magit 版本管理
-+ 在 Emacs 里进行基于 magit 的版本控制
+- 在 Emacs 里进行基于 magit 的版本控制
 #+BEGIN_SRC emacs-lisp
 ;; magit
-;;; scoop install git
-;;; scoop install delta @ https://github.com/dandavison/delta
-;;; fix ~/.gitconfig
+;; DEPENDENCY @ https://github.com/dandavison/delta
+;; INSTALL delta @ https://dandavison.github.io/delta/installation.html
+;; EDIT ~/.gitconfig @ https://dandavison.github.io/delta/get-started.html
 (use-package magit
   :ensure t
   :hook (git-commit-mode . flyspell-mode)
@@ -2331,17 +2332,26 @@ This function makes sure that dates are aligned for easy reading."
 (use-package org-noter
   :ensure t
   :defer t
-  :custom
-  (org-noter-notes-search-path '("~/org/notes/")) ;; 默认笔记路径。设置后从pdf文件中使用=org-noter=命令，会自动在该墓中寻找与文件同名的=.org=笔记文件
-  (org-noter-auto-save-last-location t) ;; 自动保存上次阅读位置
-  (org-noter-max-short-selected-text-length 20) ;; 修改长/短文本标准，默认为80
-  (org-noter-default-heading-title "第 $p$ 页的笔记") ;; 默认短标题格式
-  (org-noter-highlight-selected-text t) ;; 选中文字后插入笔记自动高亮
   :bind
-  (("C-c n n" . org-noter) ;; 与org-roam配合，打开org-noter的快捷键
-   :map org-noter-doc-mode-map ;; 加入左手键位
+  ;; 与org-roam配合，打开org-noter的快捷键
+  (("C-c n n" . org-noter)
+   ;; 加入左手键位
+   :map org-noter-doc-mode-map
    ("e" . org-noter-insert-note)
-   ("M-e" . org-noter-insert-precise-note)))
+   ("M-e" . org-noter-insert-precise-note))
+  :custom
+  ;; 选中文字后插入笔记自动高亮
+  (org-noter-highlight-selected-text t)
+  ;; 默认笔记路径。设置后从 pdf 文件中使用 =org-noter= 命令，会自动在该墓中寻找与文件同名的 =.org= 笔记文件
+  (org-noter-notes-search-path '("~/org/roam/ref/"))
+  ;; 将文档和笔记分割为两个大小相等的窗口
+  (org-noter-doc-split-fraction '(0.5 . 0.5))
+  ;; 自动保存上次阅读位置
+  (org-noter-auto-save-last-location t)
+  ;; 修改长/短文本标准，默认为80
+  (org-noter-max-short-selected-text-length 20)
+  ;; 默认短标题格式
+  (org-noter-default-heading-title "第 $p$ 页的笔记"))
 #+END_SRC
 *** org-download
 #+BEGIN_SRC emacs-lisp
@@ -2480,6 +2490,7 @@ This function makes sure that dates are aligned for easy reading."
 ;;; https://sachachua.com/blog/feed/                   ;; Sacha Chua
 ;;; https://byvoid.com/zhs/feed.xml                    ;; byvoid
 ;;; https://www.skyue.com/feed                         ;; skyue
+;;; https://einverne.github.io/feed.xml                ;; Verne
 (require 'eaf-rss-reader)
 
 ;; eaf-git

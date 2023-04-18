@@ -29,6 +29,7 @@
 ;;; https://sachachua.com/blog/feed/                   ;; Sacha Chua
 ;;; https://byvoid.com/zhs/feed.xml                    ;; byvoid
 ;;; https://www.skyue.com/feed                         ;; skyue
+;;; https://einverne.github.io/feed.xml                ;; Verne
 (require 'eaf-rss-reader)
 
 ;; eaf-git
