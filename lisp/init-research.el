@@ -170,6 +170,44 @@
 
 (setq prettify-symbols-unprettify-at-point t)  ;; 自动展开光标附近的宏命令
 
+(use-package org-present
+  :defer t
+  :config
+  (defun my/org-present-prepare-slide (buffer-name heading)
+    (org-overview)  ;; 仅显示顶层标题Show only top-level headlines
+    (org-show-entry);; 展开当前标题Unfold the current entry
+    (org-show-children))   ;; 显示当前子标题
+
+  (defun my/org-present-start () ;; 开始幻灯片的设置
+    (setq visual-fill-column-width 110
+      visual-fill-column-center-text t) ;; 调整显示界面
+    ;; 调整字体大小
+    (setq-local face-remapping-alist '((default (:height 1.5) variable-pitch)
+                                       (header-line (:height 4.0) variable-pitch)
+                                       (org-document-title (:height 1.75) org-document-title)
+                                       (org-code (:height 1.55) org-code)
+                                       (org-verbatim (:height 1.55) org-verbatim)
+                                       (org-block (:height 1.25) org-block)
+                                       (org-block-begin-line (:height 0.7) org-block)))
+    (setq header-line-format " ") ;; 在标题前加入空行
+    (org-display-inline-images) ;; 显示图片
+    (flyspell-mode 0) ;; 禁用拼写检查 (防止标红影响效果)
+    (read-only-mode 1) ;; 只读模式
+    )
+
+  (defun my/org-present-end () ;; 重置上述设置
+    (setq-local face-remapping-alist 
+                '((default variable-pitch default)))      
+    (setq header-line-format nil) 
+    (org-remove-inline-images)
+    (org-present-small)
+    (flyspell-mode t)
+    (read-only-mode 0))
+  
+  (add-hook 'org-present-mode-hook 'my/org-present-start)
+  (add-hook 'org-present-mode-quit-hook 'my/org-present-end)
+  (add-hook 'org-present-after-navigate-functions 'my/org-present-prepare-slide))
+
 (provide 'init-research)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init-research.el ends here
