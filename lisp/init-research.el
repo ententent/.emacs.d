@@ -3,6 +3,37 @@
 
 ;;; Code:
 
+(setq zot_bib '("~/research/LFH/TeX/ref.bib"
+                ; Zotero 用 Better BibTeX 导出的 .bib 文件. 可以是多个文件
+                "~/research/MAGE/TeX/ref.bib")
+      ; Zotero 的 ZotFile 同步文件夹
+      zot_pdf "~/MEGA/Zotero-Library"
+      ; 自定义的 org-roam 文献笔记目录
+      org_refs "~/org/roam/ref/" )
+
+(use-package ivy-bibtex ; 这里也可以用 ivy-bibtex 替换 helm-bibtex
+  :ensure t
+  :custom
+  (bibtex-completion-notes-path org_refs)
+  (bibtex-completion-bibliography zot_bib)
+  (bibtex-completion-library-path zot_pdf))
+
+(use-package org-roam-bibtex
+  :ensure t
+  :after org-roam
+  :hook (org-roam-mode . org-roam-bibtex-mode)i
+  :bind (("C-c n k" . orb-insert-link)
+         ("C-c n a" . orb-note-action))
+  :custom
+  ; 与上面 helm-bibtex/ivy-bibtex 的选择保持一致
+  (orb-insert-interface 'ivy-bibtex)
+  ; 默认使用标题, 但是论文的标题一般很长, 不适合作为笔记链接的名字
+  (orb-insert-link-description 'citekey)
+  (orb-preformat-keywords
+   '("citekey" "title" "url" "author-or-editor" "keywords" "file"))
+  (orb-process-file-keyword t)
+  (orb-attached-file-extensions '("pdf")))
+
 ;; 卡片笔记法的 org-roam 实践
 (use-package org-roam
   :ensure t
@@ -28,6 +59,25 @@
   (org-roam-ui-sync-theme t)                       ;; 同步 Emacs 主题
   (org-roam-ui-follow t)                           ;; 笔记节点跟随
   (org-roam-ui-update-on-save t))
+
+;; org-roam 笔记模板
+(setq my/ref-template
+      (concat "#+FILETAGS: reading research \n"
+              "- tags :: %^{keywords} \n"
+              "* %^{title}\n"
+              ":PROPERTIES:\n"
+              ":Custom_ID: %^{citekey}\n"
+              ":URL: %^{url}\n"
+              ":AUTHOR: %^{author-or-editor}\n"
+              ":NOTER_DOCUMENT: ~/MEGA/Zotero-Library/%^{citekey}.pdf\n"
+              ":NOTER_PAGE:\n"
+              ":END:"))
+(setq org-roam-capture-templates '())
+(add-to-list 'org-roam-capture-templates
+             `("r" "Zotero 文献模板" plain ; 文献笔记模板
+               ,my/ref-template
+               :target
+               (file+head "ref/${citekey}.org" "#+title: ${title}\n")))
 
 ;; pdf-tools
 ;;; Windows Installation
