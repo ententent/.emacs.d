@@ -23,7 +23,7 @@
   :after org-roam
   :hook (org-roam-mode . org-roam-bibtex-mode)i
   :bind (("C-c n k" . orb-insert-link)
-         ("C-c n a" . orb-note-action))
+         ("C-c n a" . orb-note-actions))
   :custom
   ; 与上面 helm-bibtex/ivy-bibtex 的选择保持一致
   (orb-insert-interface 'ivy-bibtex)
@@ -61,6 +61,7 @@
   (org-roam-ui-update-on-save t))
 
 ;; org-roam 笔记模板
+(setq org-roam-capture-templates '())
 (setq my/ref-template
       (concat "#+FILETAGS: reading research \n"
               "- tags :: %^{keywords} \n"
@@ -72,9 +73,8 @@
               ":NOTER_DOCUMENT: ~/MEGA/Zotero-Library/%^{citekey}.pdf\n"
               ":NOTER_PAGE:\n"
               ":END:"))
-(setq org-roam-capture-templates '())
 (add-to-list 'org-roam-capture-templates
-             `("r" "Zotero 文献模板" plain ; 文献笔记模板
+             `("r" "Zotero 文献笔记模板" plain
                ,my/ref-template
                :target
                (file+head "ref/${citekey}.org" "#+title: ${title}\n")))
