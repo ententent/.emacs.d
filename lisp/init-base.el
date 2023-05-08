@@ -62,6 +62,13 @@
                      "/TAGS\\'"
                      "COMMIT_EDITMSG\\'")))
 
+(use-package hydra
+  :ensure t)
+
+(use-package use-package-hydra
+  :ensure t
+  :after hydra)
+
 (use-package undo-tree
   :ensure t
   :hook (after-init . global-undo-tree-mode)

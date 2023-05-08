@@ -9,6 +9,18 @@
     :hook ((after-init . yas-reload-all)
            ((prog-mode LaTeX-mode org-mode) . yas-minor-mode))
     :config
+    (yas-reload-all)
+    ;; add company-yasnippet to company-backends
+    (defun company-mode/backend-with-yas (backend)
+      (if (and (listp backend) (member 'company-yasnippet backend))
+          backend
+        (append (if (consp backend) backend (list backend))
+                '(:with company-yasnippet))))
+    (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
+    ;; unbind <TAB> completion
+    (define-key yas-minor-mode-map [(tab)]        nil)
+    (define-key yas-minor-mode-map (kbd "TAB")    nil)
+    (define-key yas-minor-mode-map (kbd "<tab>")  nil)
     ;; Suppress warning for yasnippet code.
     (require 'warnings)
     (yas-global-mode 1)
@@ -23,7 +35,15 @@
         (yas-expand)
         (when (and (eq old-point (point))
                    (eq old-tick (buffer-chars-modified-tick)))
-          (ignore-errors (yas-next-field))))))
+          (ignore-errors (yas-next-field)))))
+    :bind
+    (:map yas-minor-mode-map ("S-<tab>" . yas-expand)))
+
+(use-package yasnippet-snippets
+  :ensure t
+  :after yasnippet)
+
+(global-set-key (kbd "M-/") 'hippie-expand)
 
 (use-package orderless
   :defer 1
@@ -47,13 +67,6 @@
 
 (use-package posframe
   :ensure t)
-
-;;lsp-bridge
-;;; https://github.com/manateelazycat/lsp-bridge/blob/master/README.zh-CN.md
-(add-to-list 'load-path "~/.emacs.d/lsp-bridge/")
-(require 'lsp-bridge)
-(global-lsp-bridge-mode)
-(setq lsp-bridge-python-lsp-server "pyright")
 
 (provide 'init-completion)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
