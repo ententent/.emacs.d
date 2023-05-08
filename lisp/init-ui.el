@@ -3,14 +3,16 @@
 
 ;;; Code:
 
-(use-package doom-themes
-  :ensure t
-  :config
-   ;; Global settings (defaults)
-  (setq doom-themes-enable-bold nil    ; if nil, bold is universally disabled
-	doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'doom-peacock t)
-  (doom-themes-treemacs-config))
+;; (use-package doom-themes
+;;   :ensure t
+;;   :config
+;;    ;; Global settings (defaults)
+;;   (setq doom-themes-enable-bold nil    ; if nil, bold is universally disabled
+;; 	doom-themes-enable-italic t) ; if nil, italics is universally disabled
+;;   (load-theme 'doom-peacock t)
+;;   (doom-themes-treemacs-config))
+
+(load-theme 'modus-vivendi t)
 
 ;; (use-package cnfonts
 ;;   :ensure t
@@ -175,8 +177,7 @@
   ;; 开启行号后便于使用 M-g M-g 跳转到指定行
   (global-display-line-numbers-mode t)
   ;; Disable line numbers for some modes
-  (dolist (mode '(org-mode-hook
-                  term-mode-hook
+  (dolist (mode '(term-mode-hook
                   eshell-mode-hook
                   pdf-view-mode-hook
                   eww-mode-hook))

@@ -143,17 +143,21 @@
 
 ;;; Code:
 #+END_SRC
-** doom-themes主题
-+ [[https://github.com/doomemacs/themes#manually--use-package][doom-themes]] 是我非常喜欢的一个主题包。
+** 主题配置
+- [[https://github.com/doomemacs/themes#manually--use-package][doom-themes]] 是我非常喜欢的一个主题包
 #+BEGIN_SRC emacs-lisp
-(use-package doom-themes
-  :ensure t
-  :config
-   ;; Global settings (defaults)
-  (setq doom-themes-enable-bold nil    ; if nil, bold is universally disabled
-	doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'doom-peacock t)
-  (doom-themes-treemacs-config))
+;; (use-package doom-themes
+;;   :ensure t
+;;   :config
+;;    ;; Global settings (defaults)
+;;   (setq doom-themes-enable-bold nil    ; if nil, bold is universally disabled
+;; 	doom-themes-enable-italic t) ; if nil, italics is universally disabled
+;;   (load-theme 'doom-peacock t)
+;;   (doom-themes-treemacs-config))
+#+END_SRC
+- [[https://github.com/protesilaos/modus-themes][modus]] 是另一个我非常喜欢的主题包
+#+BEGIN_SRC emacs-lisp
+(load-theme 'modus-vivendi t)
 #+END_SRC
 ** 字体配置
 *** cn-fonts
@@ -327,8 +331,7 @@
   ;; 开启行号后便于使用 M-g M-g 跳转到指定行
   (global-display-line-numbers-mode t)
   ;; Disable line numbers for some modes
-  (dolist (mode '(org-mode-hook
-                  term-mode-hook
+  (dolist (mode '(term-mode-hook
                   eshell-mode-hook
                   pdf-view-mode-hook
                   eww-mode-hook))
@@ -2096,6 +2099,20 @@ This function makes sure that dates are aligned for easy reading."
 (add-hook 'beancount-mode-hook #'outline-minor-mode)
 (define-key beancount-mode-map (kbd "C-c C-n") #'outline-next-visible-heading)
 (define-key beancount-mode-map (kbd "C-c C-p") #'outline-previous-visible-heading)
+#+END_SRC
+** evil
+#+BEGIN_SRC emacs-lisp
+(use-package evil
+  :ensure t
+  :defer 1
+  :preface
+  (setq evil-want-visual-char-semi-exclusive t
+        evil-echo-state t
+        evil-symbol-word-search t
+        evil-want-C-i-jump nil
+        org-adapt-indentation t)
+  :config
+  (evil-mode 1))
 #+END_SRC
 ** init-tools.el 文件尾
 #+BEGIN_SRC emacs-lisp

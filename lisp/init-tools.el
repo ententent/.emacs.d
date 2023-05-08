@@ -84,6 +84,18 @@
 (define-key beancount-mode-map (kbd "C-c C-n") #'outline-next-visible-heading)
 (define-key beancount-mode-map (kbd "C-c C-p") #'outline-previous-visible-heading)
 
+(use-package evil
+  :ensure t
+  :defer 1
+  :preface
+  (setq evil-want-visual-char-semi-exclusive t
+        evil-echo-state t
+        evil-symbol-word-search t
+        evil-want-C-i-jump nil
+        org-adapt-indentation t)
+  :config
+  (evil-mode 1))
+
 (provide 'init-tools)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init-tools.el ends here
