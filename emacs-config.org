@@ -425,13 +425,20 @@
 #+BEGIN_SRC emacs-lisp
 (use-package dashboard
   :ensure t
-  :config
-  (setq dashboard-banner-logo-title "Welcom to Emacs")
-  ;;(setq dashboard-projects-backend 'projectile)
-  (setq dashboard-startup-banner 'official)
-  (setq dashboard-items '((recents . 5)
-			  (bookmarks . 5)
-			  (projects . 10)))
+  :init
+  (setq dashboard-banner-logo-title "Happy Hacking!"
+        dashboard-center-content t
+        dashboard-items '((recents . 10)
+                          (bookmarks . 5)
+                          (projects . 5))
+        dashboard-page-style 'truncate-middle
+        dashboard-path-max-length 60
+        dashboard-projects-backend 'projectile
+        dashboard-set-footer t
+        dashboard-set-init-info t
+        dashboard-set-navigator t
+        dashboard-show-shortcuts nil
+        dashboard-startup-banner 'official)
   (dashboard-setup-startup-hook))
 #+END_SRC
 ** shackle 窗口行为控制
@@ -699,6 +706,23 @@ CONDITION
    ("C-x C-SPC" . 'counsel-mark-ring)
    :map minibuffer-local-map
    ("C-r" . counsel-minibuffer-history)))
+#+END_SRC
+** amx 记录命令历史
+- 参考 [[https://zhuanlan.zhihu.com/p/441612281][专业 Emacs 入门（五）：插件篇——功能优化类]]
+#+BEGIN_SRC emacs-lisp
+(use-package amx
+  :ensure t
+  :init (amx-mode))
+#+END_SRC
+** good-scroll 平滑滚动
+- 参考 [[https://zhuanlan.zhihu.com/p/441612281][专业 Emacs 入门（五）：插件篇——功能优化类]]
+- 在现代图形界面操作系统中，光标在上下移动、翻页的时候 =Emacs= 会直接刷新界面，滚动时也是按行滚动，比较粗糙。
+- =good-scroll= 提供了平滑滚动，并且支持变速滚动，更加顺手。
+#+BEGIN_SRC emacs-lisp
+(use-package good-scroll
+  :ensure t
+  :if window-system          ; 在图形化界面时才使用这个插件
+  :init (good-scroll-mode))
 #+END_SRC
 ** ace-window多窗口切换
 #+BEGIN_SRC emacs-lisp

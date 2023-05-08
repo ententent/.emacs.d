@@ -117,6 +117,15 @@
    :map minibuffer-local-map
    ("C-r" . counsel-minibuffer-history)))
 
+(use-package amx
+  :ensure t
+  :init (amx-mode))
+
+(use-package good-scroll
+  :ensure t
+  :if window-system          ; 在图形化界面时才使用这个插件
+  :init (good-scroll-mode))
+
 ;; ace-window
 (use-package ace-window
   :ensure t

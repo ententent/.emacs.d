@@ -254,13 +254,20 @@
 
 (use-package dashboard
   :ensure t
-  :config
-  (setq dashboard-banner-logo-title "Welcom to Emacs")
-  ;;(setq dashboard-projects-backend 'projectile)
-  (setq dashboard-startup-banner 'official)
-  (setq dashboard-items '((recents . 5)
-			  (bookmarks . 5)
-			  (projects . 10)))
+  :init
+  (setq dashboard-banner-logo-title "Happy Hacking!"
+        dashboard-center-content t
+        dashboard-items '((recents . 10)
+                          (bookmarks . 5)
+                          (projects . 5))
+        dashboard-page-style 'truncate-middle
+        dashboard-path-max-length 60
+        dashboard-projects-backend 'projectile
+        dashboard-set-footer t
+        dashboard-set-init-info t
+        dashboard-set-navigator t
+        dashboard-show-shortcuts nil
+        dashboard-startup-banner 'official)
   (dashboard-setup-startup-hook))
 
 (use-package shackle
