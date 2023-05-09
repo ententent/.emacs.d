@@ -20,7 +20,6 @@
 
 (use-package org-roam-bibtex
   :ensure t
-  :after org-roam
   :hook (org-roam-mode . org-roam-bibtex-mode)i
   :bind (("C-c n k" . orb-insert-link)
          ("C-c n a" . orb-note-actions))
