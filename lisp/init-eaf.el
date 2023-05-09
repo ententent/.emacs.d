@@ -35,7 +35,7 @@
 ;; eaf-git
 ;;; (require 'eaf-git)
 ;; eaf-pdf-viewer
-(require 'eaf-pdf-viewer)
+;;; (require 'eaf-pdf-viewer)
 ;; eaf-image-viewer
 (require 'eaf-image-viewer)
 ;; eaf-video-player

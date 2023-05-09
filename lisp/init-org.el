@@ -299,10 +299,6 @@
   (setq-default line-spacing 0.1)
   ;; tag边框宽度，还可以设置为 `auto' 即自动计算
   (setq org-modern-label-border 1)
-  ;; 设置表格竖线宽度，默认为3
-  (setq org-modern-table-vertical 2)
-  ;; 设置表格横线为0，默认为0.1
-  (setq org-modern-table-horizontal 0)
   ;; 复选框美化
   (setq org-modern-checkbox
         '((?X . #("▢✓" 0 2 (composition ((2)))))
@@ -319,6 +315,9 @@
   (setq org-modern-block-name nil)
   ;; #+关键字美化，我们使用了 `prettify-symbols-mode'
   (setq org-modern-keyword nil)
+  ;; org-modern 似乎会影响表格
+  (setq org-modern-table nil)
+  ;; 更多配置项参考 [[https://github.com/minad/org-modern/blob/main/org-modern.el][org-modern.el]]
   )
 
 ;; org-appear
