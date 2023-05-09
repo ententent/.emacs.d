@@ -54,6 +54,7 @@
   (require 'init-base)
   (require 'init-dired)
   (require 'init-edit)
+  (require 'init-finance)
   (require 'init-org)
   (require 'init-completion)
   (require 'init-tools)
@@ -67,22 +68,3 @@
 (provide 'init)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init.el ends here
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(connection-local-criteria-alist
-   '(((:application eshell)
-      eshell-connection-default-profile)))
- '(connection-local-profile-alist
-   '((eshell-connection-default-profile
-      (eshell-path-env-list))))
- '(package-selected-packages
-   '(magit-delta which-key good-scroll org-contrib eshell-up doom-modeline pyvenv-auto shackle vertico org-appear diredfl marginalia org-roam-ui company-box lsp-ivy capf-autosuggest benchmark-init ivy-bibtex treemacs-projectile all-the-icons-dired counsel-projectile dashboard use-package-ensure-system-package org-roam-bibtex all-the-icons-completion evil eshell-syntax-highlighting minions helm-bibtex flycheck exec-path-from-shell eshell-git-prompt use-package-hydra cal-china-x restart-emacs pdf-tools rime keycast lsp-pyright yasnippet-snippets rainbow-delimiters org-noter diff-hl amx no-littering org-modern denote doom-themes auctex lsp-ui undo-tree crux fanyi org-auto-tangle org-present diminish dap-mode popper)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )

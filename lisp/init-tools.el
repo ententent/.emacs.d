@@ -75,15 +75,6 @@
                      ;; fanyi-libre-provider
                      )))
 
-(add-to-list 'load-path "~/.emacs.d/lisp/")
-(require 'beancount)
-(add-to-list 'auto-mode-alist '("\\.bean\\'" . beancount-mode))
-;; (add-hook 'beancount-mode-hook
-;;   (lambda () (setq-local electric-indent-chars nil)))
-(add-hook 'beancount-mode-hook #'outline-minor-mode)
-(define-key beancount-mode-map (kbd "C-c C-n") #'outline-next-visible-heading)
-(define-key beancount-mode-map (kbd "C-c C-p") #'outline-previous-visible-heading)
-
 ;; (use-package evil
 ;;   :ensure t
 ;;   :defer 1
