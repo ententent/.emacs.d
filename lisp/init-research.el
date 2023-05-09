@@ -60,23 +60,15 @@
   (org-roam-ui-update-on-save t))
 
 ;; org-roam 笔记模板
-(setq org-roam-capture-templates '())
-(setq my/ref-template
-      (concat "#+FILETAGS: reading research \n"
-              "- tags :: %^{keywords} \n"
-              "* %^{title}\n"
-              ":PROPERTIES:\n"
-              ":Custom_ID: %^{citekey}\n"
-              ":URL: %^{url}\n"
-              ":AUTHOR: %^{author-or-editor}\n"
-              ":NOTER_DOCUMENT: ~/MEGA/Zotero-Library/%^{citekey}.pdf\n"
-              ":NOTER_PAGE:\n"
-              ":END:"))
-(add-to-list 'org-roam-capture-templates
-             `("r" "Zotero 文献笔记模板" plain
-               ,my/ref-template
-               :target
-               (file+head "ref/${citekey}.org" "#+title: ${title}\n")))
+(setq org-roam-capture-templates
+             '(("d" "default" plain "- tag :: \n %?" ; 普及模板
+                :target
+                (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title} \n")
+                :unnarrowed t)
+               ("r" "bibliography reference in pdfs" plain ; 文献模板
+                "#+FILETAGS: reading research \n - tags :: %^{keywords} \n* %^{title}\n:PROPERTIES:\n:Custom_ID: %^{citekey}\n:URL: %^{url}\n:AUTHOR: %^{author-or-editor}\n:NOTER_DOCUMENT: ~/MEGA/Zotero-Library/%^{citekey}.pdf\n:NOTER_PAGE:\n:END:"      
+                :target
+                (file+head "ref/${citekey}.org" "#+title: ${title}\n"))))
 
 ;; pdf-tools
 ;;; Windows Installation
