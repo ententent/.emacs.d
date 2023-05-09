@@ -33,9 +33,9 @@
 (require 'eaf-rss-reader)
 
 ;; eaf-git
-(require 'eaf-git)
+;;; (require 'eaf-git)
 ;; eaf-pdf-viewer
-;;; (require 'eaf-pdf-viewer)
+(require 'eaf-pdf-viewer)
 ;; eaf-image-viewer
 (require 'eaf-image-viewer)
 ;; eaf-video-player
@@ -44,7 +44,7 @@
 (require 'eaf-music-player)
 
 ;; eaf-terminal
-(require 'eaf-terminal)
+;;; (require 'eaf-terminal)
 ;; eaf-file-manager
 (require 'eaf-file-manager)
 ;; eaf-system-monitor
