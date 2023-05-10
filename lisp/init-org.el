@@ -568,10 +568,10 @@
 (use-package org-pomodoro
   :after org
   :config
-  (setq org-pomodoro-start-sound "~/.emacs.d/sounds/focus_bell.wav")
-  (setq org-pomodoro-short-break-sound "~/.emacs.d/sounds/three_beeps.wav")
-  (setq org-pomodoro-long-break-sound "~/.emacs.d/sounds/three_beeps.wav")
-  (setq org-pomodoro-finished-sound "~/.emacs.d/sounds/meditation_bell.wav"))
+  (setq org-pomodoro-start-sound "sounds/focus_bell.wav")
+  (setq org-pomodoro-short-break-sound "sounds/three_beeps.wav")
+  (setq org-pomodoro-long-break-sound "sounds/three_beeps.wav")
+  (setq org-pomodoro-finished-sound "sounds/meditation_bell.wav"))
 
 (use-package calendar
   :ensure nil
@@ -838,7 +838,7 @@ This function makes sure that dates are aligned for easy reading."
   ;; 截止的任务完成后不显示
   ;; (org-agenda-skip-deadline-if-done t)
   ;; 当计划的任务完成后不显示
-  (org-agenda-skip-scheduled-if-done t)
+  ;; (org-agenda-skip-scheduled-if-done t)
   ;; 计划过期上限
   (org-scheduled-past-days 365)
   ;; 计划截止上限

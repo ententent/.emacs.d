@@ -1600,14 +1600,20 @@ Version 2019-11-04"
   )
 #+END_SRC
 *** org-pomodoro 番茄工作法
+- 在 =Arch Linux= 中需要安装 =WAV= 播放器 =aplay=
+  - =sudo pacman -S alsa-utils=
+  - 否则会报错 ="not found wav player on your system"=
+- 若无法响铃则尝试安装 =sound-wav=, 使用 =(sound-wav-play "sounds/focus_bell.wav")= 核验
+  - =M-x package-install sound-wav=
+  - =(require 'sound-wav)=
 #+BEGIN_SRC emacs-lisp
 (use-package org-pomodoro
   :after org
   :config
-  (setq org-pomodoro-start-sound "~/.emacs.d/sounds/focus_bell.wav")
-  (setq org-pomodoro-short-break-sound "~/.emacs.d/sounds/three_beeps.wav")
-  (setq org-pomodoro-long-break-sound "~/.emacs.d/sounds/three_beeps.wav")
-  (setq org-pomodoro-finished-sound "~/.emacs.d/sounds/meditation_bell.wav"))
+  (setq org-pomodoro-start-sound "sounds/focus_bell.wav")
+  (setq org-pomodoro-short-break-sound "sounds/three_beeps.wav")
+  (setq org-pomodoro-long-break-sound "sounds/three_beeps.wav")
+  (setq org-pomodoro-finished-sound "sounds/meditation_bell.wav"))
 #+END_SRC
 *** org-agenda 配置
 **** calendar 基本设置
@@ -1882,7 +1888,7 @@ This function makes sure that dates are aligned for easy reading."
   ;; 截止的任务完成后不显示
   ;; (org-agenda-skip-deadline-if-done t)
   ;; 当计划的任务完成后不显示
-  (org-agenda-skip-scheduled-if-done t)
+  ;; (org-agenda-skip-scheduled-if-done t)
   ;; 计划过期上限
   (org-scheduled-past-days 365)
   ;; 计划截止上限
@@ -2823,12 +2829,34 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
 ;;; Code:
 #+END_SRC
 ** mind-wave
-+ [[https://github.com/manateelazycat/mind-wave][mind-wave]] 是 manateeLazyCat 基于ChatGPT API开发的AI插件
+- [[https://github.com/manateelazycat/mind-wave][mind-wave]] 是 manateeLazyCat 基于ChatGPT API开发的AI插件
+*** 安装
+- 将 =API Key= 保存到 =~/.emacs.d/mind-wave/chatgpt_api_key.txt=
+  - =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=
+- 安装 =Python= 依赖 =pip install openai epc sexpdata six=
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/mind-wave/")
 (require 'mind-wave)
 (setq mind-wave-auto-change-title nil) ; 避免与auto-save插件的冲突
 #+END_SRC
+*** 代理
+:PROPERTIES:
+:HEADER-ARGS: :tangle no
+:END:
+- 参考 [[https://emacs-china.org/t/mind-wave-chatgpt-api-emacs-ai/23881/127?u=ententent][emacs-china]] 上的回答, 修改 =mind-wave= 源码 =~/.emacs.d/mind-wave/mind-wave.py=
+#+BEGIN_SRC python
+import os
+os.environ["http_proxy"]="http://127.0.0.1:7890"
+os.environ["https_proxy"]="http://127.0.0.1:7890"
+#+END_SRC
+- 可参考 [[https://manateelazycat.github.io/proxy/2022/10/23/best-proxy.html][最佳代理实践 - manateelazycat]] 进行代理优化
+*** 功能
+**** 对话模式
+**** 多行输入
+**** 文档模式
+**** 代码模式
+**** 摘要模式
+**** 模型选择
 ** init-ai.el 文件尾
 #+BEGIN_SRC emacs-lisp
 (provide 'init-ai)
