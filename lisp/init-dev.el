@@ -240,16 +240,16 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
   ;; for debug
   (require 'dap-python))
 
-(use-package pyvenv
-  :ensure t
-  :config
-  (setenv "WORKON_HOME" (expand-file-name "~/miniconda3/envs"))
-  ;; (setq python-shell-interpreter "python3")  ; （可选）更改解释器名字
-  (pyvenv-mode t)
-  ;; （可选）如果希望启动后激活 miniconda 的 base 环境，就使用如下的 hook
-  ;; :hook
-  ;; (python-mode . (lambda () (pyvenv-workon "..")))
-)
+;; (use-package pyvenv
+;;   :ensure t
+;;   :config
+;;   (setenv "WORKON_HOME" (expand-file-name "~/miniconda3/envs"))
+;;   ;; (setq python-shell-interpreter "python3")  ; （可选）更改解释器名字
+;;   (pyvenv-mode t)
+;;   ;; （可选）如果希望启动后激活 miniconda 的 base 环境，就使用如下的 hook
+;;   ;; :hook
+;;   ;; (python-mode . (lambda () (pyvenv-workon "..")))
+;; )
 
 (use-package lsp-pyright
   :ensure t

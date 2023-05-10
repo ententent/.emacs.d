@@ -1601,19 +1601,33 @@ Version 2019-11-04"
 #+END_SRC
 *** org-pomodoro 番茄工作法
 - 在 =Arch Linux= 中需要安装 =WAV= 播放器 =aplay=
-  - =sudo pacman -S alsa-utils=
   - 否则会报错 ="not found wav player on your system"=
-- 若无法响铃则尝试安装 =sound-wav=, 使用 =(sound-wav-play "sounds/focus_bell.wav")= 核验
-  - =M-x package-install sound-wav=
-  - =(require 'sound-wav)=
+  - =sudo pacman -S alsa-utils=
+  - 若无法响铃则尝试安装 =sound-wav=
+    - =M-x package-install sound-wav=
+    - =(require 'sound-wav)=
+    - =(sound-wav-play "sounds/focus_bell.wav")=
+- 安装 =libnotify= 包为 =org-pomodoro= 增加桌面通知
+  - =sudo pacman -S libnotify=
+  - =sudo apt install libnotify-dev=
 #+BEGIN_SRC emacs-lisp
+(use-package sound-wav
+  :ensure t)
 (use-package org-pomodoro
-  :after org
+  :ensure t
+  :commands (org-pomodoro)
   :config
-  (setq org-pomodoro-start-sound "sounds/focus_bell.wav")
-  (setq org-pomodoro-short-break-sound "sounds/three_beeps.wav")
-  (setq org-pomodoro-long-break-sound "sounds/three_beeps.wav")
-  (setq org-pomodoro-finished-sound "sounds/meditation_bell.wav"))
+  (setq alert-user-configuration (quote ((((:category . "org-pomodoro")) libnotify nil)))
+        ; 番茄时长
+        org-pomodoro-length 25
+        ; 短休息时长
+        org-pomodoro-short-break-length 5
+        ; org-pomodoro 在通知时是否发出声音
+        org-pomodoro-play-sounds nil
+        org-pomodoro-start-sound "sounds/focus_bell.wav"
+        org-pomodoro-short-break-sound "sounds/three_beeps.wav"
+        org-pomodoro-long-break-sound "sounds/three_beeps.wav"
+        org-pomodoro-finished-sound "sounds/meditation_bell.wav"))
 #+END_SRC
 *** org-agenda 配置
 **** calendar 基本设置
@@ -2425,16 +2439,16 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
 #+END_SRC
 *** 虚拟环境
 #+BEGIN_SRC emacs-lisp
-(use-package pyvenv
-  :ensure t
-  :config
-  (setenv "WORKON_HOME" (expand-file-name "~/miniconda3/envs"))
-  ;; (setq python-shell-interpreter "python3")  ; （可选）更改解释器名字
-  (pyvenv-mode t)
-  ;; （可选）如果希望启动后激活 miniconda 的 base 环境，就使用如下的 hook
-  ;; :hook
-  ;; (python-mode . (lambda () (pyvenv-workon "..")))
-)
+;; (use-package pyvenv
+;;   :ensure t
+;;   :config
+;;   (setenv "WORKON_HOME" (expand-file-name "~/miniconda3/envs"))
+;;   ;; (setq python-shell-interpreter "python3")  ; （可选）更改解释器名字
+;;   (pyvenv-mode t)
+;;   ;; （可选）如果希望启动后激活 miniconda 的 base 环境，就使用如下的 hook
+;;   ;; :hook
+;;   ;; (python-mode . (lambda () (pyvenv-workon "..")))
+;; )
 #+END_SRC
 *** LSP
 #+BEGIN_SRC emacs-lisp

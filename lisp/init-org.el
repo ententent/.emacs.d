@@ -565,13 +565,23 @@
                            ))
   )
 
+(use-package sound-wav
+  :ensure t)
 (use-package org-pomodoro
-  :after org
+  :ensure t
+  :commands (org-pomodoro)
   :config
-  (setq org-pomodoro-start-sound "sounds/focus_bell.wav")
-  (setq org-pomodoro-short-break-sound "sounds/three_beeps.wav")
-  (setq org-pomodoro-long-break-sound "sounds/three_beeps.wav")
-  (setq org-pomodoro-finished-sound "sounds/meditation_bell.wav"))
+  (setq alert-user-configuration (quote ((((:category . "org-pomodoro")) libnotify nil)))
+        ; 番茄时长
+        org-pomodoro-length 25
+        ; 短休息时长
+        org-pomodoro-short-break-length 5
+        ; org-pomodoro 在通知时是否发出声音
+        org-pomodoro-play-sounds nil
+        org-pomodoro-start-sound "sounds/focus_bell.wav"
+        org-pomodoro-short-break-sound "sounds/three_beeps.wav"
+        org-pomodoro-long-break-sound "sounds/three_beeps.wav"
+        org-pomodoro-finished-sound "sounds/meditation_bell.wav"))
 
 (use-package calendar
   :ensure nil
