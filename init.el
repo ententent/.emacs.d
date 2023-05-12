@@ -62,7 +62,6 @@
   (require 'init-research)
   (require 'init-eaf)
   (require 'init-ai)
-  (require 'init-shell)
   )
 
 (provide 'init)
