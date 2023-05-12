@@ -256,7 +256,7 @@
 (use-package dashboard
   :ensure t
   :init
-  (setq dashboard-banner-logo-title "Happy Hacking!"
+  (setq dashboard-banner-logo-title "Don't Panic, Take it Easy"
         dashboard-center-content t
         dashboard-items '((recents . 10)
                           (bookmarks . 5)
