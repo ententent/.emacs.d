@@ -3,6 +3,14 @@
 
 ;;; Code:
 
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/lazycat-theme"))
+(require 'lazycat-theme)
+(lazycat-theme-load-dark)
+
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/awesome-tray"))
+(require 'awesome-tray)
+(awesome-tray-mode 1)
+
 ;; (use-package doom-themes
 ;;   :ensure t
 ;;   :config
@@ -12,7 +20,7 @@
 ;;   (load-theme 'doom-peacock t)
 ;;   (doom-themes-treemacs-config))
 
-(load-theme 'modus-vivendi t)
+;; (load-theme 'modus-vivendi t)
 
 ;; (use-package cnfonts
 ;;   :ensure t
@@ -200,58 +208,6 @@
 (modify-coding-system-alist 'process "*" 'utf-8)
 (when (display-graphic-p)
   (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
-
-(use-package doom-modeline
-  :ensure t
-  :hook (after-init . doom-modeline-mode)
-  :custom
-  (doom-modeline-irc nil)
-  (doom-modeline-mu4e nil)
-  (doom-modeline-gnus nil)
-  (doom-modeline-github nil)
-  (doom-modeline-buffer-file-name-style 'truncate-upto-root) ; : auto
-  (doom-modeline-persp-name nil)
-  (doom-modeline-unicode-fallback t)
-  (doom-modeline-enable-word-count nil))
-
-(use-package minions
-  :ensure t
-  :hook (after-init . minions-mode))
-
-(use-package keycast
-  :ensure t
-  :hook (after-init . keycast-mode)
-  ;; :custom-face
-  ;; (keycast-key ((t (:background "#0030b4" :weight bold))))
-  ;; (keycast-command ((t (:foreground "#0030b4" :weight bold))))
-  :config
-  ;; set for doom-modeline support
-  ;; With the latest change 72d9add, mode-line-keycast needs to be modified to keycast-mode-line.
-  (define-minor-mode keycast-mode
-    "Show current command and its key binding in the mode line (fix for use with doom-mode-line)."
-    :global t
-    (if keycast-mode
-        (progn
-          (add-hook 'pre-command-hook 'keycast--update t)
-          (add-to-list 'global-mode-string '("" keycast-mode-line "  ")))
-      (remove-hook 'pre-command-hook 'keycast--update)
-      (setq global-mode-string (delete '("" keycast-mode-line "  ") global-mode-string))
-      ))
-
-  (dolist (input '(self-insert-command
-                   org-self-insert-command))
-    (add-to-list 'keycast-substitute-alist `(,input "." "Typing…")))
-
-  (dolist (event '(mouse-event-p
-                   mouse-movement-p
-                   mwheel-scroll))
-    (add-to-list 'keycast-substitute-alist `(,event nil)))
-
-  (setq keycast-log-format "%-20K%C\n")
-  (setq keycast-log-frame-alist
-        '((minibuffer . nil)))
-  (setq keycast-log-newest-first t)
-  )
 
 (use-package dashboard
   :ensure t

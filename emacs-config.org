@@ -145,7 +145,19 @@
 ;;; Code:
 #+END_SRC
 ** 主题配置
-- [[https://github.com/doomemacs/themes#manually--use-package][doom-themes]] 是我非常喜欢的一个主题包
+*** 主要
+- 使用由懒猫开发的 [[https://github.com/manateelazycat/lazycat-theme][lazycat-theme]] 和 [[https://github.com/manateelazycat/awesome-tray][awesome-tray]]
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/lazycat-theme"))
+(require 'lazycat-theme)
+(lazycat-theme-load-dark)
+
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/awesome-tray"))
+(require 'awesome-tray)
+(awesome-tray-mode 1)
+#+END_SRC
+*** 其他
+- [[https://github.com/doomemacs/themes#manually--use-package][doom-themes]]
 #+BEGIN_SRC emacs-lisp
 ;; (use-package doom-themes
 ;;   :ensure t
@@ -156,9 +168,9 @@
 ;;   (load-theme 'doom-peacock t)
 ;;   (doom-themes-treemacs-config))
 #+END_SRC
-- [[https://github.com/protesilaos/modus-themes][modus]] 是另一个我非常喜欢的主题包
+- [[https://github.com/protesilaos/modus-themes][modus]]
 #+BEGIN_SRC emacs-lisp
-(load-theme 'modus-vivendi t)
+;; (load-theme 'modus-vivendi t)
 #+END_SRC
 ** 字体配置
 *** cn-fonts
@@ -361,69 +373,6 @@
 (modify-coding-system-alist 'process "*" 'utf-8)
 (when (display-graphic-p)
   (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
-#+END_SRC
-** 模式栏设置
-*** doom-modeline插件
-+ [[https://github.com/seagle0128/doom-modeline][doom-modeline]] 是一个模式栏美化插件。
-#+begin_src emacs-lisp
-(use-package doom-modeline
-  :ensure t
-  :hook (after-init . doom-modeline-mode)
-  :custom
-  (doom-modeline-irc nil)
-  (doom-modeline-mu4e nil)
-  (doom-modeline-gnus nil)
-  (doom-modeline-github nil)
-  (doom-modeline-buffer-file-name-style 'truncate-upto-root) ; : auto
-  (doom-modeline-persp-name nil)
-  (doom-modeline-unicode-fallback t)
-  (doom-modeline-enable-word-count nil))
-#+end_src
-*** minions插件
-+ [[https://github.com/tarsius/minions][minions]] 插件能让模式栏变得清爽，将次要模式隐藏起来。
-#+BEGIN_SRC emacs-lisp
-(use-package minions
-  :ensure t
-  :hook (after-init . minions-mode))
-#+END_SRC
-
-** keycast 按键展示
-+ [[https://github.com/tarsius/keycast][keycast mode]] 插件可以在模式栏上展示所有的按键，以及对应的函数。
-#+BEGIN_SRC emacs-lisp
-(use-package keycast
-  :ensure t
-  :hook (after-init . keycast-mode)
-  ;; :custom-face
-  ;; (keycast-key ((t (:background "#0030b4" :weight bold))))
-  ;; (keycast-command ((t (:foreground "#0030b4" :weight bold))))
-  :config
-  ;; set for doom-modeline support
-  ;; With the latest change 72d9add, mode-line-keycast needs to be modified to keycast-mode-line.
-  (define-minor-mode keycast-mode
-    "Show current command and its key binding in the mode line (fix for use with doom-mode-line)."
-    :global t
-    (if keycast-mode
-        (progn
-          (add-hook 'pre-command-hook 'keycast--update t)
-          (add-to-list 'global-mode-string '("" keycast-mode-line "  ")))
-      (remove-hook 'pre-command-hook 'keycast--update)
-      (setq global-mode-string (delete '("" keycast-mode-line "  ") global-mode-string))
-      ))
-
-  (dolist (input '(self-insert-command
-                   org-self-insert-command))
-    (add-to-list 'keycast-substitute-alist `(,input "." "Typing…")))
-
-  (dolist (event '(mouse-event-p
-                   mouse-movement-p
-                   mwheel-scroll))
-    (add-to-list 'keycast-substitute-alist `(,event nil)))
-
-  (setq keycast-log-format "%-20K%C\n")
-  (setq keycast-log-frame-alist
-        '((minibuffer . nil)))
-  (setq keycast-log-newest-first t)
-  )
 #+END_SRC
 ** dashboard 设置
 #+BEGIN_SRC emacs-lisp
