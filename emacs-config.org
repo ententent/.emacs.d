@@ -146,12 +146,15 @@
 #+END_SRC
 ** 主题配置
 *** 主要
-- 使用由懒猫开发的 [[https://github.com/manateelazycat/lazycat-theme][lazycat-theme]] 和 [[https://github.com/manateelazycat/awesome-tray][awesome-tray]]
+- 使用由懒猫开发的一系列插件
+**** [[https://github.com/manateelazycat/lazycat-theme][lazycat-theme]]
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/lazycat-theme"))
 (require 'lazycat-theme)
 (lazycat-theme-load-dark)
-
+#+END_SRC
+**** [[https://github.com/manateelazycat/awesome-tray][awesome-tray]]
+#+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/awesome-tray"))
 (require 'awesome-tray)
 (awesome-tray-mode 1)
