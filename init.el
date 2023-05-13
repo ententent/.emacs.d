@@ -50,18 +50,19 @@
 
 ;; 不要在 *message* 缓冲区显示加载模块化配置的信息
 (with-temp-message ""
-  (require 'init-ui)
+  (require 'init-ai)
   (require 'init-base)
+  (require 'init-dev)
   (require 'init-dired)
+  (require 'init-eaf)
   (require 'init-edit)
   (require 'init-finance)
+  (require 'init-lsp)
   (require 'init-org)
-  (require 'init-completion)
-  (require 'init-tools)
-  (require 'init-dev)
+  (require 'init-python)
   (require 'init-research)
-  (require 'init-eaf)
-  (require 'init-ai)
+  (require 'init-tools)
+  (require 'init-ui)
   )
 
 (provide 'init)
