@@ -814,12 +814,8 @@ This function makes sure that dates are aligned for easy reading."
   :custom
   ;; 设置需要被日程监控的org文件
   (org-agenda-files
-   (list (expand-file-name "tasks.org" org-directory)
-         (expand-file-name "diary.org" org-directory)
-         (expand-file-name "thesis.org" org-directory)
-         (expand-file-name "habits.org" org-directory)
-         (expand-file-name "mail.org" org-directory)
-         (expand-file-name "emacs-config.org" user-emacs-directory)
+   (list (expand-file-name "habits.org" org-directory)
+         (expand-file-name "weekly.org" org-directory)
          ))
   ;; 设置org的日记文件
   (org-agenda-diary-file (expand-file-name "diary.org" org-directory))

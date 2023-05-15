@@ -14,11 +14,6 @@
 (global-set-key (kbd "C-x C-z") nil)
 (global-set-key [mouse-2] nil)
 
-;; Directly modify when selecting text
-(use-package delsel
-  :ensure nil
-  :hook (after-init . delete-selection-mode))
-
 ;; (message "init-base configuration: %.2fs"
 ;;          (float-time (time-subtract (current-time) my/init-base-start-time)))
 
