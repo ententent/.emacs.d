@@ -2483,6 +2483,7 @@ This function makes sure that dates are aligned for easy reading."
 ;;; https://byvoid.com/zhs/feed.xml                    ;; byvoid
 ;;; https://www.skyue.com/feed                         ;; skyue
 ;;; https://einverne.github.io/feed.xml                ;; Verne
+;;; https://liujiacai.net/atom.xml                     ;; 刘家财
 (require 'eaf-rss-reader)
 
 ;; eaf-git

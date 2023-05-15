@@ -6,6 +6,9 @@
 - Tested with Emacs 27.2, 28.1 on Linux/Windows10/Cygwin/macOS/WSL(Windows Subsystem for Linux)
 - Vanilla key bindings and directory layout is respected
 
+* Synchronize
+- This repository has set the synchronization between [[https://codeberg.org/mawen/.emacs.d][codeberg]] and [[https://github.com/ententent/.emacs.d][GitHub]]
+
 * License
 This program is free software: you can redistribute it and/or modify it under the terms of the [[file:LICENSE][GNU General Public License]] as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
