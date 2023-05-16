@@ -211,7 +211,7 @@
 ;; https://einverne.github.io/post/2015/10/install-fonts-under-linux.html
 
 ;; 默认字体和字号 @ https://fonts.google.com/specimen/Fira+Mono
-(set-face-attribute 'default nil :font "Fira Mono" :height 160)
+(set-face-attribute 'default nil :font "Fira Mono" :height 120)
 ;; 中文默认字体 @ https://mrswolf.github.io/my-manjaro-log/
 (set-fontset-font "fontset-default" 'han "Kaiti")
 ;; 汉字间距显示问题
@@ -219,9 +219,9 @@
 ;; 数学符号默认字体，保证 Unicode 数学符号可以正确显示
 (set-fontset-font "fontset-default" 'mathematical "Cambria Math")
 ;; 固定间距字体 @ https://www.jetbrains.com/lp/mono/
-(set-face-attribute 'fixed-pitch nil :font "JetBrains Mono"  :height 150)
+(set-face-attribute 'fixed-pitch nil :font "JetBrains Mono"  :height 120)
 ;; 可变间距字体
-(set-face-attribute 'variable-pitch nil :font "Segoe Print" :height 160 :weight 'regular)
+(set-face-attribute 'variable-pitch nil :font "Segoe Print" :height 120 :weight 'regular)
 #+END_SRC
 ** 其他UI零散设置项
 #+begin_src emacs-lisp
@@ -1778,6 +1778,9 @@ This function makes sure that dates are aligned for easy reading."
 (add-to-list 'load-path "~/.emacs.d/lsp-bridge/")
 (require 'lsp-bridge)
 (global-lsp-bridge-mode)
+
+;; 开启 org-mode 补全
+(setq lsp-bridge-enable-org-babe t)
 #+END_SRC
 ** emacs-popon
 - [[https://codeberg.org/akib/emacs-popon][emacs-popon]] 是 [[https://github.com/twlz0ne/acm-terminal][acm-terminal]] 的依赖 
@@ -2052,9 +2055,54 @@ This function makes sure that dates are aligned for easy reading."
 
 ;;; Code:
 #+END_SRC
+** REPL
+#+BEGIN_SRC emacs-lisp
+(use-package python
+  :defer t
+  :mode ("\\.py\\'" . python-mode)
+  :interpreter ("python3" . python-mode))
+#+END_SRC
 ** LSP Language Server
 #+BEGIN_SRC emacs-lisp
 (setq lsp-bridge-python-lsp-server "pyright")
+;; specify environment to run epc
+(setq lsp-bridge-python-command "/usr/bin/python")
+#+END_SRC
+** 虚拟环境
+- 参考 [[https://github.com/manateelazycat/lsp-bridge/wiki/Python-virtualenv][lsp-bridge/wiki/Python-virtualenv]]
+*** pyvenv
+#+BEGIN_SRC emacs-lisp
+(use-package pyvenv
+  :ensure t
+  :config
+  (setenv "WORKON_HOME" (expand-file-name "~/miniconda3/envs"))
+  (pyvenv-mode t)
+  (add-hook 'python-mode-hook
+            (lambda () (pyvenv-workon "dev")))
+)
+#+END_SRC
+*** 配合 lsp-bridge
+#+BEGIN_SRC emacs-lisp
+(defun local/lsp-bridge-get-single-lang-server-by-project (project-path filepath)
+  (let* ((json-object-type 'plist)
+         (custom-dir (expand-file-name ".cache/lsp-bridge/pyright" user-emacs-directory))
+         (custom-config (expand-file-name "pyright.json" custom-dir))
+         (default-config (json-read-file (expand-file-name "lsp-bridge/langserver/pyright.json" user-emacs-directory)))
+         (settings (plist-get default-config :settings))
+         )
+    (plist-put settings :pythonPath (executable-find "python"))
+    (make-directory (file-name-directory custom-config) t)
+    (with-temp-file custom-config (insert (json-encode default-config)))
+    custom-config))
+
+(add-hook 'python-mode-hook
+          (lambda ()
+            (setq-local lsp-bridge-get-single-lang-server-by-project
+                        'local/lsp-bridge-get-single-lang-server-by-project)))
+
+(add-hook 'pyvenv-post-activate-hooks
+          (lambda ()
+            (lsp-bridge-restart-process)))
 #+END_SRC
 ** init-python.el 文件尾
 #+BEGIN_SRC emacs-lisp
@@ -2367,6 +2415,8 @@ This function makes sure that dates are aligned for easy reading."
 (setq eaf-proxy-type "http")
 (setq eaf-proxy-host "127.0.0.1")
 (setq eaf-proxy-port "7890")
+;; 配置 EAF 依赖的 Python 环境
+(setq eaf-python-command "/usr/bin/python")
 
 ;; eaf-browser
 (require 'eaf-browser)

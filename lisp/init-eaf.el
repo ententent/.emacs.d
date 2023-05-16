@@ -9,6 +9,8 @@
 (setq eaf-proxy-type "http")
 (setq eaf-proxy-host "127.0.0.1")
 (setq eaf-proxy-port "7890")
+;; 配置 EAF 依赖的 Python 环境
+(setq eaf-python-command "/usr/bin/python")
 
 ;; eaf-browser
 (require 'eaf-browser)

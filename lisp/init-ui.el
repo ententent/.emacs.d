@@ -51,7 +51,7 @@
 ;; https://einverne.github.io/post/2015/10/install-fonts-under-linux.html
 
 ;; 默认字体和字号 @ https://fonts.google.com/specimen/Fira+Mono
-(set-face-attribute 'default nil :font "Fira Mono" :height 160)
+(set-face-attribute 'default nil :font "Fira Mono" :height 120)
 ;; 中文默认字体 @ https://mrswolf.github.io/my-manjaro-log/
 (set-fontset-font "fontset-default" 'han "Kaiti")
 ;; 汉字间距显示问题
@@ -59,9 +59,9 @@
 ;; 数学符号默认字体，保证 Unicode 数学符号可以正确显示
 (set-fontset-font "fontset-default" 'mathematical "Cambria Math")
 ;; 固定间距字体 @ https://www.jetbrains.com/lp/mono/
-(set-face-attribute 'fixed-pitch nil :font "JetBrains Mono"  :height 150)
+(set-face-attribute 'fixed-pitch nil :font "JetBrains Mono"  :height 120)
 ;; 可变间距字体
-(set-face-attribute 'variable-pitch nil :font "Segoe Print" :height 160 :weight 'regular)
+(set-face-attribute 'variable-pitch nil :font "Segoe Print" :height 120 :weight 'regular)
 
   ;; 禁用一些GUI特性
   (setq use-dialog-box nil)               ; 鼠标操作不使用对话框

@@ -21,6 +21,9 @@
 (require 'lsp-bridge)
 (global-lsp-bridge-mode)
 
+;; 开启 org-mode 补全
+(setq lsp-bridge-enable-org-babe t)
+
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 (require 'popon)
 
