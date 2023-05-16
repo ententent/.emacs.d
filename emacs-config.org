@@ -118,6 +118,7 @@
   (require 'init-dired)
   (require 'init-eaf)
   (require 'init-edit)
+  (require 'init-english)
   (require 'init-finance)
   (require 'init-lsp)
   (require 'init-org)
@@ -211,7 +212,7 @@
 ;; https://einverne.github.io/post/2015/10/install-fonts-under-linux.html
 
 ;; 默认字体和字号 @ https://fonts.google.com/specimen/Fira+Mono
-(set-face-attribute 'default nil :font "Fira Mono" :height 120)
+(set-face-attribute 'default nil :font "Fira Mono" :height 100)
 ;; 中文默认字体 @ https://mrswolf.github.io/my-manjaro-log/
 (set-fontset-font "fontset-default" 'han "Kaiti")
 ;; 汉字间距显示问题
@@ -219,9 +220,9 @@
 ;; 数学符号默认字体，保证 Unicode 数学符号可以正确显示
 (set-fontset-font "fontset-default" 'mathematical "Cambria Math")
 ;; 固定间距字体 @ https://www.jetbrains.com/lp/mono/
-(set-face-attribute 'fixed-pitch nil :font "JetBrains Mono"  :height 120)
+(set-face-attribute 'fixed-pitch nil :font "JetBrains Mono"  :height 100)
 ;; 可变间距字体
-(set-face-attribute 'variable-pitch nil :font "Segoe Print" :height 120 :weight 'regular)
+(set-face-attribute 'variable-pitch nil :font "Segoe Print" :height 100 :weight 'regular)
 #+END_SRC
 ** 其他UI零散设置项
 #+begin_src emacs-lisp
@@ -2396,6 +2397,47 @@ This function makes sure that dates are aligned for easy reading."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init-research.el ends here
 #+END_SRC
+* init-english.el
+:PROPERTIES:
+:HEADER-ARGS: :tangle lisp/init-english.el :mkdirp yes
+:END:
+** init-english.el 文件头
+#+BEGIN_SRC emacs-lisp
+;;; init-english.el --- English Tools settings -*- lexical-binding: t -*-
+;;; Commentary:
+
+;;; Code:
+#+END_SRC
+** popweb
+- [[https://github.com/manateelazycat/popweb][popweb]] 由懒猫开发，显示弹出窗口。用途之一是英译中。
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path "~/.emacs.d/popweb/")
+(setq popweb-python-command "/usr/bin/python")
+;; Proxy
+(setq popweb-proxy-type "http")
+(setq popweb-proxy-host "127.0.0.1")
+(setq popweb-proxy-port "7890")
+;; Font size
+(setq popweb-zoom-factor 0.5)
+;; Scaled to emacs
+(setq popweb-url-web-window-width-scale 0.8)
+(setq popweb-url-web-window-height-scale 0.15)
+
+;; LaTeX preview functionality
+(add-to-list 'load-path "~/.emacs.d/popweb/extension/latex")
+(require 'popweb-latex)
+(add-hook 'latex-mode-hook #'popweb-latex-mode)
+
+;; Chinese-English translation popup
+(add-to-list 'load-path "~/.emacs.d/popweb/extension/dict") ;
+(require 'popweb-dict) 
+#+END_SRC
+** init-english.el 文件尾
+#+BEGIN_SRC emacs-lisp
+(provide 'init-english)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; init-english.el ends here
+#+END_SRC
 * init-eaf.el
 :PROPERTIES:
 :HEADER-ARGS: :tangle lisp/init-eaf.el :mkdirp yes
@@ -2484,7 +2526,6 @@ This function makes sure that dates are aligned for easy reading."
 - [[https://github.com/manateelazycat/mind-wave][mind-wave]] 是 manateeLazyCat 基于ChatGPT API开发的AI插件
 *** 安装
 - 将 =API Key= 保存到 =~/.emacs.d/mind-wave/chatgpt_api_key.txt=
-  - =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=
 - 安装 =Python= 依赖 =pip install openai epc sexpdata six=
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/mind-wave/")
@@ -2515,3 +2556,4 @@ os.environ["https_proxy"]="http://127.0.0.1:7890"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init-ai.el ends here
 #+END_SRC
+

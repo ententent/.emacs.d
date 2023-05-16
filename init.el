@@ -56,6 +56,7 @@
   (require 'init-dired)
   (require 'init-eaf)
   (require 'init-edit)
+  (require 'init-english)
   (require 'init-finance)
   (require 'init-lsp)
   (require 'init-org)
