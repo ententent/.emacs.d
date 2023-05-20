@@ -14,11 +14,12 @@
 
 (use-package pyvenv
   :ensure t
+  :defer t
   :config
   (setenv "WORKON_HOME" (expand-file-name "~/miniconda3/envs"))
   (pyvenv-mode t)
-  (add-hook 'python-mode-hook
-            (lambda () (pyvenv-workon "dev")))
+  ;; (add-hook 'python-mode-hook
+  ;;           (lambda () (pyvenv-workon "dev")))
 )
 
 (defun local/lsp-bridge-get-single-lang-server-by-project (project-path filepath)

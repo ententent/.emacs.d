@@ -212,7 +212,7 @@
 ;; https://einverne.github.io/post/2015/10/install-fonts-under-linux.html
 
 ;; 默认字体和字号 @ https://fonts.google.com/specimen/Fira+Mono
-(set-face-attribute 'default nil :font "Fira Mono" :height 100)
+(set-face-attribute 'default nil :font "Fira Mono" :height 80)
 ;; 中文默认字体 @ https://mrswolf.github.io/my-manjaro-log/
 (set-fontset-font "fontset-default" 'han "Kaiti")
 ;; 汉字间距显示问题
@@ -470,16 +470,11 @@
                      "/TAGS\\'"
                      "COMMIT_EDITMSG\\'")))
 #+END_SRC
-** undo-tree
-- 撤销设置
+** vundo 撤销设置
 #+BEGIN_SRC emacs-lisp
-(use-package undo-tree
-  :ensure t
-  :hook (after-init . global-undo-tree-mode)
-  :config
-  ;; don't save undo history to local files
-  (setq undo-tree-auto-save-history nil)
-  )
+; M-x package-install vundo
+(add-to-list 'load-path "~/.emacs.d/vundo/")
+(require 'vundo)
 #+END_SRC
 ** auto-save自动保存
 + [[https://github.com/manateelazycat/auto-save][auto-save]] 是 [[https://manateelazycat.github.io/][manateeLazyCat]] 开发的自动保存插件
@@ -2075,11 +2070,12 @@ This function makes sure that dates are aligned for easy reading."
 #+BEGIN_SRC emacs-lisp
 (use-package pyvenv
   :ensure t
+  :defer t
   :config
   (setenv "WORKON_HOME" (expand-file-name "~/miniconda3/envs"))
   (pyvenv-mode t)
-  (add-hook 'python-mode-hook
-            (lambda () (pyvenv-workon "dev")))
+  ;; (add-hook 'python-mode-hook
+  ;;           (lambda () (pyvenv-workon "dev")))
 )
 #+END_SRC
 *** 配合 lsp-bridge
@@ -2481,6 +2477,7 @@ This function makes sure that dates are aligned for easy reading."
 ;;; https://www.skyue.com/feed                         ;; skyue
 ;;; https://einverne.github.io/feed.xml                ;; Verne
 ;;; https://liujiacai.net/atom.xml                     ;; 刘家财
+;;; https://planet.emacslife.com/                      ;; Alvaro Ramirez
 (require 'eaf-rss-reader)
 
 ;; eaf-git

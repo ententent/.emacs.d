@@ -33,6 +33,7 @@
 ;;; https://www.skyue.com/feed                         ;; skyue
 ;;; https://einverne.github.io/feed.xml                ;; Verne
 ;;; https://liujiacai.net/atom.xml                     ;; 刘家财
+;;; https://planet.emacslife.com/                      ;; Alvaro Ramirez
 (require 'eaf-rss-reader)
 
 ;; eaf-git

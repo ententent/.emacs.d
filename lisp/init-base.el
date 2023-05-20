@@ -48,13 +48,9 @@
                      "/TAGS\\'"
                      "COMMIT_EDITMSG\\'")))
 
-(use-package undo-tree
-  :ensure t
-  :hook (after-init . global-undo-tree-mode)
-  :config
-  ;; don't save undo history to local files
-  (setq undo-tree-auto-save-history nil)
-  )
+; M-x package-install vundo
+(add-to-list 'load-path "~/.emacs.d/vundo/")
+(require 'vundo)
 
 ;; auto-save @
 (add-to-list 'load-path "~/.emacs.d/site-lisp/auto-save/")
