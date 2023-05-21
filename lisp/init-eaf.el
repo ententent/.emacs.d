@@ -34,6 +34,7 @@
 ;;; https://einverne.github.io/feed.xml                ;; Verne
 ;;; https://liujiacai.net/atom.xml                     ;; 刘家财
 ;;; https://planet.emacslife.com/                      ;; Alvaro Ramirez
+;;; https://leovan.me/index.xml                        ;; 范叶亮
 (require 'eaf-rss-reader)
 
 ;; eaf-git

@@ -32,6 +32,9 @@
   ;; 在这个阶段不编译
   (setq comp-deferred-compilation nil)
 
+  ;; 启动时窗口全屏
+  (add-to-list 'default-frame-alist '(fullscreen . maximized))
+
   (provide 'early-init)
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;; early-init.el ends here

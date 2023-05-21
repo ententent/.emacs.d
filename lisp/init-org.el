@@ -571,7 +571,9 @@
 (use-package org-pomodoro
   :after org
   :config
-  (setq org-pomodoro-audio-player (or (executable-find "aplay") (executable-find "afplay"))
+  (setq alert-user-configuration (quote ((((:category . "org-pomodoro")) libnotify nil)))
+        
+        org-pomodoro-audio-player (or (executable-find "aplay") (executable-find "afplay"))
         org-pomodoro-play-sounds t           ; Determines whether soudns are played or not
         
         org-pomodoro-start-sound-p t         ; Determine whether to play a sound when a pomodoro started
@@ -585,7 +587,7 @@
         org-pomodoro-overtime-sound-p t      ; Determines whether to play a sound when a pomodoro starts to run overtime
         org-pomodoro-overtime-sound (expand-file-name "sounds/meditation_bell.wav" user-emacs-directory)
 
-        org-pomodoro-clock-break t           ; Whether to clock time during breaks
+        org-pomodoro-clock-break nil         ; Don't clock time during breaks
 
         org-pomodoro-short-break-sound-p t   ; Determines whether to play a sound when a short-break finished
         org-pomodoro-short-break-sound (expand-file-name "sounds/focus_bell.wav" user-emacs-directory)

@@ -43,6 +43,9 @@
   ;; 在这个阶段不编译
   (setq comp-deferred-compilation nil)
 
+  ;; 启动时窗口全屏
+  (add-to-list 'default-frame-alist '(fullscreen . maximized))
+
   (provide 'early-init)
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;; early-init.el ends here
@@ -1422,7 +1425,9 @@ Version 2019-11-04"
 (use-package org-pomodoro
   :after org
   :config
-  (setq org-pomodoro-audio-player (or (executable-find "aplay") (executable-find "afplay"))
+  (setq alert-user-configuration (quote ((((:category . "org-pomodoro")) libnotify nil)))
+        
+        org-pomodoro-audio-player (or (executable-find "aplay") (executable-find "afplay"))
         org-pomodoro-play-sounds t           ; Determines whether soudns are played or not
         
         org-pomodoro-start-sound-p t         ; Determine whether to play a sound when a pomodoro started
@@ -1436,7 +1441,7 @@ Version 2019-11-04"
         org-pomodoro-overtime-sound-p t      ; Determines whether to play a sound when a pomodoro starts to run overtime
         org-pomodoro-overtime-sound (expand-file-name "sounds/meditation_bell.wav" user-emacs-directory)
 
-        org-pomodoro-clock-break t           ; Whether to clock time during breaks
+        org-pomodoro-clock-break nil         ; Don't clock time during breaks
 
         org-pomodoro-short-break-sound-p t   ; Determines whether to play a sound when a short-break finished
         org-pomodoro-short-break-sound (expand-file-name "sounds/focus_bell.wav" user-emacs-directory)
@@ -2521,6 +2526,7 @@ This function makes sure that dates are aligned for easy reading."
 ;;; https://einverne.github.io/feed.xml                ;; Verne
 ;;; https://liujiacai.net/atom.xml                     ;; 刘家财
 ;;; https://planet.emacslife.com/                      ;; Alvaro Ramirez
+;;; https://leovan.me/index.xml                        ;; 范叶亮
 (require 'eaf-rss-reader)
 
 ;; eaf-git
