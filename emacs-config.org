@@ -1403,7 +1403,8 @@ Version 2019-11-04"
                            ))
   )
 #+END_SRC
-*** org-pomodoro 番茄工作法
+*** 番茄工作法
+**** org-pomodoro
 - 在 =Arch Linux= 中需要安装 =WAV= 播放器 =aplay=
   - 否则会报错 ="not found wav player on your system"=
   - =sudo pacman -S alsa-utils=
@@ -1415,23 +1416,65 @@ Version 2019-11-04"
   - =sudo pacman -S libnotify=
   - =sudo apt install libnotify-dev=
 #+BEGIN_SRC emacs-lisp
-(use-package sound-wav
-  :ensure t)
+(add-to-list 'load-path "~/.emacs.d/lisp/")
+(require 'org-pomodoro)
+
 (use-package org-pomodoro
-  :ensure t
-  :commands (org-pomodoro)
+  :after org
   :config
-  (setq alert-user-configuration (quote ((((:category . "org-pomodoro")) libnotify nil)))
-        ; 番茄时长
-        org-pomodoro-length 25
-        ; 短休息时长
-        org-pomodoro-short-break-length 5
-        ; org-pomodoro 在通知时是否发出声音
-        org-pomodoro-play-sounds nil
-        org-pomodoro-start-sound "sounds/focus_bell.wav"
-        org-pomodoro-short-break-sound "sounds/three_beeps.wav"
-        org-pomodoro-long-break-sound "sounds/three_beeps.wav"
-        org-pomodoro-finished-sound "sounds/meditation_bell.wav"))
+  (setq org-pomodoro-audio-player (or (executable-find "aplay") (executable-find "afplay"))
+        org-pomodoro-play-sounds t           ; Determines whether soudns are played or not
+        
+        org-pomodoro-start-sound-p t         ; Determine whether to play a sound when a pomodoro started
+        org-pomodoro-start-sound (expand-file-name "sounds/focus_bell.wav" user-emacs-directory)
+        org-pomodoro-length 1                ; The length of a pomodoro in minutes
+
+        org-pomodoro-finished-sound-p t      ; Determines whether to play a sound when a pomodoro finished
+        org-pomodoro-finished-sound (expand-file-name "sounds/meditation_bell.wav" user-emacs-directory)
+
+        org-pomodoro-manual-break t          ; Whether the user needs to exit manually from a running pomodoro to enter a break
+        org-pomodoro-overtime-sound-p t      ; Determines whether to play a sound when a pomodoro starts to run overtime
+        org-pomodoro-overtime-sound (expand-file-name "sounds/meditation_bell.wav" user-emacs-directory)
+
+        org-pomodoro-clock-break t           ; Whether to clock time during breaks
+
+        org-pomodoro-short-break-sound-p t   ; Determines whether to play a sound when a short-break finished
+        org-pomodoro-short-break-sound (expand-file-name "sounds/focus_bell.wav" user-emacs-directory)
+        org-pomodoro-short-break-length 1    ; The length of a short break in minutes
+
+        org-pomodoro-long-break-sound-p t    ; Determines whether to play sound when a long-break finished
+        org-pomodoro-long-break-sound (expand-file-name "sounds/focus_bell.wav" user-emacs-directory)
+        org-pomodoro-long-break-frequency 4  ; The maximum number of pomodoros until a long break is started
+        org-pomodoro-long-break-length 1     ; The length of a long break in minutes
+        )
+  )
+#+END_SRC
+**** pomidor
+#+BEGIN_SRC emacs-lisp
+(use-package pomidor
+  :ensure t
+  :bind (("<f12>" . pomidor))
+  :config
+  (setq pomidor-sound-tick nil                  ; disable tick-tack sound
+        pomidor-sound-tack nil                  ; disable tick-tack sound
+        pomidor-seconds (* 1 60)               ; 25 minutes for the work period
+        pomidor-break-seconds (* 1 60)          ; 5 minutes break time
+        pomidor-breaks-before-long 2            ; wait 4 short breaks before long break
+        pomidor-long-break-seconds (* 1 60)    ; 20 minutes long break time
+        pomidor-sound-overwork (expand-file-name "sounds/meditation_bell.wav" user-emacs-directory)
+        pomidor-sound-break-over (expand-file-name "sounds/focus_bell.wav" user-emacs-directory)
+  )
+  (set-face-attribute 'pomidor-work-face nil :foreground "#ff0000")
+  (set-face-attribute 'pomidor-overwork-face nil :foreground "#00abff")
+  (set-face-attribute 'pomidor-break-face nil :foreground "#00ff00")
+  (set-face-attribute 'pomidor-skip-face nil :foreground "#abbac3")
+  :hook
+  (pomidor-mode . (lambda ()
+                    (display-line-numbers-mode -1)
+                    (setq left-fringe-width 0 right-fringe-width 0)
+                    (setq left-margin-width 2 right-margin-width 0)
+                    ;; force fringe update
+                    (set-window-buffer nil (current-buffer)))))
 #+END_SRC
 *** org-agenda 配置
 **** calendar 基本设置
