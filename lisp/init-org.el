@@ -41,30 +41,6 @@
                       ("[ ]"              . 9744)         ; ☐
                       ("[X]"              . 9745)         ; ☑
                       ("[-]"              . 8863)         ; ⊟
-                      ("#+begin_src"      . 9998)         ; ✎
-                      ("#+end_src"        . 9633)         ; □
-                      ("#+begin_example"  . 20363)        ; 例
-                      ("#+end_example"    . 20363)        ; 例
-                      ("#+results:"       . 9776)         ; ☰
-                      ("#+attr_latex:"    . 127259)       ; 🄛
-                      ("#+attr_html:"     . 127255)       ; 🄗
-                      ("#+attr_org:"      . 127262)       ; 🄞
-                      ("#+name:"          . 127261)       ; 🄝
-                      ("#+caption:"       . 127250)       ; 🄒
-					  ("#+date:"          . 128197)       ; 📅
-					  ("#+author:"        . 128214)       ; 📖
-					  ("#+setupfile:"     . 128221)       ; 📝
-					  ("#+email:"         . 128231)       ; 📧
-                      ("#+startup:"       . 10034)        ; ✲
-                      ("#+options:"       . 9881)         ; ⚙
-                      ("#+title:"         . 39064)        ; 题
-                      ("#+subtitle:"      . 21103)        ; 副
-                      ("#+downloaded:"    . 8650)         ; ⇊
-                      ("#+language:"      . 25991)        ; 文
-                      ("#+begin_quote"    . 187)          ; »
-                      ("#+end_quote"      . 171)          ; «
-                      ("#+begin_results"  . 8943)         ; ⋯
-                      ("#+end_results"    . 8943)         ; ⋯
                       )))
       (setq prettify-symbols-unprettify-at-point t)
       (prettify-symbols-mode 1))
@@ -332,12 +308,12 @@
   (setq org-appear-inside-latex t)
   )
 
-(use-package org-auto-tangle
-  :ensure t
-  :hook (org-mode . org-auto-tangle-mode)
-  :config
-  (setq org-auto-tangle-default t)
-  )
+;; (use-package org-auto-tangle
+;;   :ensure t
+;;   :hook (org-mode . org-auto-tangle-mode)
+;;   :config
+;;   (setq org-auto-tangle-default t)
+;;   )
 
 (use-package org-src
   :ensure nil
@@ -578,7 +554,7 @@
         
         org-pomodoro-start-sound-p t         ; Determine whether to play a sound when a pomodoro started
         org-pomodoro-start-sound (expand-file-name "sounds/focus_bell.wav" user-emacs-directory)
-        org-pomodoro-length 1                ; The length of a pomodoro in minutes
+        org-pomodoro-length 25               ; The length of a pomodoro in minutes
 
         org-pomodoro-finished-sound-p t      ; Determines whether to play a sound when a pomodoro finished
         org-pomodoro-finished-sound (expand-file-name "sounds/meditation_bell.wav" user-emacs-directory)
@@ -591,12 +567,12 @@
 
         org-pomodoro-short-break-sound-p t   ; Determines whether to play a sound when a short-break finished
         org-pomodoro-short-break-sound (expand-file-name "sounds/focus_bell.wav" user-emacs-directory)
-        org-pomodoro-short-break-length 1    ; The length of a short break in minutes
+        org-pomodoro-short-break-length 5    ; The length of a short break in minutes
 
         org-pomodoro-long-break-sound-p t    ; Determines whether to play sound when a long-break finished
         org-pomodoro-long-break-sound (expand-file-name "sounds/focus_bell.wav" user-emacs-directory)
         org-pomodoro-long-break-frequency 4  ; The maximum number of pomodoros until a long break is started
-        org-pomodoro-long-break-length 1     ; The length of a long break in minutes
+        org-pomodoro-long-break-length 15    ; The length of a long break in minutes
         )
   )
 
@@ -913,6 +889,77 @@ This function makes sure that dates are aligned for easy reading."
   (org-deadline-warning-days 3)
   )
 
+(use-package ox-html
+  :after ox
+  :config
+  (setq org-export-global-macros
+        '(("timestamp" . "@@html:<span class=\"timestamp\">[$1]</span>@@")))
+  (setq org-html-preamble t)
+  (setq org-html-preamble-format
+      '(("en" "<a href=\"/index.html\" class=\"button\">Home</a>
+               <a href=\"/posts/index.html\" class=\"button\">Posts</a>
+               <a href=\"/about.html\" class=\"button\">About</a>
+               <hr>")))
+
+  (setq org-html-postamble t)
+
+  (setq org-html-postamble-format
+        '(("en" "<hr><div class=\"info\"> <span class=\"created\">Created with %c on Arch Linux</span>
+ <span class=\"updated\">Updated: %d</span> </div>")))
+
+  (setq org-html-head-include-default-style nil)
+
+  (setq org-html-head
+        "<link rel=\"stylesheet\" type=\"text/css\" href=\"/css/style.css\" />
+         <script src=\"js/copy.js\"></script> "))
+
+(use-package ox-publish
+  :after ox
+  :config
+  ;; https://git.sr.ht/~taingram/taingram.org/tree/master/item/publish.el
+  (defun taingram--sitemap-dated-entry-format (entry style project)
+    "Sitemap PROJECT ENTRY STYLE format that includes date."
+    (let ((filename (org-publish-find-title entry project)))
+      (if (= (length filename) 0)
+          (format "*%s*" entry)
+        (format "{{{timestamp(%s)}}}   [[file:%s][%s]]"
+                (format-time-string "%Y-%m-%d"
+                                    (org-publish-find-date entry project))
+                entry
+                filename))))
+
+  (setq org-publish-project-alist
+        `(("site"
+           :base-directory "~/org/docs/blog/"
+           :base-extension "org"
+           :recursive nil
+           :publishing-directory "~/blog/"
+           :publishing-function org-html-publish-to-html)
+
+          ("posts"
+           :base-directory "~/org/docs/blog/posts/"
+           :base-extension "org"
+           :publishing-directory "~/blog/posts/"
+           :publishing-function org-html-publish-to-html
+           :with-author t
+           :auto-sitemap t
+           :sitemap-filename "index.org"
+           :sitemap-title "posts"
+           :sitemap-sort-files anti-chronologically
+           :sitemap-format-entry taingram--sitemap-dated-entry-format)
+
+          ("static"
+           :base-directory "~/org/docs/blog/"
+           :base-extension "css\\|js\\|txt\\|jpg\\|gif\\|png"
+           :recursive t
+           :publishing-directory  "~/blog/"
+           :publishing-function org-publish-attachment)
+
+          ("personal-website" :components ("site" "posts" "static")))))
+
 (provide 'init-org)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init-org.el ends here
+
+(add-to-list 'load-path "~/.emacs.d/css-sort/")
+(require 'css-sort)

@@ -76,6 +76,9 @@
   (crux-with-region-or-point-to-eol kill-ring-save)
   (defalias 'rename-file-and-buffer #'crux-rename-file-and-buffer))
 
+(add-to-list 'load-path "~/.emacs.d/blink-search/")
+(require 'blink-search)
+
 (use-package counsel
   :ensure t)
 
@@ -89,7 +92,8 @@
   (setq search-default-mode #'char-fold-to-regexp)
   (setq ivy-count-format "(%d/%d) ")
   :bind
-  (("C-s" . 'swiper)
+  (
+   ("C-s" . 'swiper)
    ("C-x b" . 'ivy-switch-buffer)
    ("C-c v" . 'ivy-push-view)
    ("C-c s" . 'ivy-switch-view)

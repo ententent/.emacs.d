@@ -47,6 +47,7 @@
 (require 'eaf-video-player)
 ;; eaf-music-player
 (require 'eaf-music-player)
+(setq eaf-music-default-file "~/MEGA/Music")
 
 ;; eaf-terminal
 (require 'eaf-terminal)
