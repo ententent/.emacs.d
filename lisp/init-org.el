@@ -899,6 +899,7 @@ This function makes sure that dates are aligned for easy reading."
       '(("en" "<a href=\"/index.html\" class=\"button\">Home</a>
                <a href=\"/posts/index.html\" class=\"button\">Posts</a>
                <a href=\"/about.html\" class=\"button\">About</a>
+               <a href=\"/rss.xml\" class=\"button\">RSS</a>
                <hr>")))
 
   (setq org-html-postamble t)
@@ -912,6 +913,42 @@ This function makes sure that dates are aligned for easy reading."
   (setq org-html-head
         "<link rel=\"stylesheet\" type=\"text/css\" href=\"/css/style.css\" />
          <script src=\"js/copy.js\"></script> "))
+
+; RSS Feed
+(add-to-list 'load-path "~/.emacs.d/lisp/")
+(require 'ox-rss)
+
+(defun posts-rss-feed (title list)
+  "Generate a sitemap of posts that is exported as a RSS feed.
+TITLE is the title of the RSS feed.  LIST is an internal
+representation for the files to include.  PROJECT is the current
+project."
+  (concat
+   "#+TITLE: " title "\n\n"
+          (org-list-to-subtree list)))
+
+(defun format-posts-rss-feed-entry (entry _style project)
+  "Format ENTRY for the posts RSS feed in PROJECT."
+  (let* (
+         (title (org-publish-find-title entry project))
+         (link (concat "posts/" (file-name-sans-extension entry) ".html"))
+         (pubdate (format-time-string (car org-time-stamp-formats)
+          (org-publish-find-date entry project))))
+    (message pubdate)
+    (format "%s
+:properties:
+:rss_permalink: %s
+:pubdate: %s
+:end:\n"
+            title
+            link
+            pubdate)))
+
+(defun publish-posts-rss-feed (plist filename dir)
+  "Publish PLIST to RSS when FILENAME is rss.org.
+DIR is the location of the output."
+  (if (equal "rss.org" (file-name-nondirectory filename))
+      (org-rss-publish-to-rss plist filename dir)))
 
 (use-package ox-publish
   :after ox
@@ -933,13 +970,14 @@ This function makes sure that dates are aligned for easy reading."
            :base-directory "~/org/docs/blog/"
            :base-extension "org"
            :recursive nil
-           :publishing-directory "~/blog/"
+           :publishing-directory "~/pages/"
            :publishing-function org-html-publish-to-html)
 
           ("posts"
            :base-directory "~/org/docs/blog/posts/"
            :base-extension "org"
-           :publishing-directory "~/blog/posts/"
+           :exclude "rss.org"
+           :publishing-directory "~/pages/posts/"
            :publishing-function org-html-publish-to-html
            :with-author t
            :auto-sitemap t
@@ -952,10 +990,28 @@ This function makes sure that dates are aligned for easy reading."
            :base-directory "~/org/docs/blog/"
            :base-extension "css\\|js\\|txt\\|jpg\\|gif\\|png"
            :recursive t
-           :publishing-directory  "~/blog/"
+           :publishing-directory  "~/pages/"
            :publishing-function org-publish-attachment)
 
-          ("personal-website" :components ("site" "posts" "static")))))
+          ("rss"
+            :publishing-directory "~/pages/"
+            :base-directory "~/org/docs/blog/posts"
+            :base-extension "org"
+            :exclude "index.org"
+            :publishing-function publish-posts-rss-feed
+            :rss-extension "xml"
+            :html-link-home "https://mawen.codeberg.page/"
+            :html-link-use-abs-url t
+            :html-link-org-files-as-html t
+            :auto-sitemap t
+            :sitemap-function posts-rss-feed
+            :sitemap-title "Wen Ma's Blog"
+            :sitemap-filename "rss.org"
+            :sitemap-style list
+            :sitemap-sort-files anti-chronologically
+            :sitemap-format-entry format-posts-rss-feed-entry)
+          
+          ("personal-website" :components ("site" "posts" "static" "rss")))))
 
 (add-to-list 'load-path "~/.emacs.d/site-lisp/css-sort/")
 (require 'css-sort)
