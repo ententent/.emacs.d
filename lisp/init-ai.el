@@ -3,7 +3,7 @@
 
 ;;; Code:
 
-(add-to-list 'load-path "~/.emacs.d/mind-wave/")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/mind-wave/")
 (require 'mind-wave)
 (setq mind-wave-auto-change-title nil) ; 避免与auto-save插件的冲突
 

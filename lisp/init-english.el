@@ -3,7 +3,7 @@
 
 ;;; Code:
 
-(add-to-list 'load-path "~/.emacs.d/popweb/")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/popweb/")
 (setq popweb-python-command "/usr/bin/python")
 ;; Proxy
 (setq popweb-proxy-type "http")
@@ -16,12 +16,12 @@
 (setq popweb-url-web-window-height-scale 0.15)
 
 ;; LaTeX preview functionality
-(add-to-list 'load-path "~/.emacs.d/popweb/extension/latex")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/popweb/extension/latex")
 (require 'popweb-latex)
 (add-hook 'latex-mode-hook #'popweb-latex-mode)
 
 ;; Chinese-English translation popup
-(add-to-list 'load-path "~/.emacs.d/popweb/extension/dict") ;
+(add-to-list 'load-path "~/.emacs.d/site-lisp/popweb/extension/dict") ;
 (require 'popweb-dict)
 
 (provide 'init-english)

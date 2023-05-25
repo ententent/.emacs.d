@@ -22,7 +22,7 @@
 ;; mv rime rime_bak/
 ;; git clone https://github.com/iDvel/rime-ice --depth=1
 ;; mv rime-ice rime/
-(add-to-list 'load-path "~/.emacs.d/emacs-rime/")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-rime/")
 (require 'rime)
 
 ;; 雾凇拼音

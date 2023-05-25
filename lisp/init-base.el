@@ -49,7 +49,7 @@
                      "COMMIT_EDITMSG\\'")))
 
 ; M-x package-install vundo
-(add-to-list 'load-path "~/.emacs.d/vundo/")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/vundo/")
 (require 'vundo)
 
 ;; auto-save @
@@ -76,7 +76,7 @@
   (crux-with-region-or-point-to-eol kill-ring-save)
   (defalias 'rename-file-and-buffer #'crux-rename-file-and-buffer))
 
-(add-to-list 'load-path "~/.emacs.d/blink-search/")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/blink-search/")
 (require 'blink-search)
 
 (use-package counsel

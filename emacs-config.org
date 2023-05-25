@@ -153,13 +153,13 @@
 - 使用由懒猫开发的一系列插件
 **** [[https://github.com/manateelazycat/lazycat-theme][lazycat-theme]]
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/lazycat-theme"))
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/site-lisp/lazycat-theme"))
 (require 'lazycat-theme)
 (lazycat-theme-load-dark)
 #+END_SRC
 **** [[https://github.com/manateelazycat/awesome-tray][awesome-tray]]
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/awesome-tray"))
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/site-lisp/awesome-tray"))
 (require 'awesome-tray)
 (awesome-tray-mode 1)
 #+END_SRC
@@ -180,33 +180,6 @@
 ;; (load-theme 'modus-vivendi t)
 #+END_SRC
 ** 字体配置
-*** cn-fonts
-- tumashu 开发的 [[https://github.com/tumashu/cnfonts][cnfonts]] 方便实现中英文字体等宽对齐
-#+BEGIN_SRC emacs-lisp
-;; (use-package cnfonts
-;;   :ensure t
-;;   :after all-the-icons
-;;   :hook (cnfonts-set-font-finish
-;;          . (lambda (fontsizes-list)
-;;              (set-fontset-font t 'unicode (font-spec :family "Noto Color Emoji") nil 'append)
-;;              (set-fontset-font t 'unicode (font-spec :family "Sarasa Term SC Nerd") nil 'append)
-;;              (set-fontset-font t 'unicode (font-spec :family "Noto Emoji") nil 'append)
-;;              (set-fontset-font t 'unicode (font-spec :family "all-the-icons") nil 'append)
-;;              (set-fontset-font t 'unicode (font-spec :family "file-icons") nil 'append)
-;;              (set-fontset-font t 'unicode (font-spec :family "Material Icons") nil 'append)
-;;              (set-fontset-font t 'unicode (font-spec :family "github-octicons") nil 'append)
-;;              (set-fontset-font t 'unicode (font-spec :family "FontAwesome") nil 'append)
-;;              (set-fontset-font t 'unicode (font-spec :family "Weather Icons") nil 'append)))
-
-;;   :custom
-;;   (cnfonts-personal-fontnames '(("Fira Mono" "JetBrains Mono" "Ubuntu Mono")
-;;                                 ("霞鹜文楷" "微软雅黑")
-;;                                 ("Simsun-ExtB" "方正聚珍新仿简繁" "PragmataPro Mono Liga")
-;;                                 ("Noto Emoji" "Sarasa Term SC Nerd" "Segoe UI Emoji" "Segoe UI Symbol" "Segoe Print")))
-;;   :config
-;;   (cnfonts-enable))
-#+END_SRC
-*** 金色飞贼小米的配置
 - 参考链接[[https://emacs-china.org/t/emacs/22193][为emacs正确配置英文、中文、符号字体的正确方式？]]
 #+BEGIN_SRC emacs-lisp
 ;; sudo mv * /usr/share/fonts/truetype
@@ -476,7 +449,7 @@
 ** vundo 撤销设置
 #+BEGIN_SRC emacs-lisp
 ; M-x package-install vundo
-(add-to-list 'load-path "~/.emacs.d/vundo/")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/vundo/")
 (require 'vundo)
 #+END_SRC
 ** auto-save自动保存
@@ -512,7 +485,7 @@
 ** blink-search
 - [[https://github.com/manateelazycat/blink-search][blink-search]] 是懒猫打造的搜索框架
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path "~/.emacs.d/blink-search/")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/blink-search/")
 (require 'blink-search)
 #+END_SRC
 ** ivy 增强
@@ -1762,10 +1735,6 @@ This function makes sure that dates are aligned for easy reading."
 #+END_SRC
 ** org-mode 写博客
 *** ox-html
-:LOGBOOK:
-CLOCK: [2023-05-25 星期四 10:15]--[2023-05-25 星期四 10:22] =>  0:07
-CLOCK: [2023-05-25 星期四 09:44]--[2023-05-25 星期四 10:09] =>  0:25
-:END:
 #+BEGIN_SRC emacs-lisp
 (use-package ox-html
   :after ox
@@ -1837,16 +1806,16 @@ CLOCK: [2023-05-25 星期四 09:44]--[2023-05-25 星期四 10:09] =>  0:25
 
           ("personal-website" :components ("site" "posts" "static")))))
 #+END_SRC
+*** css-sort
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path "~/.emacs.d/site-lisp/css-sort/")
+(require 'css-sort)
+#+END_SRC
 ** init-org.el 文件尾
 #+BEGIN_SRC emacs-lisp
 (provide 'init-org)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init-org.el ends here
-#+END_SRC
-*** css-sort
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path "~/.emacs.d/css-sort/")
-(require 'css-sort)
 #+END_SRC
 * init-lsp.el
 :PROPERTIES:
@@ -1884,7 +1853,7 @@ CLOCK: [2023-05-25 星期四 09:44]--[2023-05-25 星期四 10:09] =>  0:25
 ** lsp-bridge
 - [[https://github.com/manateelazycat/lsp-bridge][lsp-bridge]] 插件旨在实现Emacs生态中最快的LSP客户端
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path "~/.emacs.d/lsp-bridge/")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/lsp-bridge/")
 (require 'lsp-bridge)
 (global-lsp-bridge-mode)
 
@@ -1951,7 +1920,7 @@ CLOCK: [2023-05-25 星期四 09:44]--[2023-05-25 星期四 10:09] =>  0:25
 ;; mv rime rime_bak/
 ;; git clone https://github.com/iDvel/rime-ice --depth=1
 ;; mv rime-ice rime/
-(add-to-list 'load-path "~/.emacs.d/emacs-rime/")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-rime/")
 (require 'rime)
 
 ;; 雾凇拼音
@@ -2520,7 +2489,7 @@ CLOCK: [2023-05-25 星期四 09:44]--[2023-05-25 星期四 10:09] =>  0:25
 ** popweb
 - [[https://github.com/manateelazycat/popweb][popweb]] 由懒猫开发，显示弹出窗口。用途之一是英译中。
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path "~/.emacs.d/popweb/")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/popweb/")
 (setq popweb-python-command "/usr/bin/python")
 ;; Proxy
 (setq popweb-proxy-type "http")
@@ -2533,12 +2502,12 @@ CLOCK: [2023-05-25 星期四 09:44]--[2023-05-25 星期四 10:09] =>  0:25
 (setq popweb-url-web-window-height-scale 0.15)
 
 ;; LaTeX preview functionality
-(add-to-list 'load-path "~/.emacs.d/popweb/extension/latex")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/popweb/extension/latex")
 (require 'popweb-latex)
 (add-hook 'latex-mode-hook #'popweb-latex-mode)
 
 ;; Chinese-English translation popup
-(add-to-list 'load-path "~/.emacs.d/popweb/extension/dict") ;
+(add-to-list 'load-path "~/.emacs.d/site-lisp/popweb/extension/dict") ;
 (require 'popweb-dict) 
 #+END_SRC
 ** init-english.el 文件尾
@@ -2640,7 +2609,7 @@ CLOCK: [2023-05-25 星期四 09:44]--[2023-05-25 星期四 10:09] =>  0:25
 - 将 =API Key= 保存到 =~/.emacs.d/mind-wave/chatgpt_api_key.txt=
 - 安装 =Python= 依赖 =pip install openai epc sexpdata six=
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path "~/.emacs.d/mind-wave/")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/mind-wave/")
 (require 'mind-wave)
 (setq mind-wave-auto-change-title nil) ; 避免与auto-save插件的冲突
 #+END_SRC

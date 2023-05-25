@@ -17,7 +17,7 @@
 (require 'yasnippet)
 (yas-global-mode 1)
 
-(add-to-list 'load-path "~/.emacs.d/lsp-bridge/")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/lsp-bridge/")
 (require 'lsp-bridge)
 (global-lsp-bridge-mode)
 
