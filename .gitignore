@@ -1,3 +1,4 @@
+__pycache__/
 .cache/
 .gitignore~
 all-the-icons/
@@ -14,7 +15,6 @@ eshell/
 history
 init.el~
 /lsp-bridge
-mind-wave/
 projectile.cache
 projectile-bookmarks.eld
 recentf
@@ -26,3 +26,9 @@ var/
 var/savehist.el
 var/save-place.el
 var/recentf-save.el
+
+# blink-search
+history.txt
+
+# popweb
+popweb/browser
