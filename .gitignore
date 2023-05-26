@@ -1,11 +1,35 @@
+# python
 __pycache__/
-.cache/
+
+# emacs
 .gitignore~
-all-the-icons/
-auto-save-list/
-blink-search.db
+init.el~
 bookmarks
 bookmarks~
+
+# blink-search
+blink-search.db
+history.txt
+
+# mind-wave
+chatgpt_api_key.txt
+
+# popweb
+popweb/browser
+
+# projectile
+projectile.cache
+projectile-bookmarks.eld
+
+# recentf
+recentf
+
+# tramp
+tramp
+
+.cache/
+all-the-icons/
+auto-save-list/
 eaf/
 eln-cache/
 elpa/
@@ -13,22 +37,10 @@ emacs-application-framework/
 emacs-rime/
 eshell/
 history
-init.el~
-/lsp-bridge
-projectile.cache
-projectile-bookmarks.eld
-recentf
 server/
-tramp
 transient/
 url/
 var/
 var/savehist.el
 var/save-place.el
 var/recentf-save.el
-
-# blink-search
-history.txt
-
-# popweb
-popweb/browser
