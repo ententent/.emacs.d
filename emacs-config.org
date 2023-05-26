@@ -149,8 +149,7 @@
 ;;; Code:
 #+END_SRC
 ** 主题配置
-*** 主要
-- 使用由懒猫开发的一系列插件
+- 主要使用由懒猫开发的一系列插件
 **** [[https://github.com/manateelazycat/lazycat-theme][lazycat-theme]]
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/site-lisp/lazycat-theme"))
@@ -162,22 +161,6 @@
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/site-lisp/awesome-tray"))
 (require 'awesome-tray)
 (awesome-tray-mode 1)
-#+END_SRC
-*** 其他
-- [[https://github.com/doomemacs/themes#manually--use-package][doom-themes]]
-#+BEGIN_SRC emacs-lisp
-;; (use-package doom-themes
-;;   :ensure t
-;;   :config
-;;    ;; Global settings (defaults)
-;;   (setq doom-themes-enable-bold nil    ; if nil, bold is universally disabled
-;; 	doom-themes-enable-italic t) ; if nil, italics is universally disabled
-;;   (load-theme 'doom-peacock t)
-;;   (doom-themes-treemacs-config))
-#+END_SRC
-- [[https://github.com/protesilaos/modus-themes][modus]]
-#+BEGIN_SRC emacs-lisp
-;; (load-theme 'modus-vivendi t)
 #+END_SRC
 ** 字体配置
 - 参考链接[[https://emacs-china.org/t/emacs/22193][为emacs正确配置英文、中文、符号字体的正确方式？]]
@@ -736,7 +719,7 @@ Version 2019-11-04"
 ;;; Code:
 #+END_SRC
 ** Emacs备份设置
-+ 不使用Emacs的自动备份设置。
+- 不使用Emacs的自动备份设置。
 #+BEGIN_SRC emacs-lisp
 (setq make-backup-files nil)                                  ; 不自动备份
 (setq auto-save-default nil)                                  ; 不使用Emacs自带的自动保存
@@ -752,7 +735,6 @@ Version 2019-11-04"
 (global-set-key (kbd "C-x C-z") nil)
 (global-set-key [mouse-2] nil)
 #+END_SRC
-** 对 org 文件进行自动 tangle
 ** init-edit.el 文件尾
 #+BEGIN_SRC emacs-lisp
 ;; (message "init-base configuration: %.2fs"
@@ -775,7 +757,7 @@ Version 2019-11-04"
 #+END_SRC
 ** beancount 复式簿记法
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path "~/.emacs.d/lisp/")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/beancount/")
 (require 'beancount)
 (add-to-list 'auto-mode-alist '("\\.bean\\'" . beancount-mode))
 ;; (add-hook 'beancount-mode-hook
@@ -1121,12 +1103,12 @@ Version 2019-11-04"
 *** org-auto-tangle 自动tangle设置
 - [[https://github.com/yilkalargaw/org-auto-tangle][org-auto-tangle]] 插件可以在Org mode下自动进行tangle。
 #+BEGIN_SRC emacs-lisp
-;; (use-package org-auto-tangle
-;;   :ensure t
-;;   :hook (org-mode . org-auto-tangle-mode)
-;;   :config
-;;   (setq org-auto-tangle-default t)
-;;   )
+(use-package org-auto-tangle
+  :ensure t
+  :hook (org-mode . org-auto-tangle-mode)
+  :config
+  (setq org-auto-tangle-default t)
+  )
 #+END_SRC
 *** org-src
 - 代码块基础设置
@@ -1967,47 +1949,6 @@ DIR is the location of the output."
 (use-package which-key
   :ensure t
   :init (which-key-mode))
-#+END_SRC
-** emacs-rime
-#+BEGIN_SRC emacs-lisp
-;; dependency
-;; sudo apt install fcitx5 fcitx5-* librime-dev
-;; cd ~/.local/share/fcitx5/rime
-;; mv rime rime_bak/
-;; git clone https://github.com/iDvel/rime-ice --depth=1
-;; mv rime-ice rime/
-(add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-rime/")
-(require 'rime)
-
-;; 雾凇拼音
-;;; https://emacs-china.org/t/emacs-rime/24125
-;;; https://github.com/iDvel/rime-ice
-
-;;; Code:
-(setq rime-user-data-dir "~/.local/share/fcitx5/rime")
-
-(setq rime-posframe-properties
-      (list :background-color "#333333"
-            :foreground-color "#dcdccc"
-            ;;:font "WenQuanYi Micro Hei Mono-14"
-            :internal-border-width 10))
-
-(setq default-input-method "rime"
-      rime-show-candidate 'posframe)
-#+END_SRC
-** evil
-#+BEGIN_SRC emacs-lisp
-;; (use-package evil
-;;   :ensure t
-;;   :defer 1
-;;   :preface
-;;   (setq evil-want-visual-char-semi-exclusive t
-;;         evil-echo-state t
-;;         evil-symbol-word-search t
-;;         evil-want-C-i-jump nil
-;;         org-adapt-indentation t)
-;;   :config
-;;   (evil-mode 1))
 #+END_SRC
 ** init-tools.el 文件尾
 #+BEGIN_SRC emacs-lisp

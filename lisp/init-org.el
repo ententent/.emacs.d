@@ -308,12 +308,12 @@
   (setq org-appear-inside-latex t)
   )
 
-;; (use-package org-auto-tangle
-;;   :ensure t
-;;   :hook (org-mode . org-auto-tangle-mode)
-;;   :config
-;;   (setq org-auto-tangle-default t)
-;;   )
+(use-package org-auto-tangle
+  :ensure t
+  :hook (org-mode . org-auto-tangle-mode)
+  :config
+  (setq org-auto-tangle-default t)
+  )
 
 (use-package org-src
   :ensure nil
