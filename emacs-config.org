@@ -2628,6 +2628,21 @@ os.environ["https_proxy"]="http://127.0.0.1:7890"
 **** 代码模式
 **** 摘要模式
 **** 模型选择
+** org-ai
+#+BEGIN_SRC emacs-lisp
+(setq url-proxy-services
+      '(("http"  . "127.0.0.1:7890")
+        ("https" . "127.0.0.1:7890")))
+
+(use-package org-ai
+  :ensure t
+  :bind (("C-c q" . org-ai-prompt)
+         ("C-c x" . org-ai-on-region))
+  :hook (org-mode . org-ai-mode)
+  :config
+  (setq org-ai-default-max-tokens 480)
+  (setq org-ai-default-chat-system-prompt "你是一个 Emacs 助手，请以 Org-mode 的格式来回复我"))
+#+END_SRC
 ** init-ai.el 文件尾
 #+BEGIN_SRC emacs-lisp
 (provide 'init-ai)
