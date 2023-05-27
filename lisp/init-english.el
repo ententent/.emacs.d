@@ -9,8 +9,8 @@
 (use-package sdcv
   :commands (sdcv-search-pointer+)
   :bind
-  (("\e\e ," . sdcv-search-pointer+)
-   ("\e\e ." . sdcv-search-pointer))
+  (("\e\e w ," . sdcv-search-pointer+)
+   ("\e\e w ." . sdcv-search-pointer))
   :config
   (setq sdcv-say-word-p t)
   (setq sdcv-dictionary-data-dir (expand-file-name "~/.emacs.d/site-lisp/sdcv"))
@@ -27,6 +27,14 @@
   (setq sdcv-tooltip-timeout 10)
   (setq sdcv-fail-notify-string "没找到释义")
   (setq sdcv-tooltip-border-width 2)
+  )
+
+(add-to-list 'load-path "~/.emacs.d/site-lisp/company-english-helper/")
+(require 'company-english-helper)
+
+(use-package company-english-helper
+  :bind
+  (("\e\e w w" . toggle-company-english-helper))
   )
 
 (add-to-list 'load-path "~/.emacs.d/site-lisp/popweb/")

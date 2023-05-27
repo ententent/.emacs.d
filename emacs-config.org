@@ -1327,6 +1327,8 @@ Version 2019-11-04"
                            ("n" "Notes" entry (file+headline "capture.org" "Notes")
                             "* %? %^g\n%i\n"
                             :empty-lines-after 1)
+                           ("w" "Words" entry (file+headline "~/org/drill/English/vocabulary.org" "vocabulary")
+                            "* %^{word} :drill:\n%^{Context}\n** Meaning\n%^{Meaning}\n")
                            ;; For EWW
                            ("b" "Bookmarks" entry (file+headline "capture.org" "Bookmarks")
                             "* %:description\n\n%a%?"
@@ -2483,7 +2485,8 @@ DIR is the location of the output."
 
 ;;; Code:
 #+END_SRC
-** sdcv
+** sdcv 查单词
+- =sudo pacman -S stardict sdcv=
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/site-lisp/sdcv/")
 (require 'sdcv)
@@ -2491,8 +2494,8 @@ DIR is the location of the output."
 (use-package sdcv
   :commands (sdcv-search-pointer+)
   :bind
-  (("\e\e ," . sdcv-search-pointer+)
-   ("\e\e ." . sdcv-search-pointer))
+  (("\e\e w ," . sdcv-search-pointer+)
+   ("\e\e w ." . sdcv-search-pointer))
   :config
   (setq sdcv-say-word-p t)
   (setq sdcv-dictionary-data-dir (expand-file-name "~/.emacs.d/site-lisp/sdcv"))
@@ -2509,6 +2512,16 @@ DIR is the location of the output."
   (setq sdcv-tooltip-timeout 10)
   (setq sdcv-fail-notify-string "没找到释义")
   (setq sdcv-tooltip-border-width 2)
+  )
+#+END_SRC
+** company-english-helper 写单词
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path "~/.emacs.d/site-lisp/company-english-helper/")
+(require 'company-english-helper)
+
+(use-package company-english-helper
+  :bind
+  (("\e\e w w" . toggle-company-english-helper))
   )
 #+END_SRC
 ** popweb

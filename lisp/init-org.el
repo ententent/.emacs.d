@@ -524,6 +524,8 @@
                            ("n" "Notes" entry (file+headline "capture.org" "Notes")
                             "* %? %^g\n%i\n"
                             :empty-lines-after 1)
+                           ("w" "Words" entry (file+headline "~/org/drill/English/vocabulary.org" "vocabulary")
+                            "* %^{word} :drill:\n%^{Context}\n** Meaning\n%^{Meaning}\n")
                            ;; For EWW
                            ("b" "Bookmarks" entry (file+headline "capture.org" "Bookmarks")
                             "* %:description\n\n%a%?"
