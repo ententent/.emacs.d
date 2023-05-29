@@ -515,6 +515,14 @@
   :if window-system          ; 在图形化界面时才使用这个插件
   :init (good-scroll-mode))
 #+END_SRC
+** toggle-one-window 最大化窗口布局与恢复
+- 来自懒猫的插件 [[https://github.com/manateelazycat/toggle-one-window][toggle-one-window]]
+- 遇到需要阅读较长文字的场合，可使用 =toggle-one-window= 命令切换到最大化模式。
+- 阅览完毕后再次调用 =toggle-one-window= 命令恢复窗口布局。
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path "~/.emacs.d/site-lisp/toggle-one-window/")
+(require 'toggle-one-window)
+#+END_SRC
 ** ace-window 多窗口切换
 #+BEGIN_SRC emacs-lisp
 ;; ace-window

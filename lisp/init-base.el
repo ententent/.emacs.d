@@ -112,6 +112,9 @@
   :if window-system          ; 在图形化界面时才使用这个插件
   :init (good-scroll-mode))
 
+(add-to-list 'load-path "~/.emacs.d/site-lisp/toggle-one-window/")
+(require 'toggle-one-window)
+
 ;; ace-window
 (use-package ace-window
   :ensure t
