@@ -187,6 +187,9 @@
 (define-key awesome-pair-mode-map (kbd "M-n") 'awesome-pair-jump-left)
 (define-key awesome-pair-mode-map (kbd "M-:") 'awesome-pair-jump-out-pair-and-newline)
 
+(add-to-list 'load-path "~/.emacs.d/site-lisp/color-rg/")
+(require 'color-rg)
+
 (provide 'init-dev)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init-dev.el ends here

@@ -2187,6 +2187,11 @@ DIR is the location of the output."
 (define-key awesome-pair-mode-map (kbd "M-n") 'awesome-pair-jump-left)
 (define-key awesome-pair-mode-map (kbd "M-:") 'awesome-pair-jump-out-pair-and-newline)
 #+END_SRC
+** color-rg 基于ripgrep的搜索和重构工具
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path "~/.emacs.d/site-lisp/color-rg/")
+(require 'color-rg)
+#+END_SRC
 ** init-dev.el 文件尾
 #+BEGIN_SRC emacs-lisp
 (provide 'init-dev)

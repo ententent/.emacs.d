@@ -80,6 +80,10 @@
 ;;
 
 ;;; Change log:
+;; 2023/06/03
+;;      * Add `awesome-tray-module-celestial-info' to show moon phase date and sunrise/sunset time.
+;;      * Add `awesome-tray-location-info-all', `awesome-tray-location-info-top',
+;;        and `awesome-tray-location-info-bottom' to use custom string for All, Top and Bottom in buffer location info.
 ;;
 ;; 2022/03/01
 ;;      * Use overlay re-implement tray information render.
@@ -316,6 +320,21 @@ If nil, don't update the awesome-tray automatically."
   :group 'awesome-tray
   :type 'string)
 
+(defcustom awesome-tray-location-info-all ""
+  "Default string indicating buffer all."
+  :group 'awesome-tray
+  :type 'string)
+
+(defcustom awesome-tray-location-info-top " ⬆"
+  "Default string indicating buffer top."
+  :group 'awesome-tray
+  :type 'string)
+
+(defcustom awesome-tray-location-info-bottom " ⬇"
+  "Default string indicating buffer bottom."
+  :group 'awesome-tray
+  :type 'string)
+
 (defcustom awesome-tray-ellipsis "…"
   "Default string for the ellipsis when something is truncated."
   :group 'awesome-tray
@@ -498,6 +517,8 @@ Example:
   '(("awesome-tab" . (awesome-tray-module-awesome-tab-info awesome-tray-module-awesome-tab-face))
     ("buffer-name" . (awesome-tray-module-buffer-name-info awesome-tray-module-buffer-name-face))
     ("circe" . (awesome-tray-module-circe-info awesome-tray-module-circe-face))
+    ("date" . (awesome-tray-module-date-info awesome-tray-module-date-face))
+    ("celestial" . (awesome-tray-module-celestial-info awesome-tray-module-celestial-face))
     ("date" . (awesome-tray-module-date-info awesome-tray-module-date-face))
     ("evil" . (awesome-tray-module-evil-info awesome-tray-module-evil-face))
     ("file-path" . (awesome-tray-module-file-path-info awesome-tray-module-file-path-face))
@@ -729,7 +750,7 @@ Requires `anzu', also `evil-anzu' if using `evil-mode' for compatibility with
                  (setq battery-type "OFF")
                  (if (eq system-type 'darwin)
                      (setq battery-status (battery-format " [%p%%]" battery-info))
-                     (setq battery-status (battery-format " [%p%% %t]" battery-info)))))
+                   (setq battery-status (battery-format " [%p%% %t]" battery-info)))))
 
           ;; Update battery cache.
           (setq awesome-tray-battery-status-cache (concat battery-type battery-status)))
@@ -741,7 +762,13 @@ Requires `anzu', also `evil-anzu' if using `evil-mode' for compatibility with
 (defun awesome-tray-module-location-info ()
   (if (equal major-mode 'eaf-mode)
       ""
-    (concat (format-mode-line awesome-tray-location-format))))
+    (string-replace
+     " All" awesome-tray-location-info-all
+     (string-replace
+      " Top" awesome-tray-location-info-top
+      (string-replace
+       " Bottom" awesome-tray-location-info-bottom
+       (format-mode-line awesome-tray-location-format))))))
 
 (with-eval-after-load 'libmpdel
   (add-hook 'libmpdel-current-playlist-changed-hook 'awesome-tray-mpd-command-update-cache)
@@ -776,6 +803,14 @@ Requires `anzu', also `evil-anzu' if using `evil-mode' for compatibility with
 (defun awesome-tray-module-date-info ()
   "Displays the date."
   (format-time-string awesome-tray-date-format))
+
+(defun awesome-tray-module-celestial-info ()
+  "Displays lunar phase and sunrise/sunset time."
+  (with-demoted-errors
+      ""
+    (if (featurep 'celestial-mode-line)
+        celestial-mode-line-string
+      "")))
 
 (defun awesome-tray-module-last-command-info ()
   (format "%s" last-command))
@@ -1131,18 +1166,19 @@ If right is non nil, replace to the right"
   (interactive)
   (when awesome-tray-hide-mode-line
     ;; Restore mode-line colors.
-    (set-face-attribute 'mode-line nil
-                        :foreground (nth 0 awesome-tray-mode-line-colors)
-                        :background (nth 1 awesome-tray-mode-line-colors)
-                        :family (nth 2 awesome-tray-mode-line-colors)
-                        :box (nth 3 awesome-tray-mode-line-colors)
-                        :height awesome-tray-mode-line-default-height)
-    (set-face-attribute 'mode-line-inactive nil
-                        :foreground (nth 4 awesome-tray-mode-line-colors)
-                        :background (nth 5 awesome-tray-mode-line-colors)
-                        :family (nth 6 awesome-tray-mode-line-colors)
-                        :box (nth 7 awesome-tray-mode-line-colors)
-                        :height awesome-tray-mode-line-default-height))
+    (when awesome-tray-mode-line-colors
+      (set-face-attribute 'mode-line nil
+                          :foreground (nth 0 awesome-tray-mode-line-colors)
+                          :background (nth 1 awesome-tray-mode-line-colors)
+                          :family (nth 2 awesome-tray-mode-line-colors)
+                          :box (nth 3 awesome-tray-mode-line-colors)
+                          :height awesome-tray-mode-line-default-height)
+      (set-face-attribute 'mode-line-inactive nil
+                          :foreground (nth 4 awesome-tray-mode-line-colors)
+                          :background (nth 5 awesome-tray-mode-line-colors)
+                          :family (nth 6 awesome-tray-mode-line-colors)
+                          :box (nth 7 awesome-tray-mode-line-colors)
+                          :height awesome-tray-mode-line-default-height)))
 
   ;; Remove awesome-tray overlays
   (mapc 'delete-overlay awesome-tray-overlays)
