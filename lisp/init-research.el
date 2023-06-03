@@ -70,15 +70,6 @@
                 :target
                 (file+head "ref/${citekey}.org" "#+title: ${title}\n"))))
 
-;; pdf-tools
-;;; Windows Installation
-;;;; M-x package-list-packages -> pdf-tools (from melpa-stable)
-;;;; scoop install msys2
-;;;; open mingw64.exe under msys2
-;;;; pacman -S mingw-w64-x86_64-texlive-full
-;;;; pacman -S mingw-w64-x86_64-emacs-pdf-toool-s-server
-;;;; add E:\Scoop\apps\msys2\current\mingw64\bin to environment variable
-;;;; pdf-tools-install
 (use-package pdf-tools
   :mode ("\\.pdf\\'" . pdf-view-mode)                           ;; pdf 文件默认打开方式
   :bind
