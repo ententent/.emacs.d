@@ -179,9 +179,9 @@
 ;; 数学符号默认字体，保证 Unicode 数学符号可以正确显示
 (set-fontset-font "fontset-default" 'mathematical "Cambria Math")
 ;; 固定间距字体 @ https://www.jetbrains.com/lp/mono/
-(set-face-attribute 'fixed-pitch nil :font "JetBrains Mono"  :height 100)
+(set-face-attribute 'fixed-pitch nil :font "JetBrains Mono"  :height 135)
 ;; 可变间距字体
-(set-face-attribute 'variable-pitch nil :font "Segoe Print" :height 100 :weight 'regular)
+(set-face-attribute 'variable-pitch nil :font "Segoe Print" :height 135 :weight 'regular)
 #+END_SRC
 ** 其他UI零散设置项
 #+begin_src emacs-lisp
@@ -2686,8 +2686,8 @@ DIR is the location of the output."
 (require 'eaf-music-player)
 (setq eaf-music-default-file "~/MEGA/Music/songs")
 
-;; eaf-terminal
-(require 'eaf-terminal)
+;; eaf-pyqterminal
+(require 'eaf-pyqterminal)
 ;; eaf-file-manager
 (require 'eaf-file-manager)
 ;; eaf-system-monitor

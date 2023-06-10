@@ -49,8 +49,8 @@
 (require 'eaf-music-player)
 (setq eaf-music-default-file "~/MEGA/Music/songs")
 
-;; eaf-terminal
-(require 'eaf-terminal)
+;; eaf-pyqterminal
+(require 'eaf-pyqterminal)
 ;; eaf-file-manager
 (require 'eaf-file-manager)
 ;; eaf-system-monitor
