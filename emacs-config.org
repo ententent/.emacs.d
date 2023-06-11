@@ -118,7 +118,6 @@
   (require 'init-ai)
   (require 'init-base)
   (require 'init-dev)
-  (require 'init-dired)
   (require 'init-eaf)
   (require 'init-edit)
   (require 'init-english)
@@ -448,7 +447,7 @@
 ;; (setq auto-save-delete-trailing-whitespace t)
 #+END_SRC
 ** crux系统增强
-+ [[https://github.com/bbatsov/crux][crux]] 提供一系列的增强，如移动增强、删除增强等。
+- [[https://github.com/bbatsov/crux][crux]] 提供一系列的增强，如移动增强、删除增强等。
 #+BEGIN_SRC emacs-lisp
 ;; crux
 (use-package crux
@@ -535,185 +534,6 @@
 (provide 'init-base)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init-base.el ends here
-#+END_SRC
-* init-dired.el
-:PROPERTIES:
-:HEADER-ARGS: :tangle lisp/init-dired.el :mkdirp yes
-:END:
-** init-dired.el 文件头
-#+BEGIN_SRC emacs-lisp
-;;; init-dired.el --- Dired settings -*- lexical-binding: t -*-
-;;; Commentary:
-
-;;; Code:
-#+END_SRC
-** dired 基础配置
-#+BEGIN_SRC emacs-lisp
-(use-package dired
-  :ensure nil
-  :bind (:map dired-mode-map
-              ("C-<return>" . xah-open-in-external-app)
-              ("W" . dired-copy-path)
-              )
-  :config
-  ;; Enable the disabled dired commands
-  (put 'dired-find-alternate-file 'disabled nil)
-
-  ;; open files via external program based on file types, See:
-  ;; https://emacs.stackexchange.com/questions/3105/how-to-use-an-external-program-as-the-default-way-to-open-pdfs-from-emacs
-  (defun xdg-open (filename)
-    (interactive "fFilename: ")
-    (let ((process-connection-type))
-      (start-process "" nil (cond ((eq system-type 'gnu/linux) "xdg-open")
-                                  ((eq system-type 'darwin) "open")
-                                  ((eq system-type 'windows-nt) "start")
-                                  (t "")) (expand-file-name filename))))
-  ;; open files via external program when using find-file
-  (defun find-file-auto (orig-fun &rest args)
-    (let ((filename (car args)))
-      (if (cl-find-if
-           (lambda (regexp) (string-match regexp filename))
-           '(
-             ;; "\\.html?\\'"
-             "\\.xlsx?\\'"
-             "\\.pptx?\\'"
-             "\\.docx?\\'"
-             "\\.mp4\\'"
-             "\\.app\\'"
-             ))
-          (xdg-open filename)
-        (apply orig-fun args))))
-  (advice-add 'find-file :around 'find-file-auto)
-
-  (defun dired-copy-path ()
-    "In dired, copy file path to kill-buffer.
-At 2nd time it copy current directory to kill-buffer."
-    (interactive)
-    (let (path)
-      (setq path (dired-file-name-at-point))
-      (if (string= path (current-kill 0 1)) (setq path (dired-current-directory)))
-      (message path)
-      (kill-new path)))
-
-  (defun xah-open-in-external-app (&optional @fname)
-    "Open the current file or dired marked files in external app.
-The app is chosen from your OS's preference.
-
-When called in emacs lisp, if @fname is given, open that.
-
-URL `http://ergoemacs.org/emacs/emacs_dired_open_file_in_ext_apps.html'
-Version 2019-11-04"
-    (interactive)
-    (let* (
-           ($file-list
-            (if @fname
-                (progn (list @fname))
-              (if (or (string-equal major-mode "dired-mode")
-                      (string-equal major-mode "dirvish-mode"))
-                  (dired-get-marked-files)
-                (list (buffer-file-name)))))
-           ($do-it-p (if (<= (length $file-list) 5)
-                         t
-                       (y-or-n-p "Open more than 5 files? "))))
-      (when $do-it-p
-        (cond
-         ((string-equal system-type "windows-nt")
-          (mapc
-           (lambda ($fpath)
-             (w32-shell-execute "open" $fpath)) $file-list))
-         ((string-equal system-type "darwin")
-          (mapc
-           (lambda ($fpath)
-             (shell-command
-              (concat "open " (shell-quote-argument $fpath))))  $file-list))
-         ((string-equal system-type "gnu/linux")
-          (mapc
-           (lambda ($fpath) (let ((process-connection-type nil))
-                              (start-process "" nil "xdg-open" $fpath))) $file-list))))))
-  :custom
-  ;; (dired-recursive-deletes 'always)
-  (delete-by-moving-to-trash t)
-  (dired-dwim-target t)
-  (dired-bind-vm nil)
-  (dired-bind-man nil)
-  (dired-bind-info nil)
-  (dired-auto-revert-buffer t)
-  (dired-hide-details-hide-symlink-targets nil)
-  (dired-kill-when-opening-new-dired-buffer t)
-  (dired-listing-switches "-AFhlv"))
-
-(use-package dired-aux
-  :ensure nil
-  :bind (:map dired-mode-map
-              ("C-c +" . dired-create-empty-file))
-  :config
-  ;; with the help of `evil-collection', P is bound to `dired-do-print'.
-  (define-advice dired-do-print (:override (&optional _))
-    "Show/hide dotfiles."
-    (interactive)
-    (if (or (not (boundp 'dired-dotfiles-show-p)) dired-dotfiles-show-p)
-        (progn
-          (setq-local dired-dotfiles-show-p nil)
-          (dired-mark-files-regexp "^\\.")
-          (dired-do-kill-lines))
-      (revert-buffer)
-      (setq-local dired-dotfiles-show-p t)))
-  :custom
-  (dired-isearch-filenames 'dwim)
-  (dired-create-destination-dirs 'ask)
-  (dired-vc-rename-file t))
-
-(use-package dired-x
-  :ensure nil
-  :hook (dired-mode . dired-omit-mode)
-  :init
-  (setq dired-guess-shell-alist-user `((,(rx "."
-                                             (or
-                                              ;; Videos
-                                              "mp4" "avi" "mkv" "flv" "ogv" "ogg" "mov"
-                                              ;; Music
-                                              "wav" "mp3" "flac"
-                                              ;; Images
-                                              "jpg" "jpeg" "png" "gif" "xpm" "svg" "bmp"
-                                              ;; Docs
-                                              "pdf" "md" "djvu" "ps" "eps" "doc" "docx" "xls" "xlsx" "ppt" "pptx")
-                                             string-end)
-                                        ,(cond ((eq system-type 'gnu/linux) "xdg-open")
-                                               ((eq system-type 'darwin) "open")
-                                               ((eq system-type 'windows-nt) "start")
-                                               (t "")))))
-  :custom
-  (dired-omit-verbose nil)
-  (dired-omit-files (rx string-start
-                        (or ".DS_Store"
-                            ".cache"
-                            ".vscode"
-                            ".ccls-cache" ".clangd")
-                        string-end))
-  ;; Dont prompt about killing buffer visiting delete file
-  (dired-clean-confirm-killing-deleted-buffers nil)
-  )
-#+END_SRC
-** diredfl 多彩美化
-+ 默认的 Dired 只有两种颜色以区分文件和文件夹，使用 [[https://github.com/purcell/diredfl][diredfl]] 插件让Dired变得多彩
-#+BEGIN_SRC emacs-lisp
-(use-package diredfl
-  :ensure t
-  :hook (dired-mode . diredfl-mode))
-#+END_SRC
-** all-the-icons-dired 图标美化
-+ 使用 [[https://github.com/jtbm37/all-the-icons-dired][all-the-icons-dired]] 插件为Dired添加好看的图标
-#+BEGIN_SRC emacs-lisp
-(use-package all-the-icons-dired
-  :ensure t
-  :hook (dired-mode . all-the-icons-dired-mode)
-  )
-#+END_SRC
-** init-dired.el 文件尾
-#+BEGIN_SRC emacs-lisp
-(provide 'init-dired)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; init-dired.el ends here
 #+END_SRC
 * init-edit.el
 :PROPERTIES:
@@ -1356,11 +1176,9 @@ Version 2019-11-04"
   - =sudo pacman -S libnotify=
   - =sudo apt install libnotify-dev=
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path "~/.emacs.d/site-lisp/org-pomodoro/")
-(require 'org-pomodoro)
-
 (use-package org-pomodoro
   :after org
+  :load-path "~/.emacs.d/site-lisp/org-pomodoro/"
   :config
   (setq alert-user-configuration (quote ((((:category . "org-pomodoro")) libnotify nil)))
         
@@ -1902,10 +1720,10 @@ DIR is the location of the output."
 ;;; Code:
 #+END_SRC
 ** exec-path-from-shell
-+ purcell 开发的 [[https://github.com/purcell/exec-path-from-shell][exec-path-from-shell]] 让Emacs使用用户shell所设定的$PATH
+- purcell 开发的 [[https://github.com/purcell/exec-path-from-shell][exec-path-from-shell]] 让Emacs使用用户shell所设定的$PATH
 #+BEGIN_SRC emacs-lisp
 (use-package exec-path-from-shell
-  :ensure t
+  :load-path "~/.emacs.d/site-lisp/exec-path-from-shell/"
   :config
   (when (memq window-system '(mac ns x))
     (exec-path-from-shell-initialize)))
@@ -1913,14 +1731,14 @@ DIR is the location of the output."
 ** restart-emacs 重启
 #+BEGIN_SRC emacs-lisp
 (use-package restart-emacs
-  :ensure t)
+  :load-path "~/.emacs.d/site-lisp/restart-emacs/")
 #+END_SRC
-** which-key 快捷键
-+ [[https://github.com/justbur/emacs-which-key][which-key]] 插件将提示快捷键
+** which-key 快捷键提示
 #+BEGIN_SRC emacs-lisp
 (use-package which-key
-  :ensure t
-  :init (which-key-mode))
+  :load-path "~/.emacs.d/site-lisp/which-key/"
+  :config
+  (which-key-mode 1))
 #+END_SRC
 ** init-tools.el 文件尾
 #+BEGIN_SRC emacs-lisp
@@ -2480,40 +2298,6 @@ DIR is the location of the output."
   (setq sdcv-fail-notify-string "没找到释义")
   (setq sdcv-tooltip-border-width 2)
   )
-#+END_SRC
-** company-english-helper 写单词
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path "~/.emacs.d/site-lisp/company-english-helper/")
-(require 'company-english-helper)
-
-(use-package company-english-helper
-  :bind
-  (("\e\e w w" . toggle-company-english-helper))
-  )
-#+END_SRC
-** popweb
-- [[https://github.com/manateelazycat/popweb][popweb]] 由懒猫开发，显示弹出窗口。用途之一是英译中。
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path "~/.emacs.d/site-lisp/popweb/")
-(setq popweb-python-command "/usr/bin/python")
-;; Proxy
-(setq popweb-proxy-type "http")
-(setq popweb-proxy-host "127.0.0.1")
-(setq popweb-proxy-port "7890")
-;; Font size
-(setq popweb-zoom-factor 0.5)
-;; Scaled to emacs
-(setq popweb-url-web-window-width-scale 0.8)
-(setq popweb-url-web-window-height-scale 0.15)
-
-;; LaTeX preview functionality
-(add-to-list 'load-path "~/.emacs.d/site-lisp/popweb/extension/latex")
-(require 'popweb-latex)
-(add-hook 'latex-mode-hook #'popweb-latex-mode)
-
-;; Chinese-English translation popup
-(add-to-list 'load-path "~/.emacs.d/site-lisp/popweb/extension/dict") ;
-(require 'popweb-dict) 
 #+END_SRC
 ** init-english.el 文件尾
 #+BEGIN_SRC emacs-lisp

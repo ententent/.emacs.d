@@ -53,7 +53,6 @@
   (require 'init-ai)
   (require 'init-base)
   (require 'init-dev)
-  (require 'init-dired)
   (require 'init-eaf)
   (require 'init-edit)
   (require 'init-english)

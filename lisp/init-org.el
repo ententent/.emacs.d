@@ -536,11 +536,9 @@
                            ))
   )
 
-(add-to-list 'load-path "~/.emacs.d/site-lisp/org-pomodoro/")
-(require 'org-pomodoro)
-
 (use-package org-pomodoro
   :after org
+  :load-path "~/.emacs.d/site-lisp/org-pomodoro/"
   :config
   (setq alert-user-configuration (quote ((((:category . "org-pomodoro")) libnotify nil)))
         
