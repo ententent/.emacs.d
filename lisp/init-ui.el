@@ -29,135 +29,163 @@
 ;; 可变间距字体
 (set-face-attribute 'variable-pitch nil :font "Segoe Print" :height 135 :weight 'regular)
 
-  ;; 禁用一些GUI特性
-  (setq use-dialog-box nil)               ; 鼠标操作不使用对话框
-  (setq inhibit-default-init t)           ; 不加载 `default' 库
-  (setq inhibit-startup-screen t)         ; 不加载启动画面
-  (setq inhibit-startup-message t)        ; 不加载启动消息
-  (setq inhibit-startup-buffer-menu t)    ; 不显示缓冲区列表
+(fset 'yes-or-no-p 'y-or-n-p)                   ; 以 y/n 代表 yes/no
+(blink-cursor-mode -1)                          ; 禁止闪烁光标
+(transient-mark-mode 1)                         ; 标记高亮
+(global-subword-mode 1)                         ; Word 移动支持 FooBar 的格式
 
-  ;; 草稿缓冲区默认文字设置
-  (setq initial-scratch-message (concat ";; Happy hacking, "
-                                        (capitalize user-login-name) " - Emacs ♥ you!\n\n"))
+(setq confirm-kill-processes nil)               ; 退出自动杀掉进程
+(setq initial-scratch-message "")               ; 关闭启动空白buffer, 避免干扰session恢复
+(setq ring-bell-function 'ignore)               ; 关闭出错时的提示音
+(setq mouse-yank-at-point t)                    ; 在光标处而非鼠标所在位置粘贴
 
-  ;; 设置缓冲区的文字方向为从左到右
-  (setq bidi-paragraph-direction 'left-to-right)
-  ;; 禁止使用双向括号算法
-  ;; (setq bidi-inhibit-bpa t)
+;; 禁用一些GUI特性
+(setq use-dialog-box nil)                       ; 鼠标操作不使用对话框
+(setq inhibit-default-init t)                   ; 不加载 `default' 库
+(setq inhibit-startup-screen t)                 ; 不加载启动画面
+(setq inhibit-startup-message t)                ; 不加载启动消息
+(setq inhibit-startup-buffer-menu t)            ; 不显示缓冲区列表
 
-  ;; 设置自动折行宽度为80个字符，默认值为70
-  (setq-default fill-column 80)
+;; 增加长行处理性能
+(setq bidi-inhibit-bpa t)
+(setq-default bidi-paragraph-direction 'left-to-right)
 
-  ;; 设置大文件阈值为100MB，默认10MB
-  (setq large-file-warning-threshold 100000000)
+;; 设置自动折行宽度为80个字符，默认值为70
+(setq-default fill-column 80)
 
-  ;; 以16进制显示字节数
-  (setq display-raw-bytes-as-hex t)
-  ;; 有输入时禁止 `fontification' 相关的函数钩子，能让滚动更顺滑
-  (setq redisplay-skip-fontification-on-input t)
+;; 设置大文件阈值为100MB，默认10MB
+(setq large-file-warning-threshold 100000000)
 
-  ;; 禁止响铃
-  (setq ring-bell-function 'ignore)
+;; 以16进制显示字节数
+(setq display-raw-bytes-as-hex t)
+;; 有输入时禁止 `fontification' 相关的函数钩子，能让滚动更顺滑
+(setq redisplay-skip-fontification-on-input t)
 
-  ;; 禁止闪烁光标
-  (blink-cursor-mode -1)
+;; 拷贝粘贴设置
+(setq select-enable-primary nil)        ; 选择文字时不拷贝
+(setq select-enable-clipboard t)        ; 拷贝时使用剪贴板
 
-  ;; 在光标处而非鼠标所在位置粘贴
-  (setq mouse-yank-at-point t)
+;; 鼠标滚动设置
+(setq scroll-step 2)
+(setq scroll-margin 2)
+(setq hscroll-step 2)
+(setq hscroll-margin 2)
+(setq scroll-conservatively 101)
+(setq scroll-up-aggressively 0.01)
+(setq scroll-down-aggressively 0.01)
+(setq scroll-preserve-screen-position 'always)
 
-  ;; 拷贝粘贴设置
-  (setq select-enable-primary nil)        ; 选择文字时不拷贝
-  (setq select-enable-clipboard t)        ; 拷贝时使用剪贴板
+;; 对于高的行禁止自动垂直滚动
+(setq auto-window-vscroll nil)
 
-  ;; 鼠标滚动设置
-  (setq scroll-step 2)
-  (setq scroll-margin 2)
-  (setq hscroll-step 2)
-  (setq hscroll-margin 2)
-  (setq scroll-conservatively 101)
-  (setq scroll-up-aggressively 0.01)
-  (setq scroll-down-aggressively 0.01)
-  (setq scroll-preserve-screen-position 'always)
+;; 设置新分屏打开的位置的阈值
+(setq split-width-threshold (assoc-default 'width default-frame-alist))
+(setq split-height-threshold nil)
 
-  ;; 对于高的行禁止自动垂直滚动
-  (setq auto-window-vscroll nil)
+;; TAB键设置，在Emacs里不使用TAB键，所有的TAB默认为4个空格
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
 
-  ;; 设置新分屏打开的位置的阈值
-  (setq split-width-threshold (assoc-default 'width default-frame-alist))
-  (setq split-height-threshold nil)
+;; 设置剪贴板历史长度300，默认为60
+(setq kill-ring-max 200)
 
-  ;; TAB键设置，在Emacs里不使用TAB键，所有的TAB默认为4个空格
-  (setq-default indent-tabs-mode nil)
-  (setq-default tab-width 4)
+;; 在剪贴板里不存储重复内容
+(setq kill-do-not-save-duplicates t)
 
-  ;; yes或no提示设置，通过下面这个函数设置当缓冲区名字匹配到预设的字符串时自动回答yes
-  (setq original-y-or-n-p 'y-or-n-p)
-  (defalias 'original-y-or-n-p (symbol-function 'y-or-n-p))
-  (defun default-yes-sometimes (prompt)
-    "automatically say y when buffer name match following string"
-    (if (or
-         (string-match "has a running process" prompt)
-         (string-match "does not exist; create" prompt)
-         (string-match "modified; kill anyway" prompt)
-         (string-match "Delete buffer using" prompt)
-         (string-match "Kill buffer of" prompt)
-         (string-match "still connected.  Kill it?" prompt)
-         (string-match "Shutdown the client's kernel" prompt)
-         (string-match "kill them and exit anyway" prompt)
-         (string-match "Revert buffer from file" prompt)
-         (string-match "Kill Dired buffer of" prompt)
-         (string-match "delete buffer using" prompt)
-         (string-match "Kill all pass entry" prompt)
-         (string-match "for all cursors" prompt)
-         (string-match "Do you want edit the entry" prompt))
-        t
-      (original-y-or-n-p prompt)))
-  (defalias 'yes-or-no-p 'default-yes-sometimes)
-  (defalias 'y-or-n-p 'default-yes-sometimes)
+;; 设置位置记录长度为6，默认为16
+;; 可以使用 `counsel-mark-ring' or `consult-mark' (C-x j) 来访问光标位置记录
+;; 使用 C-x C-SPC 执行 `pop-global-mark' 直接跳转到上一个全局位置处
+;; 使用 C-u C-SPC 跳转到本地位置处
+(setq mark-ring-max 6)
+(setq global-mark-ring-max 6)
 
-  ;; 设置剪贴板历史长度300，默认为60
-  (setq kill-ring-max 200)
+;; 设置 emacs-lisp 的限制
+(setq max-lisp-eval-depth 10000)        ; 默认值为 800
+(setq max-specpdl-size 10000)           ; 默认值为 1600
 
-  ;; 在剪贴板里不存储重复内容
-  (setq kill-do-not-save-duplicates t)
+;; 启用 `list-timers', `list-threads' 这两个命令
+(put 'list-timers 'disabled nil)
+(put 'list-threads 'disabled nil)
 
-  ;; 设置位置记录长度为6，默认为16
-  ;; 可以使用 `counsel-mark-ring' or `consult-mark' (C-x j) 来访问光标位置记录
-  ;; 使用 C-x C-SPC 执行 `pop-global-mark' 直接跳转到上一个全局位置处
-  ;; 使用 C-u C-SPC 跳转到本地位置处
-  (setq mark-ring-max 6)
-  (setq global-mark-ring-max 6)
+;; 在命令行里支持鼠标
+(xterm-mouse-mode 1)
 
-  ;; 设置 emacs-lisp 的限制
-  (setq max-lisp-eval-depth 10000)        ; 默认值为 800
-  (setq max-specpdl-size 10000)           ; 默认值为 1600
+;; 退出Emacs时进行确认
+(setq confirm-kill-emacs 'y-or-n-p)
 
-  ;; 启用 `list-timers', `list-threads' 这两个命令
-  (put 'list-timers 'disabled nil)
-  (put 'list-threads 'disabled nil)
+(global-display-line-numbers-mode t)    ; 开启行号后便于使用 M-g M-g 跳转
+(column-number-mode t)                  ; 在模式栏上显示当前光标的列号
+(global-hl-line-mode t)                 ; 高亮当前行
+(visual-line-mode 1)                    ; 视觉换行模式
+; Line numbers are not displayed when large files are used.
+(setq line-number-display-limit large-file-warning-threshold)
+(setq line-number-display-limit-width 1000)
 
-  ;; 在命令行里支持鼠标
-  (xterm-mouse-mode 1)
+(dolist (hook (list
+             'c-mode-common-hook
+             'c-mode-hook
+             'emacs-lisp-mode-hook
+             'lisp-interaction-mode-hook
+             'lisp-mode-hook
+             'java-mode-hook
+             'asm-mode-hook
+             'haskell-mode-hook
+             'rcirc-mode-hook
+             'erc-mode-hook
+             'sh-mode-hook
+             'makefile-gmake-mode-hook
+             'python-mode-hook
+             'js-mode-hook
+             'html-mode-hook
+             'css-mode-hook
+             'tuareg-mode-hook
+             'go-mode-hook
+             'coffee-mode-hook
+             'qml-mode-hook
+             'markdown-mode-hook
+             'slime-repl-mode-hook
+             'package-menu-mode-hook
+             'cmake-mode-hook
+             'php-mode-hook
+             'web-mode-hook
+             'coffee-mode-hook
+             'sws-mode-hook
+             'jade-mode-hook
+             'vala-mode-hook
+             'rust-mode-hook
+             'ruby-mode-hook
+             'qmake-mode-hook
+             'lua-mode-hook
+             'swift-mode-hook
+             'llvm-mode-hook
+             'conf-toml-mode-hook
+             'nxml-mode-hook
+             'nim-mode-hook
+             'typescript-mode-hook
+             'elixir-mode-hook
+             'clojure-mode-hook
+             'dart-mode-hook
 
-  ;; 退出Emacs时进行确认
-  (setq confirm-kill-emacs 'y-or-n-p)
+             'c-ts-mode-hook
+             'c++-ts-mode-hook
+             'cmake-ts-mode-hook
+             'toml-ts-mode-hook
+             'css-ts-mode-hook
+             'js-ts-mode-hook
+             'json-ts-mode-hook
+             'python-ts-mode-hook
+             'bash-ts-mode-hook
+             'typescript-ts-mode-hook
+             'rust-ts-mode-hook
+             ))
+(add-hook hook (lambda () (display-line-numbers-mode))))
 
-  ;; 开启Emacs的视觉换行模式
-  (visual-line-mode 1)
-
-  ;; 在模式栏上显示当前光标的列号
-  (column-number-mode t)
-
-  ;; 开启行号后便于使用 M-g M-g 跳转到指定行
-  (global-display-line-numbers-mode t)
-  ;; Disable line numbers for some modes
-  (dolist (mode '(term-mode-hook
-                  eshell-mode-hook
-                  pdf-view-mode-hook
-                  eww-mode-hook))
-    (add-hook mode (lambda () (display-line-numbers-mode 0))))
-  ;;; highlight current line
-  (global-hl-line-mode t)
+;; Disable line numbers for some modes
+(dolist (mode '(term-mode-hook
+                eshell-mode-hook
+                pdf-view-mode-hook
+                eww-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 ;; 配置所有的编码为UTF-8，参考：
 ;; https://thraxys.wordpress.com/2016/01/13/utf-8-in-emacs-everywhere-forever/
