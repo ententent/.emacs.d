@@ -308,13 +308,6 @@
   (setq org-appear-inside-latex t)
   )
 
-(use-package org-auto-tangle
-  :ensure t
-  :hook (org-mode . org-auto-tangle-mode)
-  :config
-  (setq org-auto-tangle-default t)
-  )
-
 (use-package org-src
   :ensure nil
   :hook (org-babel-after-execute . org-redisplay-inline-images)
@@ -543,7 +536,7 @@
                            ))
   )
 
-(add-to-list 'load-path "~/.emacs.d/lisp/")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/org-pomodoro/")
 (require 'org-pomodoro)
 
 (use-package org-pomodoro
@@ -555,53 +548,28 @@
         org-pomodoro-play-sounds t           ; Determines whether soudns are played or not
         
         org-pomodoro-start-sound-p t         ; Determine whether to play a sound when a pomodoro started
-        org-pomodoro-start-sound (expand-file-name "sounds/focus_bell.wav" user-emacs-directory)
+        org-pomodoro-start-sound (expand-file-name "site-lisp/org-pomodoro/focus_bell.wav" user-emacs-directory)
         org-pomodoro-length 25               ; The length of a pomodoro in minutes
 
         org-pomodoro-finished-sound-p t      ; Determines whether to play a sound when a pomodoro finished
-        org-pomodoro-finished-sound (expand-file-name "sounds/meditation_bell.wav" user-emacs-directory)
+        org-pomodoro-finished-sound (expand-file-name "site-lisp/org-pomodoro/meditation_bell.wav" user-emacs-directory)
 
         org-pomodoro-manual-break t          ; Whether the user needs to exit manually from a running pomodoro to enter a break
         org-pomodoro-overtime-sound-p t      ; Determines whether to play a sound when a pomodoro starts to run overtime
-        org-pomodoro-overtime-sound (expand-file-name "sounds/meditation_bell.wav" user-emacs-directory)
+        org-pomodoro-overtime-sound (expand-file-name "site-lisp/org-pomodoro/meditation_bell.wav" user-emacs-directory)
 
         org-pomodoro-clock-break nil         ; Don't clock time during breaks
 
         org-pomodoro-short-break-sound-p t   ; Determines whether to play a sound when a short-break finished
-        org-pomodoro-short-break-sound (expand-file-name "sounds/focus_bell.wav" user-emacs-directory)
+        org-pomodoro-short-break-sound (expand-file-name "site-lisp/org-pomodoro/focus_bell.wav" user-emacs-directory)
         org-pomodoro-short-break-length 5    ; The length of a short break in minutes
 
         org-pomodoro-long-break-sound-p t    ; Determines whether to play sound when a long-break finished
-        org-pomodoro-long-break-sound (expand-file-name "sounds/focus_bell.wav" user-emacs-directory)
+        org-pomodoro-long-break-sound (expand-file-name "site-lisp/org-pomodoro/focus_bell.wav" user-emacs-directory)
         org-pomodoro-long-break-frequency 4  ; The maximum number of pomodoros until a long break is started
         org-pomodoro-long-break-length 15    ; The length of a long break in minutes
         )
   )
-
-(use-package pomidor
-  :ensure t
-  :bind (("<f12>" . pomidor))
-  :config
-  (setq pomidor-sound-tick nil                  ; disable tick-tack sound
-        pomidor-sound-tack nil                  ; disable tick-tack sound
-        pomidor-seconds (* 1 60)               ; 25 minutes for the work period
-        pomidor-break-seconds (* 1 60)          ; 5 minutes break time
-        pomidor-breaks-before-long 2            ; wait 4 short breaks before long break
-        pomidor-long-break-seconds (* 1 60)    ; 20 minutes long break time
-        pomidor-sound-overwork (expand-file-name "sounds/meditation_bell.wav" user-emacs-directory)
-        pomidor-sound-break-over (expand-file-name "sounds/focus_bell.wav" user-emacs-directory)
-  )
-  (set-face-attribute 'pomidor-work-face nil :foreground "#ff0000")
-  (set-face-attribute 'pomidor-overwork-face nil :foreground "#00abff")
-  (set-face-attribute 'pomidor-break-face nil :foreground "#00ff00")
-  (set-face-attribute 'pomidor-skip-face nil :foreground "#abbac3")
-  :hook
-  (pomidor-mode . (lambda ()
-                    (display-line-numbers-mode -1)
-                    (setq left-fringe-width 0 right-fringe-width 0)
-                    (setq left-margin-width 2 right-margin-width 0)
-                    ;; force fringe update
-                    (set-window-buffer nil (current-buffer)))))
 
 (use-package calendar
   :ensure nil
@@ -1012,7 +980,7 @@ DIR is the location of the output."
             :sitemap-style list
             :sitemap-sort-files anti-chronologically
             :sitemap-format-entry format-posts-rss-feed-entry)
-          
+
           ("personal-website" :components ("site" "posts" "static" "rss")))))
 
 (add-to-list 'load-path "~/.emacs.d/site-lisp/css-sort/")

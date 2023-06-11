@@ -3,30 +3,24 @@
 
 ;;; Code:
 
-(setq zot_bib '("~/research/LFH/TeX/ref.bib"
-                ; Zotero 用 Better BibTeX 导出的 .bib 文件. 可以是多个文件
-                "~/research/MAGE/TeX/ref.bib")
-      ; Zotero 的 ZotFile 同步文件夹
-      zot_pdf "~/MEGA/Zotero-Library"
-      ; 自定义的 org-roam 文献笔记目录
-      org_refs "~/org/roam/ref/" )
-
-(use-package ivy-bibtex ; 这里也可以用 ivy-bibtex 替换 helm-bibtex
+(use-package ivy-bibtex
   :ensure t
   :custom
-  (bibtex-completion-notes-path org_refs)
-  (bibtex-completion-bibliography zot_bib)
-  (bibtex-completion-library-path zot_pdf))
+  (bibtex-completion-bibliography '("~/Thesis/ITM/TeX/ref.bib"
+                                    "~/Thesis/LFH/TeX/ref.bib"
+                                    ))
+  (bibtex-completion-library-path "~/MEGA/Zotero-Library")
+  (bibtex-completion-notes-path "~/org/roam/interleave/"))
 
 (use-package org-roam-bibtex
   :ensure t
-  :hook (org-roam-mode . org-roam-bibtex-mode)i
+  :hook (org-roam-mode . org-roam-bibtex-mode)
   :bind (("C-c n k" . orb-insert-link)
          ("C-c n a" . orb-note-actions))
   :custom
-  ; 与上面 helm-bibtex/ivy-bibtex 的选择保持一致
+  ; 使用 ivy-bibtex 作为文献搜索界面
   (orb-insert-interface 'ivy-bibtex)
-  ; 默认使用标题, 但是论文的标题一般很长, 不适合作为笔记链接的名字
+  ; 使用引用键名作为笔记链接的标题
   (orb-insert-link-description 'citekey)
   (orb-preformat-keywords
    '("citekey" "title" "url" "author-or-editor" "keywords" "file"))
@@ -61,21 +55,22 @@
 
 ;; org-roam 笔记模板
 (setq org-roam-capture-templates
-             '(("d" "default" plain "- tag :: \n %?" ; 普及模板
-                :target
-                (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title} \n")
-                :unnarrowed t)
-               ("r" "bibliography reference in pdfs" plain ; 文献模板
-                "#+FILETAGS: reading research \n - tags :: %^{keywords} \n* %^{title}\n:PROPERTIES:\n:Custom_ID: %^{citekey}\n:URL: %^{url}\n:AUTHOR: %^{author-or-editor}\n:NOTER_DOCUMENT: ~/MEGA/Zotero-Library/%^{citekey}.pdf\n:NOTER_PAGE:\n:END:"      
-                :target
-                (file+head "ref/${citekey}.org" "#+title: ${title}\n"))))
+      '(("d" "默认模板" plain
+         "- tag :: \n %?"
+         :target
+         (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title} \n")
+         :unnarrowed t)
+        ("r" "文献笔记" plain
+         "#+FILETAGS: reading research \n - tags :: %^{keywords} \n* %^{title}\n:PROPERTIES:\n:interleave_url: /home/mawen/MEGA/Zotero-Library/%^{citekey}.pdf\n:interleave_page_note: 1\n:END:"      
+         :target
+         (file+head "ref/${citekey}.org" "#+title: ${title}\n"))))
 
 ;; 对于Windows系统，需要安装ImageMagick，并保证magick.exe在PATH变量的路径中
 ;;; 用msys2安装: pacman -S mingw-w64-x86_64-imagemagick
 (use-package org-download
   :ensure async ;; 因为不是从melpa安装，需要手动保证async安装
   :defer t ;; 延迟加载
-  :load-path "~/.emacs.d/lisp/"
+  :load-path "~/.emacs.d/site-lisp/org-download/"
   :bind
   (:map org-mode-map
         ("C-M-y" . org-download-clipboard)) ;; 绑定从剪贴板粘贴截图的快捷键

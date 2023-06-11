@@ -1108,16 +1108,6 @@ Version 2019-11-04"
   (setq org-appear-inside-latex t)
   )
 #+END_SRC
-*** org-auto-tangle 自动tangle设置
-- [[https://github.com/yilkalargaw/org-auto-tangle][org-auto-tangle]] 插件可以在Org mode下自动进行tangle。
-#+BEGIN_SRC emacs-lisp
-(use-package org-auto-tangle
-  :ensure t
-  :hook (org-mode . org-auto-tangle-mode)
-  :config
-  (setq org-auto-tangle-default t)
-  )
-#+END_SRC
 *** org-src
 - 代码块基础设置
 #+BEGIN_SRC emacs-lisp
@@ -1354,8 +1344,7 @@ Version 2019-11-04"
                            ))
   )
 #+END_SRC
-*** 番茄工作法
-**** org-pomodoro
+*** org-pomodoro 番茄工作法
 - 在 =Arch Linux= 中需要安装 =WAV= 播放器 =aplay=
   - 否则会报错 ="not found wav player on your system"=
   - =sudo pacman -S alsa-utils=
@@ -1367,7 +1356,7 @@ Version 2019-11-04"
   - =sudo pacman -S libnotify=
   - =sudo apt install libnotify-dev=
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path "~/.emacs.d/lisp/")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/org-pomodoro/")
 (require 'org-pomodoro)
 
 (use-package org-pomodoro
@@ -1379,55 +1368,28 @@ Version 2019-11-04"
         org-pomodoro-play-sounds t           ; Determines whether soudns are played or not
         
         org-pomodoro-start-sound-p t         ; Determine whether to play a sound when a pomodoro started
-        org-pomodoro-start-sound (expand-file-name "sounds/focus_bell.wav" user-emacs-directory)
+        org-pomodoro-start-sound (expand-file-name "site-lisp/org-pomodoro/focus_bell.wav" user-emacs-directory)
         org-pomodoro-length 25               ; The length of a pomodoro in minutes
 
         org-pomodoro-finished-sound-p t      ; Determines whether to play a sound when a pomodoro finished
-        org-pomodoro-finished-sound (expand-file-name "sounds/meditation_bell.wav" user-emacs-directory)
+        org-pomodoro-finished-sound (expand-file-name "site-lisp/org-pomodoro/meditation_bell.wav" user-emacs-directory)
 
         org-pomodoro-manual-break t          ; Whether the user needs to exit manually from a running pomodoro to enter a break
         org-pomodoro-overtime-sound-p t      ; Determines whether to play a sound when a pomodoro starts to run overtime
-        org-pomodoro-overtime-sound (expand-file-name "sounds/meditation_bell.wav" user-emacs-directory)
+        org-pomodoro-overtime-sound (expand-file-name "site-lisp/org-pomodoro/meditation_bell.wav" user-emacs-directory)
 
         org-pomodoro-clock-break nil         ; Don't clock time during breaks
 
         org-pomodoro-short-break-sound-p t   ; Determines whether to play a sound when a short-break finished
-        org-pomodoro-short-break-sound (expand-file-name "sounds/focus_bell.wav" user-emacs-directory)
+        org-pomodoro-short-break-sound (expand-file-name "site-lisp/org-pomodoro/focus_bell.wav" user-emacs-directory)
         org-pomodoro-short-break-length 5    ; The length of a short break in minutes
 
         org-pomodoro-long-break-sound-p t    ; Determines whether to play sound when a long-break finished
-        org-pomodoro-long-break-sound (expand-file-name "sounds/focus_bell.wav" user-emacs-directory)
+        org-pomodoro-long-break-sound (expand-file-name "site-lisp/org-pomodoro/focus_bell.wav" user-emacs-directory)
         org-pomodoro-long-break-frequency 4  ; The maximum number of pomodoros until a long break is started
         org-pomodoro-long-break-length 15    ; The length of a long break in minutes
         )
   )
-#+END_SRC
-**** pomidor
-#+BEGIN_SRC emacs-lisp
-(use-package pomidor
-  :ensure t
-  :bind (("<f12>" . pomidor))
-  :config
-  (setq pomidor-sound-tick nil                  ; disable tick-tack sound
-        pomidor-sound-tack nil                  ; disable tick-tack sound
-        pomidor-seconds (* 1 60)               ; 25 minutes for the work period
-        pomidor-break-seconds (* 1 60)          ; 5 minutes break time
-        pomidor-breaks-before-long 2            ; wait 4 short breaks before long break
-        pomidor-long-break-seconds (* 1 60)    ; 20 minutes long break time
-        pomidor-sound-overwork (expand-file-name "sounds/meditation_bell.wav" user-emacs-directory)
-        pomidor-sound-break-over (expand-file-name "sounds/focus_bell.wav" user-emacs-directory)
-  )
-  (set-face-attribute 'pomidor-work-face nil :foreground "#ff0000")
-  (set-face-attribute 'pomidor-overwork-face nil :foreground "#00abff")
-  (set-face-attribute 'pomidor-break-face nil :foreground "#00ff00")
-  (set-face-attribute 'pomidor-skip-face nil :foreground "#abbac3")
-  :hook
-  (pomidor-mode . (lambda ()
-                    (display-line-numbers-mode -1)
-                    (setq left-fringe-width 0 right-fringe-width 0)
-                    (setq left-margin-width 2 right-margin-width 0)
-                    ;; force fringe update
-                    (set-window-buffer nil (current-buffer)))))
 #+END_SRC
 *** org-agenda 配置
 **** calendar 基本设置
@@ -1851,7 +1813,7 @@ DIR is the location of the output."
             :sitemap-style list
             :sitemap-sort-files anti-chronologically
             :sitemap-format-entry format-posts-rss-feed-entry)
-          
+
           ("personal-website" :components ("site" "posts" "static" "rss")))))
 #+END_SRC
 *** css-sort
@@ -2272,34 +2234,28 @@ DIR is the location of the output."
 
 ;;; Code:
 #+END_SRC
-** ivy-bibtex
+** ivy-bibtex 读取 Zotero 信息
 #+BEGIN_SRC emacs-lisp
-(setq zot_bib '("~/research/LFH/TeX/ref.bib"
-                ; Zotero 用 Better BibTeX 导出的 .bib 文件. 可以是多个文件
-                "~/research/MAGE/TeX/ref.bib")
-      ; Zotero 的 ZotFile 同步文件夹
-      zot_pdf "~/MEGA/Zotero-Library"
-      ; 自定义的 org-roam 文献笔记目录
-      org_refs "~/org/roam/ref/" )
-
-(use-package ivy-bibtex ; 这里也可以用 ivy-bibtex 替换 helm-bibtex
+(use-package ivy-bibtex
   :ensure t
   :custom
-  (bibtex-completion-notes-path org_refs)
-  (bibtex-completion-bibliography zot_bib)
-  (bibtex-completion-library-path zot_pdf))
+  (bibtex-completion-bibliography '("~/Thesis/ITM/TeX/ref.bib"
+                                    "~/Thesis/LFH/TeX/ref.bib"
+                                    ))
+  (bibtex-completion-library-path "~/MEGA/Zotero-Library")
+  (bibtex-completion-notes-path "~/org/roam/interleave/"))
 #+END_SRC
-** org-roam-bibtex
+** org-roam-bibtex 读取 iby-bibtex 的信息并绑定 orb 快捷键
 #+BEGIN_SRC emacs-lisp
 (use-package org-roam-bibtex
   :ensure t
-  :hook (org-roam-mode . org-roam-bibtex-mode)i
+  :hook (org-roam-mode . org-roam-bibtex-mode)
   :bind (("C-c n k" . orb-insert-link)
          ("C-c n a" . orb-note-actions))
   :custom
-  ; 与上面 helm-bibtex/ivy-bibtex 的选择保持一致
+  ; 使用 ivy-bibtex 作为文献搜索界面
   (orb-insert-interface 'ivy-bibtex)
-  ; 默认使用标题, 但是论文的标题一般很长, 不适合作为笔记链接的名字
+  ; 使用引用键名作为笔记链接的标题
   (orb-insert-link-description 'citekey)
   (orb-preformat-keywords
    '("citekey" "title" "url" "author-or-editor" "keywords" "file"))
@@ -2336,14 +2292,15 @@ DIR is the location of the output."
 
 ;; org-roam 笔记模板
 (setq org-roam-capture-templates
-             '(("d" "default" plain "- tag :: \n %?" ; 普及模板
-                :target
-                (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title} \n")
-                :unnarrowed t)
-               ("r" "bibliography reference in pdfs" plain ; 文献模板
-                "#+FILETAGS: reading research \n - tags :: %^{keywords} \n* %^{title}\n:PROPERTIES:\n:Custom_ID: %^{citekey}\n:URL: %^{url}\n:AUTHOR: %^{author-or-editor}\n:NOTER_DOCUMENT: ~/MEGA/Zotero-Library/%^{citekey}.pdf\n:NOTER_PAGE:\n:END:"      
-                :target
-                (file+head "ref/${citekey}.org" "#+title: ${title}\n"))))
+      '(("d" "默认模板" plain
+         "- tag :: \n %?"
+         :target
+         (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title} \n")
+         :unnarrowed t)
+        ("r" "文献笔记" plain
+         "#+FILETAGS: reading research \n - tags :: %^{keywords} \n* %^{title}\n:PROPERTIES:\n:interleave_url: /home/mawen/MEGA/Zotero-Library/%^{citekey}.pdf\n:interleave_page_note: 1\n:END:"      
+         :target
+         (file+head "ref/${citekey}.org" "#+title: ${title}\n"))))
 #+END_SRC
 ** org-download
 #+BEGIN_SRC emacs-lisp
@@ -2352,7 +2309,7 @@ DIR is the location of the output."
 (use-package org-download
   :ensure async ;; 因为不是从melpa安装，需要手动保证async安装
   :defer t ;; 延迟加载
-  :load-path "~/.emacs.d/lisp/"
+  :load-path "~/.emacs.d/site-lisp/org-download/"
   :bind
   (:map org-mode-map
         ("C-M-y" . org-download-clipboard)) ;; 绑定从剪贴板粘贴截图的快捷键
@@ -2625,14 +2582,14 @@ DIR is the location of the output."
   (add-hook 'eaf-pdf-viewer-hook 'eaf-interleave-app-mode)
   (add-hook 'org-mode-hook 'eaf-interleave-mode)
   (with-eval-after-load 'eaf-interleave
-    (define-key eaf-interleave-app-mode-map (kbd "C-c M-o") 'eaf-interleave-open-notes-file)
-    (define-key eaf-interleave-app-mode-map (kbd "C-c M-i") 'eaf-interleave-add-note)    
-    (define-key eaf-interleave-app-mode-map (kbd "C-c M-q") 'eaf-interleave-quit)
     (define-key eaf-interleave-mode-map (kbd "M-.") 'eaf-interleave-sync-current-note)
     (define-key eaf-interleave-mode-map (kbd "M-p") 'eaf-interleave-sync-previous-note)
-    (define-key eaf-interleave-mode-map (kbd "M-n") 'eaf-interleave-sync-next-note))
+    (define-key eaf-interleave-mode-map (kbd "M-n") 'eaf-interleave-sync-next-note)
+    (define-key eaf-interleave-app-mode-map (kbd "C-c M-o") 'eaf-interleave-open-notes-file)
+    (define-key eaf-interleave-app-mode-map (kbd "C-c M-i") 'eaf-interleave-add-note)    
+    (define-key eaf-interleave-app-mode-map (kbd "C-c M-q") 'eaf-interleave-quit))
   ;; 默认笔记路径, 自动在该目录中寻找同名 org 文件
-  (setq eaf-interleave-org-notes-dir-list '("~/org/roam/ref"))
+  (setq eaf-interleave-org-notes-dir-list '("~/org/roam/interleave"))
   ;; 分隔文档和笔记
   (setq eaf-interleave-split-direction 'vertical
 	eaf-interleave-split-lines 20

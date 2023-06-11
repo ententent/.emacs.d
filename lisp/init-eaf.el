@@ -51,14 +51,14 @@
   (add-hook 'eaf-pdf-viewer-hook 'eaf-interleave-app-mode)
   (add-hook 'org-mode-hook 'eaf-interleave-mode)
   (with-eval-after-load 'eaf-interleave
-    (define-key eaf-interleave-app-mode-map (kbd "C-c M-o") 'eaf-interleave-open-notes-file)
-    (define-key eaf-interleave-app-mode-map (kbd "C-c M-i") 'eaf-interleave-add-note)    
-    (define-key eaf-interleave-app-mode-map (kbd "C-c M-q") 'eaf-interleave-quit)
     (define-key eaf-interleave-mode-map (kbd "M-.") 'eaf-interleave-sync-current-note)
     (define-key eaf-interleave-mode-map (kbd "M-p") 'eaf-interleave-sync-previous-note)
-    (define-key eaf-interleave-mode-map (kbd "M-n") 'eaf-interleave-sync-next-note))
+    (define-key eaf-interleave-mode-map (kbd "M-n") 'eaf-interleave-sync-next-note)
+    (define-key eaf-interleave-app-mode-map (kbd "C-c M-o") 'eaf-interleave-open-notes-file)
+    (define-key eaf-interleave-app-mode-map (kbd "C-c M-i") 'eaf-interleave-add-note)    
+    (define-key eaf-interleave-app-mode-map (kbd "C-c M-q") 'eaf-interleave-quit))
   ;; 默认笔记路径, 自动在该目录中寻找同名 org 文件
-  (setq eaf-interleave-org-notes-dir-list '("~/org/roam/ref"))
+  (setq eaf-interleave-org-notes-dir-list '("~/org/roam/interleave"))
   ;; 分隔文档和笔记
   (setq eaf-interleave-split-direction 'vertical
 	eaf-interleave-split-lines 20
