@@ -63,25 +63,8 @@
   (require 'init-python)
   (require 'init-research)
   (require 'init-tools)
-
-  ;; Restore session at last.
-  (require 'init-session)
-  (emacs-session-restore)
   )
 
 (provide 'init)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init.el ends here
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(yasnippet-snippets use-package-hydra use-package-ensure-system-package treemacs-projectile treemacs-all-the-icons tablist shackle request rainbow-delimiters queue pyvenv popper polymode password-store-otp ox-hugo org-roam-ui org-roam-bibtex org-modern org-drill org-contrib org-appear org-ai no-littering minions marginalia magit-delta lsp-ui lsp-pyright lsp-ivy ivy-bibtex graphql good-scroll eshell-up eshell-syntax-highlighting eshell-git-prompt diminish diff-hl dashboard crux counsel-projectile conda company-box capf-autosuggest cal-china-x benchmark-init auctex async anaphora amx all-the-icons-gnus all-the-icons-completion alert aio)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
