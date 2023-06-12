@@ -20,9 +20,9 @@
 ;; On Windows, after downloading the fonts, one needs to manually install them
 ;; M-x package-install RET all-the-icons
 ;; restart-emacs, M-x all-the-icons-install-fonts
-;; (setq url-proxy-services
-;;       '(("http" . "127.0.0.1:7890")
-;;         ("https" . "127.0.0.1:7890")))
+(setq url-proxy-services
+      '(("http" . "127.0.0.1:7890")
+        ("https" . "127.0.0.1:7890")))
 (use-package all-the-icons
   :if (display-graphic-p))
 

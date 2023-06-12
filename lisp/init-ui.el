@@ -205,20 +205,13 @@
 
 (use-package dashboard
   :ensure t
-  :init
-  (setq dashboard-banner-logo-title "Don't Panic, Take it Easy"
-        dashboard-center-content t
-        dashboard-items '((recents . 10)
-                          (bookmarks . 5)
-                          (projects . 5))
-        dashboard-page-style 'truncate-middle
-        dashboard-path-max-length 60
-        dashboard-projects-backend 'projectile
-        dashboard-set-footer t
-        dashboard-set-init-info t
-        dashboard-set-navigator t
-        dashboard-show-shortcuts nil
-        dashboard-startup-banner 'official)
+  :config
+  (setq dashboard-banner-logo-title "Welcome to Emacs!") ;; 个性签名，随读者喜好设置
+  (setq dashboard-projects-backend 'projectile)
+  (setq dashboard-startup-banner 'official)
+  (setq dashboard-items '((recents  . 5)
+			              (bookmarks . 5)
+			              (projects . 10)))
   (dashboard-setup-startup-hook))
 
 (provide 'init-ui)

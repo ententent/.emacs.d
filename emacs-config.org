@@ -160,7 +160,7 @@
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/site-lisp/awesome-tray"))
 (require 'awesome-tray)
 (awesome-tray-mode 1)
-#+END_SRC
+#+End_SRC
 ** 字体配置
 - 参考链接[[https://emacs-china.org/t/emacs/22193][为emacs正确配置英文、中文、符号字体的正确方式？]]
 #+BEGIN_SRC emacs-lisp
@@ -368,20 +368,13 @@
 #+BEGIN_SRC emacs-lisp
 (use-package dashboard
   :ensure t
-  :init
-  (setq dashboard-banner-logo-title "Don't Panic, Take it Easy"
-        dashboard-center-content t
-        dashboard-items '((recents . 10)
-                          (bookmarks . 5)
-                          (projects . 5))
-        dashboard-page-style 'truncate-middle
-        dashboard-path-max-length 60
-        dashboard-projects-backend 'projectile
-        dashboard-set-footer t
-        dashboard-set-init-info t
-        dashboard-set-navigator t
-        dashboard-show-shortcuts nil
-        dashboard-startup-banner 'official)
+  :config
+  (setq dashboard-banner-logo-title "Welcome to Emacs!") ;; 个性签名，随读者喜好设置
+  (setq dashboard-projects-backend 'projectile)
+  (setq dashboard-startup-banner 'official)
+  (setq dashboard-items '((recents  . 5)
+			              (bookmarks . 5)
+			              (projects . 10)))
   (dashboard-setup-startup-hook))
 #+END_SRC
 ** init-ui.el 文件尾
@@ -1803,9 +1796,9 @@ DIR is the location of the output."
 ;; On Windows, after downloading the fonts, one needs to manually install them
 ;; M-x package-install RET all-the-icons
 ;; restart-emacs, M-x all-the-icons-install-fonts
-;; (setq url-proxy-services
-;;       '(("http" . "127.0.0.1:7890")
-;;         ("https" . "127.0.0.1:7890")))
+(setq url-proxy-services
+      '(("http" . "127.0.0.1:7890")
+        ("https" . "127.0.0.1:7890")))
 (use-package all-the-icons
   :if (display-graphic-p))
 
@@ -2093,7 +2086,7 @@ DIR is the location of the output."
   (bibtex-completion-library-path "~/MEGA/Zotero-Library")
   (bibtex-completion-notes-path "~/org/roam/interleave/"))
 #+END_SRC
-** org-roam-bibtex 读取 iby-bibtex 的信息并绑定 orb 快捷键
+** org-roam-bibtex 读取 ivy-bibtex 的信息并绑定 orb 快捷键
 #+BEGIN_SRC emacs-lisp
 (use-package org-roam-bibtex
   :ensure t
@@ -2112,7 +2105,6 @@ DIR is the location of the output."
 #+END_SRC
 ** org-roam
 #+BEGIN_SRC emacs-lisp
-;; 卡片笔记法的 org-roam 实践
 (use-package org-roam
   :ensure t
   :custom
@@ -2148,7 +2140,7 @@ DIR is the location of the output."
         ("r" "文献笔记" plain
          "#+FILETAGS: reading research \n - tags :: %^{keywords} \n* %^{title}\n:PROPERTIES:\n:interleave_url: /home/mawen/MEGA/Zotero-Library/%^{citekey}.pdf\n:interleave_page_note: 1\n:END:"      
          :target
-         (file+head "ref/${citekey}.org" "#+title: ${title}\n"))))
+         (file+head "interleave/${citekey}.org" "#+title: ${title}\n"))))
 #+END_SRC
 ** org-download
 #+BEGIN_SRC emacs-lisp

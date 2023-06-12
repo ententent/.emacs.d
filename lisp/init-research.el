@@ -28,7 +28,6 @@
   (orb-process-file-keyword t)
   (orb-attached-file-extensions '("pdf")))
 
-;; 卡片笔记法的 org-roam 实践
 (use-package org-roam
   :ensure t
   :custom
@@ -64,7 +63,7 @@
         ("r" "文献笔记" plain
          "#+FILETAGS: reading research \n - tags :: %^{keywords} \n* %^{title}\n:PROPERTIES:\n:interleave_url: /home/mawen/MEGA/Zotero-Library/%^{citekey}.pdf\n:interleave_page_note: 1\n:END:"      
          :target
-         (file+head "ref/${citekey}.org" "#+title: ${title}\n"))))
+         (file+head "interleave/${citekey}.org" "#+title: ${title}\n"))))
 
 ;; 对于Windows系统，需要安装ImageMagick，并保证magick.exe在PATH变量的路径中
 ;;; 用msys2安装: pacman -S mingw-w64-x86_64-imagemagick
