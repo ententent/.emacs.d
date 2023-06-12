@@ -48,12 +48,12 @@
 (let ((dir (locate-user-emacs-file "lisp")))
   (add-to-list 'load-path (file-name-as-directory dir)))
 
-;; 不要在 *message* 缓冲区显示加载模块化配置的信息
+;; 抹掉插件启动的输出
 (with-temp-message ""
+  (require 'init-ui)
   (require 'init-ai)
   (require 'init-base)
   (require 'init-dev)
-  (require 'init-dired)
   (require 'init-eaf)
   (require 'init-edit)
   (require 'init-english)
@@ -63,7 +63,6 @@
   (require 'init-python)
   (require 'init-research)
   (require 'init-tools)
-  (require 'init-ui)
   )
 
 (provide 'init)

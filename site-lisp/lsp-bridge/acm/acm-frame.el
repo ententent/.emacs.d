@@ -152,6 +152,21 @@
                 ))
   (add-function :after after-focus-change-function #'acm-frame-restore-font))
 
+(cl-defmacro acm-frame-new (frame frame-buffer buffer-name &optional max-width max-height)
+  `(progn
+     (when (and (frame-live-p ,frame)
+                (not (eq (frame-parent ,frame) (selected-frame))))
+       (acm-frame-delete-frame ,frame))
+
+     (acm-frame-create-frame-if-not-exist ,frame ,frame-buffer ,buffer-name 1 t)
+
+     (acm-frame-set-frame-max-size ,frame ,max-width ,max-height)
+
+     (let ((pos (acm-frame-get-popup-position (point) 1)))
+       (acm-frame-set-frame-position ,frame (car pos) (cdr pos)))
+
+     (acm-frame-adjust-frame-pos ,frame)))
+
 (cl-defmacro acm-frame-create-frame-if-not-exist (frame frame-buffer frame-name margin no-accept-focus)
   `(unless (frame-live-p ,frame)
      (setq ,frame (acm-frame-make-frame ,frame-name ,no-accept-focus))
@@ -307,6 +322,11 @@ influence of C1 on the result."
         (set-frame-position frame
                             frame-x
                             (- frame-y frame-height (line-pixel-height))))))
+
+(defun acm-frame-can-display-p ()
+  (not (or noninteractive
+           emacs-basic-display
+           (not (display-graphic-p)))))
 
 (provide 'acm-frame)
 ;;; acm-frame.el ends here

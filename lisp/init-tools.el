@@ -4,17 +4,18 @@
 ;;; Code:
 
 (use-package exec-path-from-shell
-  :ensure t
+  :load-path "~/.emacs.d/site-lisp/exec-path-from-shell/"
   :config
   (when (memq window-system '(mac ns x))
     (exec-path-from-shell-initialize)))
 
 (use-package restart-emacs
-  :ensure t)
+  :load-path "~/.emacs.d/site-lisp/restart-emacs/")
 
 (use-package which-key
-  :ensure t
-  :init (which-key-mode))
+  :load-path "~/.emacs.d/site-lisp/which-key/"
+  :config
+  (which-key-mode 1))
 
 (provide 'init-tools)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

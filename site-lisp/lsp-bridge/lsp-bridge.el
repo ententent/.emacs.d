@@ -12,7 +12,7 @@
 ;; URL: https://github.com/manateelazycat/lsp-bridge
 ;; Keywords:
 ;; Compatibility: emacs-version >= 28
-;; Package-Requires: ((emacs "28") (posframe "1.1.7") (markdown-mode "2.6"))
+;; Package-Requires: ((emacs "28") (markdown-mode "2.6"))
 ;;
 ;; Features that might be required by this library:
 ;;
@@ -76,7 +76,6 @@
 (require 'map)
 (require 'seq)
 (require 'subr-x)
-(require 'posframe)
 (require 'markdown-mode)
 (require 'diff)
 
@@ -170,24 +169,9 @@ Setting this to nil or 0 will turn off the indicator."
   :type 'boolean
   :group 'lsp-bridge)
 
-(defcustom lsp-bridge-lookup-doc-tooltip " *lsp-bridge-hover*"
+(defcustom lsp-bridge-popup-documentation-buffer " *lsp-bridge-hover*"
   "Buffer for display hover information."
   :type 'string
-  :group 'lsp-bridge)
-
-(defcustom lsp-bridge-lookup-doc-tooltip-border-width 20
-  "The border width of lsp-bridge hover tooltip, in pixels."
-  :type 'integer
-  :group 'lsp-bridge)
-
-(defcustom lsp-bridge-lookup-doc-tooltip-max-width 150
-  "The max width of lsp-bridge hover tooltip."
-  :type 'integer
-  :group 'lsp-bridge)
-
-(defcustom lsp-bridge-lookup-doc-tooltip-max-height 20
-  "The max width of lsp-bridge hover tooltip."
-  :type 'integer
   :group 'lsp-bridge)
 
 (defcustom lsp-bridge-disable-backup t
@@ -347,6 +331,10 @@ Then LSP-Bridge will start by gdb, please send new issue with `*lsp-bridge*' buf
 
 (defcustom lsp-bridge-enable-profile nil
   "Enable this option to output performance data to ~/lsp-bridge.prof."
+  :type 'boolean)
+
+(defcustom lsp-bridge-enable-completion-in-minibuffer nil
+  "Enable this option to completion in minibuffer."
   :type 'boolean)
 
 (defcustom lsp-bridge-multi-lang-server-extension-list
@@ -711,12 +699,13 @@ So we build this macro to restore postion after code format."
   "Get lang server with project path, file path or file extension."
   (expand-file-name user-emacs-directory))
 
-(defun lsp-bridge--get-buffer-content-func (buffer-name)
+(defun lsp-bridge--get-buffer-content-func (buffer-name &optional no-org-babel)
   "Get buffer content for lsp. BUFFER-NAME is name eval from (buffer-name)."
   (when-let* ((buf (get-buffer buffer-name)))
     (if (and lsp-bridge-enable-org-babel
-             (eq major-mode 'org-mode))
-        (and lsp-bridge-org-babel--info-cache (org-element-property :value lsp-bridge-org-babel--info-cache))
+             (eq major-mode 'org-mode) (not no-org-babel))
+        (and lsp-bridge-org-babel--info-cache
+             (org-element-property :value lsp-bridge-org-babel--info-cache))
       (with-current-buffer buf
         (buffer-substring-no-properties (point-min) (point-max))))))
 
@@ -1309,8 +1298,10 @@ So we build this macro to restore postion after code format."
       (lsp-bridge-complete-other-backends)
 
       ;; Update search words backend.
-      (lsp-bridge-search-words-update)
-      )))
+      (lsp-bridge-search-words-update
+       lsp-bridge--before-change-begin-pos
+       lsp-bridge--before-change-end-pos
+       (buffer-substring-no-properties begin end)))))
 
 (defun lsp-bridge-complete-other-backends ()
   (let ((this-command-string (format "%s" this-command)))
@@ -1425,38 +1416,18 @@ So we build this macro to restore postion after code format."
                                (mapcar #'buffer-file-name (buffer-list)))))
       (lsp-bridge-call-async "search_file_words_index_files" files))))
 
-(defun lsp-bridge-search-words-update-file ()
+(defun lsp-bridge-search-words-update (begin-pos end-pos change-text)
   (if (lsp-bridge-is-remote-file)
       (progn
         (lsp-bridge-remote-save-buffer)
         (lsp-bridge-remote-send-func-request "search_file_words_load_file" (list lsp-bridge-remote-file-path)))
-    (when (and buffer-file-name
-               (lsp-bridge-epc-live-p lsp-bridge-epc-process)
-               (not (member (file-name-extension buffer-file-name)
-                            lsp-bridge-search-words-prohibit-file-extensions)))
-      (lsp-bridge-call-async "search_file_words_change_file"
-                             buffer-file-name
-                             (base64-encode-string (encode-coding-string (buffer-string) 'utf-8))
-                             ))))
-
-(defun lsp-bridge-search-words-rebuild-cache ()
-  "Rebuild words cache when idle."
-  (if (lsp-bridge-is-remote-file)
-      (progn
-        (lsp-bridge-search-words-update-file)
-
-        (unless (eq last-command 'mwheel-scroll)
-          (lsp-bridge-remote-send-func-request "search_file_words_rebuild_cache" (list))))
     (when (lsp-bridge-epc-live-p lsp-bridge-epc-process)
-      ;; Update file search words when idle.
-      (lsp-bridge-search-words-update-file)
-
-      (unless (eq last-command 'mwheel-scroll)
-        (lsp-bridge-call-async "search_file_words_rebuild_cache")))))
-
-(defun lsp-bridge-search-words-update ()
-  (unless (eq last-command 'mwheel-scroll)
-    (lsp-bridge-search-words-update-file)))
+      (lsp-bridge-call-async "search_file_words_change_buffer"
+                             (buffer-name)
+                             begin-pos
+                             end-pos
+                             change-text
+                             ))))
 
 (defun lsp-bridge-completion-ui-visible-p ()
   (acm-frame-visible-p acm-menu-frame))
@@ -1632,66 +1603,62 @@ So we build this macro to restore postion after code format."
   ;; Flash define line.
   (lsp-bridge-flash-line))
 
+(defvar lsp-bridge-popup-documentation-frame nil)
+
 (defun lsp-bridge-popup-documentation-scroll-up (&optional arg)
   (interactive)
-  (posframe-funcall lsp-bridge-lookup-doc-tooltip
-                    #'scroll-up-command arg))
+  (when (frame-live-p lsp-bridge-popup-documentation-frame)
+    (with-selected-frame lsp-bridge-popup-documentation-frame
+      (apply #'scroll-up-command arg))))
 
 (defun lsp-bridge-popup-documentation-scroll-down (&optional arg)
   (interactive)
-  (posframe-funcall lsp-bridge-lookup-doc-tooltip
-                    #'scroll-down-command arg))
+  (when (frame-live-p lsp-bridge-popup-documentation-frame)
+    (with-selected-frame lsp-bridge-popup-documentation-frame
+      (apply #'scroll-down-command arg))))
 
 (defun lsp-bridge-popup-documentation--show (value)
-  (with-current-buffer (get-buffer-create lsp-bridge-lookup-doc-tooltip)
+  (with-current-buffer (get-buffer-create lsp-bridge-popup-documentation-buffer)
     (read-only-mode -1)
     (erase-buffer)
     (insert value)
     (acm-markdown-render-content))
-  (when (posframe-workable-p)
-    (posframe-show lsp-bridge-lookup-doc-tooltip
-                   :position (point)
-                   :internal-border-width lsp-bridge-lookup-doc-tooltip-border-width
-                   :background-color (acm-frame-background-color)
-                   :max-width lsp-bridge-lookup-doc-tooltip-max-width
-                   :max-height lsp-bridge-lookup-doc-tooltip-max-height)))
+
+  (acm-frame-new lsp-bridge-popup-documentation-frame
+                 lsp-bridge-popup-documentation-buffer
+                 "lsp bridge popup documentation frame"))
 
 (defun lsp-bridge-hide-doc-tooltip ()
-  (posframe-hide lsp-bridge-lookup-doc-tooltip))
-
-(defvar lsp-bridge-signature-posframe-params
-  (list :poshandler #'posframe-poshandler-point-bottom-left-corner-upward
-        :internal-border-width 20
-        :max-width 60
-        :max-height 12)
-  "Params for signature and `posframe-show'.")
+  (acm-frame-hide-frame lsp-bridge-popup-documentation-frame))
 
 (defcustom lsp-bridge-signature-show-function 'message
-  "Function to render signature help. Set to `lsp-bridge-signature-posframe' to use the posframe."
+  "Function to render signature help. Set to `lsp-bridge-signature-show-with-frame' to use the popup frame."
   :type 'function
   :group 'lsp-bridge)
 
-(defcustom lsp-bridge-signature-tooltip " *lsp-bridge-signature*"
+(defcustom lsp-bridge-signature-buffer " *lsp-bridge-signature*"
   "Buffer for display signature information."
   :type 'string
   :group 'lsp-bridge)
 
-(defun lsp-bridge-hide-signature-tooltip ()
-  (posframe-hide lsp-bridge-signature-tooltip))
+(defvar lsp-bridge-signature-frame nil)
 
-(defun lsp-bridge-signature-posframe (str)
-  "Use posframe to show the STR signatureHelp string."
+(defun lsp-bridge-hide-signature-tooltip ()
+  (acm-frame-hide-frame lsp-bridge-signature-frame))
+
+(defun lsp-bridge-signature-show-with-frame (str)
+  "Use popup frame to show the STR signatureHelp string."
   (if (not (string-empty-p str))
-      (apply #'posframe-show
-             (with-current-buffer (get-buffer-create lsp-bridge-signature-tooltip)
-               (erase-buffer)
-               (insert str)
-               (visual-line-mode 1)
-               (current-buffer))
-             (append
-              lsp-bridge-signature-posframe-params
-              (list :position (point)
-                    :background-color (acm-frame-background-color))))
+      (progn
+        (with-current-buffer (get-buffer-create lsp-bridge-signature-buffer)
+          (erase-buffer)
+          (insert str)
+          (visual-line-mode 1)
+          (current-buffer))
+
+        (acm-frame-new lsp-bridge-signature-frame
+                       lsp-bridge-signature-buffer
+                       "lsp bridge signature frame"))
     (lsp-bridge-hide-signature-tooltip)))
 
 (defun lsp-bridge-signature-help--update (help-infos help-index)
@@ -1724,7 +1691,8 @@ So we build this macro to restore postion after code format."
 (add-hook 'post-command-hook 'lsp-bridge-monitor-window-buffer-change)
 
 (defun lsp-bridge-enable-in-minibuffer ()
-  (when (where-is-internal #'completion-at-point (list (current-local-map)))
+  (when (and lsp-bridge-enable-completion-in-minibuffer
+             (where-is-internal #'completion-at-point (list (current-local-map))))
     (lsp-bridge-mode 1)
     ))
 
@@ -1737,7 +1705,6 @@ So we build this macro to restore postion after code format."
     (post-command-hook lsp-bridge-monitor-post-command nil t)
     (after-save-hook lsp-bridge-monitor-after-save nil t)
     (kill-buffer-hook lsp-bridge-close-buffer-file nil t)
-    (find-file-hook lsp-bridge-search-words-update-file nil t)
     (before-revert-hook lsp-bridge-close-buffer-file nil t)
     (post-self-insert-hook lsp-bridge-monitor-post-self-insert 90 t)
     ))

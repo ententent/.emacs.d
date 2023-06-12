@@ -1,5 +1,5 @@
 #+TITLE: Emacs配置文件
-#+AUTHOR: xiudi
+#+AUTHOR: mawen
 #+DATE: 2023/04/07 20:43:53
 #+STARTUP: overview
 
@@ -113,12 +113,12 @@
 (let ((dir (locate-user-emacs-file "lisp")))
   (add-to-list 'load-path (file-name-as-directory dir)))
 
-;; 不要在 *message* 缓冲区显示加载模块化配置的信息
+;; 抹掉插件启动的输出
 (with-temp-message ""
+  (require 'init-ui)
   (require 'init-ai)
   (require 'init-base)
   (require 'init-dev)
-  (require 'init-dired)
   (require 'init-eaf)
   (require 'init-edit)
   (require 'init-english)
@@ -128,7 +128,6 @@
   (require 'init-python)
   (require 'init-research)
   (require 'init-tools)
-  (require 'init-ui)
   )
 #+END_SRC
 ** init.el 文件尾
@@ -179,27 +178,32 @@
 ;; 数学符号默认字体，保证 Unicode 数学符号可以正确显示
 (set-fontset-font "fontset-default" 'mathematical "Cambria Math")
 ;; 固定间距字体 @ https://www.jetbrains.com/lp/mono/
-(set-face-attribute 'fixed-pitch nil :font "JetBrains Mono"  :height 100)
+(set-face-attribute 'fixed-pitch nil :font "JetBrains Mono"  :height 135)
 ;; 可变间距字体
-(set-face-attribute 'variable-pitch nil :font "Segoe Print" :height 100 :weight 'regular)
+(set-face-attribute 'variable-pitch nil :font "Segoe Print" :height 135 :weight 'regular)
 #+END_SRC
-** 其他UI零散设置项
+** generic
 #+begin_src emacs-lisp
+  (fset 'yes-or-no-p 'y-or-n-p)                   ; 以 y/n 代表 yes/no
+  (blink-cursor-mode -1)                          ; 禁止闪烁光标
+  (transient-mark-mode 1)                         ; 标记高亮
+  (global-subword-mode 1)                         ; Word 移动支持 FooBar 的格式
+
+  (setq confirm-kill-processes nil)               ; 退出自动杀掉进程
+  (setq initial-scratch-message "")               ; 关闭启动空白buffer, 避免干扰session恢复
+  (setq ring-bell-function 'ignore)               ; 关闭出错时的提示音
+  (setq mouse-yank-at-point t)                    ; 在光标处而非鼠标所在位置粘贴
+  
   ;; 禁用一些GUI特性
-  (setq use-dialog-box nil)               ; 鼠标操作不使用对话框
-  (setq inhibit-default-init t)           ; 不加载 `default' 库
-  (setq inhibit-startup-screen t)         ; 不加载启动画面
-  (setq inhibit-startup-message t)        ; 不加载启动消息
-  (setq inhibit-startup-buffer-menu t)    ; 不显示缓冲区列表
+  (setq use-dialog-box nil)                       ; 鼠标操作不使用对话框
+  (setq inhibit-default-init t)                   ; 不加载 `default' 库
+  (setq inhibit-startup-screen t)                 ; 不加载启动画面
+  (setq inhibit-startup-message t)                ; 不加载启动消息
+  (setq inhibit-startup-buffer-menu t)            ; 不显示缓冲区列表
 
-  ;; 草稿缓冲区默认文字设置
-  (setq initial-scratch-message (concat ";; Happy hacking, "
-                                        (capitalize user-login-name) " - Emacs ♥ you!\n\n"))
-
-  ;; 设置缓冲区的文字方向为从左到右
-  (setq bidi-paragraph-direction 'left-to-right)
-  ;; 禁止使用双向括号算法
-  ;; (setq bidi-inhibit-bpa t)
+  ;; 增加长行处理性能
+  (setq bidi-inhibit-bpa t)
+  (setq-default bidi-paragraph-direction 'left-to-right)
 
   ;; 设置自动折行宽度为80个字符，默认值为70
   (setq-default fill-column 80)
@@ -211,15 +215,6 @@
   (setq display-raw-bytes-as-hex t)
   ;; 有输入时禁止 `fontification' 相关的函数钩子，能让滚动更顺滑
   (setq redisplay-skip-fontification-on-input t)
-
-  ;; 禁止响铃
-  (setq ring-bell-function 'ignore)
-
-  ;; 禁止闪烁光标
-  (blink-cursor-mode -1)
-
-  ;; 在光标处而非鼠标所在位置粘贴
-  (setq mouse-yank-at-point t)
 
   ;; 拷贝粘贴设置
   (setq select-enable-primary nil)        ; 选择文字时不拷贝
@@ -245,31 +240,6 @@
   ;; TAB键设置，在Emacs里不使用TAB键，所有的TAB默认为4个空格
   (setq-default indent-tabs-mode nil)
   (setq-default tab-width 4)
-
-  ;; yes或no提示设置，通过下面这个函数设置当缓冲区名字匹配到预设的字符串时自动回答yes
-  (setq original-y-or-n-p 'y-or-n-p)
-  (defalias 'original-y-or-n-p (symbol-function 'y-or-n-p))
-  (defun default-yes-sometimes (prompt)
-    "automatically say y when buffer name match following string"
-    (if (or
-         (string-match "has a running process" prompt)
-         (string-match "does not exist; create" prompt)
-         (string-match "modified; kill anyway" prompt)
-         (string-match "Delete buffer using" prompt)
-         (string-match "Kill buffer of" prompt)
-         (string-match "still connected.  Kill it?" prompt)
-         (string-match "Shutdown the client's kernel" prompt)
-         (string-match "kill them and exit anyway" prompt)
-         (string-match "Revert buffer from file" prompt)
-         (string-match "Kill Dired buffer of" prompt)
-         (string-match "delete buffer using" prompt)
-         (string-match "Kill all pass entry" prompt)
-         (string-match "for all cursors" prompt)
-         (string-match "Do you want edit the entry" prompt))
-        t
-      (original-y-or-n-p prompt)))
-  (defalias 'yes-or-no-p 'default-yes-sometimes)
-  (defalias 'y-or-n-p 'default-yes-sometimes)
 
   ;; 设置剪贴板历史长度300，默认为60
   (setq kill-ring-max 200)
@@ -298,22 +268,79 @@
   ;; 退出Emacs时进行确认
   (setq confirm-kill-emacs 'y-or-n-p)
 
-  ;; 开启Emacs的视觉换行模式
-  (visual-line-mode 1)
+  (global-display-line-numbers-mode t)    ; 开启行号后便于使用 M-g M-g 跳转
+  (column-number-mode t)                  ; 在模式栏上显示当前光标的列号
+  (global-hl-line-mode t)                 ; 高亮当前行
+  (visual-line-mode 1)                    ; 视觉换行模式
+  ; Line numbers are not displayed when large files are used.
+  (setq line-number-display-limit large-file-warning-threshold)
+  (setq line-number-display-limit-width 1000)
+  
+  (dolist (hook (list
+               'c-mode-common-hook
+               'c-mode-hook
+               'emacs-lisp-mode-hook
+               'lisp-interaction-mode-hook
+               'lisp-mode-hook
+               'java-mode-hook
+               'asm-mode-hook
+               'haskell-mode-hook
+               'rcirc-mode-hook
+               'erc-mode-hook
+               'sh-mode-hook
+               'makefile-gmake-mode-hook
+               'python-mode-hook
+               'js-mode-hook
+               'html-mode-hook
+               'css-mode-hook
+               'tuareg-mode-hook
+               'go-mode-hook
+               'coffee-mode-hook
+               'qml-mode-hook
+               'markdown-mode-hook
+               'slime-repl-mode-hook
+               'package-menu-mode-hook
+               'cmake-mode-hook
+               'php-mode-hook
+               'web-mode-hook
+               'coffee-mode-hook
+               'sws-mode-hook
+               'jade-mode-hook
+               'vala-mode-hook
+               'rust-mode-hook
+               'ruby-mode-hook
+               'qmake-mode-hook
+               'lua-mode-hook
+               'swift-mode-hook
+               'llvm-mode-hook
+               'conf-toml-mode-hook
+               'nxml-mode-hook
+               'nim-mode-hook
+               'typescript-mode-hook
+               'elixir-mode-hook
+               'clojure-mode-hook
+               'dart-mode-hook
 
-  ;; 在模式栏上显示当前光标的列号
-  (column-number-mode t)
+               'c-ts-mode-hook
+               'c++-ts-mode-hook
+               'cmake-ts-mode-hook
+               'toml-ts-mode-hook
+               'css-ts-mode-hook
+               'js-ts-mode-hook
+               'json-ts-mode-hook
+               'python-ts-mode-hook
+               'bash-ts-mode-hook
+               'typescript-ts-mode-hook
+               'rust-ts-mode-hook
+               ))
+  (add-hook hook (lambda () (display-line-numbers-mode))))
 
-  ;; 开启行号后便于使用 M-g M-g 跳转到指定行
-  (global-display-line-numbers-mode t)
   ;; Disable line numbers for some modes
   (dolist (mode '(term-mode-hook
                   eshell-mode-hook
                   pdf-view-mode-hook
                   eww-mode-hook))
     (add-hook mode (lambda () (display-line-numbers-mode 0))))
-  ;;; highlight current line
-  (global-hl-line-mode t)
 #+end_src
 ** 编码设置
 - Windows所使用的编码方式与Manjaro不同，导致中文字体无法正确显示
@@ -448,7 +475,7 @@
 ;; (setq auto-save-delete-trailing-whitespace t)
 #+END_SRC
 ** crux系统增强
-+ [[https://github.com/bbatsov/crux][crux]] 提供一系列的增强，如移动增强、删除增强等。
+- [[https://github.com/bbatsov/crux][crux]] 提供一系列的增强，如移动增强、删除增强等。
 #+BEGIN_SRC emacs-lisp
 ;; crux
 (use-package crux
@@ -535,185 +562,6 @@
 (provide 'init-base)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init-base.el ends here
-#+END_SRC
-* init-dired.el
-:PROPERTIES:
-:HEADER-ARGS: :tangle lisp/init-dired.el :mkdirp yes
-:END:
-** init-dired.el 文件头
-#+BEGIN_SRC emacs-lisp
-;;; init-dired.el --- Dired settings -*- lexical-binding: t -*-
-;;; Commentary:
-
-;;; Code:
-#+END_SRC
-** dired 基础配置
-#+BEGIN_SRC emacs-lisp
-(use-package dired
-  :ensure nil
-  :bind (:map dired-mode-map
-              ("C-<return>" . xah-open-in-external-app)
-              ("W" . dired-copy-path)
-              )
-  :config
-  ;; Enable the disabled dired commands
-  (put 'dired-find-alternate-file 'disabled nil)
-
-  ;; open files via external program based on file types, See:
-  ;; https://emacs.stackexchange.com/questions/3105/how-to-use-an-external-program-as-the-default-way-to-open-pdfs-from-emacs
-  (defun xdg-open (filename)
-    (interactive "fFilename: ")
-    (let ((process-connection-type))
-      (start-process "" nil (cond ((eq system-type 'gnu/linux) "xdg-open")
-                                  ((eq system-type 'darwin) "open")
-                                  ((eq system-type 'windows-nt) "start")
-                                  (t "")) (expand-file-name filename))))
-  ;; open files via external program when using find-file
-  (defun find-file-auto (orig-fun &rest args)
-    (let ((filename (car args)))
-      (if (cl-find-if
-           (lambda (regexp) (string-match regexp filename))
-           '(
-             ;; "\\.html?\\'"
-             "\\.xlsx?\\'"
-             "\\.pptx?\\'"
-             "\\.docx?\\'"
-             "\\.mp4\\'"
-             "\\.app\\'"
-             ))
-          (xdg-open filename)
-        (apply orig-fun args))))
-  (advice-add 'find-file :around 'find-file-auto)
-
-  (defun dired-copy-path ()
-    "In dired, copy file path to kill-buffer.
-At 2nd time it copy current directory to kill-buffer."
-    (interactive)
-    (let (path)
-      (setq path (dired-file-name-at-point))
-      (if (string= path (current-kill 0 1)) (setq path (dired-current-directory)))
-      (message path)
-      (kill-new path)))
-
-  (defun xah-open-in-external-app (&optional @fname)
-    "Open the current file or dired marked files in external app.
-The app is chosen from your OS's preference.
-
-When called in emacs lisp, if @fname is given, open that.
-
-URL `http://ergoemacs.org/emacs/emacs_dired_open_file_in_ext_apps.html'
-Version 2019-11-04"
-    (interactive)
-    (let* (
-           ($file-list
-            (if @fname
-                (progn (list @fname))
-              (if (or (string-equal major-mode "dired-mode")
-                      (string-equal major-mode "dirvish-mode"))
-                  (dired-get-marked-files)
-                (list (buffer-file-name)))))
-           ($do-it-p (if (<= (length $file-list) 5)
-                         t
-                       (y-or-n-p "Open more than 5 files? "))))
-      (when $do-it-p
-        (cond
-         ((string-equal system-type "windows-nt")
-          (mapc
-           (lambda ($fpath)
-             (w32-shell-execute "open" $fpath)) $file-list))
-         ((string-equal system-type "darwin")
-          (mapc
-           (lambda ($fpath)
-             (shell-command
-              (concat "open " (shell-quote-argument $fpath))))  $file-list))
-         ((string-equal system-type "gnu/linux")
-          (mapc
-           (lambda ($fpath) (let ((process-connection-type nil))
-                              (start-process "" nil "xdg-open" $fpath))) $file-list))))))
-  :custom
-  ;; (dired-recursive-deletes 'always)
-  (delete-by-moving-to-trash t)
-  (dired-dwim-target t)
-  (dired-bind-vm nil)
-  (dired-bind-man nil)
-  (dired-bind-info nil)
-  (dired-auto-revert-buffer t)
-  (dired-hide-details-hide-symlink-targets nil)
-  (dired-kill-when-opening-new-dired-buffer t)
-  (dired-listing-switches "-AFhlv"))
-
-(use-package dired-aux
-  :ensure nil
-  :bind (:map dired-mode-map
-              ("C-c +" . dired-create-empty-file))
-  :config
-  ;; with the help of `evil-collection', P is bound to `dired-do-print'.
-  (define-advice dired-do-print (:override (&optional _))
-    "Show/hide dotfiles."
-    (interactive)
-    (if (or (not (boundp 'dired-dotfiles-show-p)) dired-dotfiles-show-p)
-        (progn
-          (setq-local dired-dotfiles-show-p nil)
-          (dired-mark-files-regexp "^\\.")
-          (dired-do-kill-lines))
-      (revert-buffer)
-      (setq-local dired-dotfiles-show-p t)))
-  :custom
-  (dired-isearch-filenames 'dwim)
-  (dired-create-destination-dirs 'ask)
-  (dired-vc-rename-file t))
-
-(use-package dired-x
-  :ensure nil
-  :hook (dired-mode . dired-omit-mode)
-  :init
-  (setq dired-guess-shell-alist-user `((,(rx "."
-                                             (or
-                                              ;; Videos
-                                              "mp4" "avi" "mkv" "flv" "ogv" "ogg" "mov"
-                                              ;; Music
-                                              "wav" "mp3" "flac"
-                                              ;; Images
-                                              "jpg" "jpeg" "png" "gif" "xpm" "svg" "bmp"
-                                              ;; Docs
-                                              "pdf" "md" "djvu" "ps" "eps" "doc" "docx" "xls" "xlsx" "ppt" "pptx")
-                                             string-end)
-                                        ,(cond ((eq system-type 'gnu/linux) "xdg-open")
-                                               ((eq system-type 'darwin) "open")
-                                               ((eq system-type 'windows-nt) "start")
-                                               (t "")))))
-  :custom
-  (dired-omit-verbose nil)
-  (dired-omit-files (rx string-start
-                        (or ".DS_Store"
-                            ".cache"
-                            ".vscode"
-                            ".ccls-cache" ".clangd")
-                        string-end))
-  ;; Dont prompt about killing buffer visiting delete file
-  (dired-clean-confirm-killing-deleted-buffers nil)
-  )
-#+END_SRC
-** diredfl 多彩美化
-+ 默认的 Dired 只有两种颜色以区分文件和文件夹，使用 [[https://github.com/purcell/diredfl][diredfl]] 插件让Dired变得多彩
-#+BEGIN_SRC emacs-lisp
-(use-package diredfl
-  :ensure t
-  :hook (dired-mode . diredfl-mode))
-#+END_SRC
-** all-the-icons-dired 图标美化
-+ 使用 [[https://github.com/jtbm37/all-the-icons-dired][all-the-icons-dired]] 插件为Dired添加好看的图标
-#+BEGIN_SRC emacs-lisp
-(use-package all-the-icons-dired
-  :ensure t
-  :hook (dired-mode . all-the-icons-dired-mode)
-  )
-#+END_SRC
-** init-dired.el 文件尾
-#+BEGIN_SRC emacs-lisp
-(provide 'init-dired)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; init-dired.el ends here
 #+END_SRC
 * init-edit.el
 :PROPERTIES:
@@ -1108,16 +956,6 @@ Version 2019-11-04"
   (setq org-appear-inside-latex t)
   )
 #+END_SRC
-*** org-auto-tangle 自动tangle设置
-- [[https://github.com/yilkalargaw/org-auto-tangle][org-auto-tangle]] 插件可以在Org mode下自动进行tangle。
-#+BEGIN_SRC emacs-lisp
-(use-package org-auto-tangle
-  :ensure t
-  :hook (org-mode . org-auto-tangle-mode)
-  :config
-  (setq org-auto-tangle-default t)
-  )
-#+END_SRC
 *** org-src
 - 代码块基础设置
 #+BEGIN_SRC emacs-lisp
@@ -1354,24 +1192,17 @@ Version 2019-11-04"
                            ))
   )
 #+END_SRC
-*** 番茄工作法
-**** org-pomodoro
+*** org-pomodoro 番茄工作法
 - 在 =Arch Linux= 中需要安装 =WAV= 播放器 =aplay=
   - 否则会报错 ="not found wav player on your system"=
   - =sudo pacman -S alsa-utils=
-  - 若无法响铃则尝试安装 =sound-wav=
-    - =M-x package-install sound-wav=
-    - =(require 'sound-wav)=
-    - =(sound-wav-play "sounds/focus_bell.wav")=
 - 安装 =libnotify= 包为 =org-pomodoro= 增加桌面通知
   - =sudo pacman -S libnotify=
   - =sudo apt install libnotify-dev=
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path "~/.emacs.d/lisp/")
-(require 'org-pomodoro)
-
 (use-package org-pomodoro
   :after org
+  :load-path "~/.emacs.d/site-lisp/org-pomodoro/"
   :config
   (setq alert-user-configuration (quote ((((:category . "org-pomodoro")) libnotify nil)))
         
@@ -1379,55 +1210,28 @@ Version 2019-11-04"
         org-pomodoro-play-sounds t           ; Determines whether soudns are played or not
         
         org-pomodoro-start-sound-p t         ; Determine whether to play a sound when a pomodoro started
-        org-pomodoro-start-sound (expand-file-name "sounds/focus_bell.wav" user-emacs-directory)
+        org-pomodoro-start-sound (expand-file-name "site-lisp/org-pomodoro/focus_bell.wav" user-emacs-directory)
         org-pomodoro-length 25               ; The length of a pomodoro in minutes
 
         org-pomodoro-finished-sound-p t      ; Determines whether to play a sound when a pomodoro finished
-        org-pomodoro-finished-sound (expand-file-name "sounds/meditation_bell.wav" user-emacs-directory)
+        org-pomodoro-finished-sound (expand-file-name "site-lisp/org-pomodoro/meditation_bell.wav" user-emacs-directory)
 
         org-pomodoro-manual-break t          ; Whether the user needs to exit manually from a running pomodoro to enter a break
         org-pomodoro-overtime-sound-p t      ; Determines whether to play a sound when a pomodoro starts to run overtime
-        org-pomodoro-overtime-sound (expand-file-name "sounds/meditation_bell.wav" user-emacs-directory)
+        org-pomodoro-overtime-sound (expand-file-name "site-lisp/org-pomodoro/meditation_bell.wav" user-emacs-directory)
 
         org-pomodoro-clock-break nil         ; Don't clock time during breaks
 
         org-pomodoro-short-break-sound-p t   ; Determines whether to play a sound when a short-break finished
-        org-pomodoro-short-break-sound (expand-file-name "sounds/focus_bell.wav" user-emacs-directory)
+        org-pomodoro-short-break-sound (expand-file-name "site-lisp/org-pomodoro/focus_bell.wav" user-emacs-directory)
         org-pomodoro-short-break-length 5    ; The length of a short break in minutes
 
         org-pomodoro-long-break-sound-p t    ; Determines whether to play sound when a long-break finished
-        org-pomodoro-long-break-sound (expand-file-name "sounds/focus_bell.wav" user-emacs-directory)
+        org-pomodoro-long-break-sound (expand-file-name "site-lisp/org-pomodoro/focus_bell.wav" user-emacs-directory)
         org-pomodoro-long-break-frequency 4  ; The maximum number of pomodoros until a long break is started
         org-pomodoro-long-break-length 15    ; The length of a long break in minutes
         )
   )
-#+END_SRC
-**** pomidor
-#+BEGIN_SRC emacs-lisp
-(use-package pomidor
-  :ensure t
-  :bind (("<f12>" . pomidor))
-  :config
-  (setq pomidor-sound-tick nil                  ; disable tick-tack sound
-        pomidor-sound-tack nil                  ; disable tick-tack sound
-        pomidor-seconds (* 1 60)               ; 25 minutes for the work period
-        pomidor-break-seconds (* 1 60)          ; 5 minutes break time
-        pomidor-breaks-before-long 2            ; wait 4 short breaks before long break
-        pomidor-long-break-seconds (* 1 60)    ; 20 minutes long break time
-        pomidor-sound-overwork (expand-file-name "sounds/meditation_bell.wav" user-emacs-directory)
-        pomidor-sound-break-over (expand-file-name "sounds/focus_bell.wav" user-emacs-directory)
-  )
-  (set-face-attribute 'pomidor-work-face nil :foreground "#ff0000")
-  (set-face-attribute 'pomidor-overwork-face nil :foreground "#00abff")
-  (set-face-attribute 'pomidor-break-face nil :foreground "#00ff00")
-  (set-face-attribute 'pomidor-skip-face nil :foreground "#abbac3")
-  :hook
-  (pomidor-mode . (lambda ()
-                    (display-line-numbers-mode -1)
-                    (setq left-fringe-width 0 right-fringe-width 0)
-                    (setq left-margin-width 2 right-margin-width 0)
-                    ;; force fringe update
-                    (set-window-buffer nil (current-buffer)))))
 #+END_SRC
 *** org-agenda 配置
 **** calendar 基本设置
@@ -1851,7 +1655,7 @@ DIR is the location of the output."
             :sitemap-style list
             :sitemap-sort-files anti-chronologically
             :sitemap-format-entry format-posts-rss-feed-entry)
-          
+
           ("personal-website" :components ("site" "posts" "static" "rss")))))
 #+END_SRC
 *** css-sort
@@ -1940,10 +1744,10 @@ DIR is the location of the output."
 ;;; Code:
 #+END_SRC
 ** exec-path-from-shell
-+ purcell 开发的 [[https://github.com/purcell/exec-path-from-shell][exec-path-from-shell]] 让Emacs使用用户shell所设定的$PATH
+- purcell 开发的 [[https://github.com/purcell/exec-path-from-shell][exec-path-from-shell]] 让Emacs使用用户shell所设定的$PATH
 #+BEGIN_SRC emacs-lisp
 (use-package exec-path-from-shell
-  :ensure t
+  :load-path "~/.emacs.d/site-lisp/exec-path-from-shell/"
   :config
   (when (memq window-system '(mac ns x))
     (exec-path-from-shell-initialize)))
@@ -1951,14 +1755,14 @@ DIR is the location of the output."
 ** restart-emacs 重启
 #+BEGIN_SRC emacs-lisp
 (use-package restart-emacs
-  :ensure t)
+  :load-path "~/.emacs.d/site-lisp/restart-emacs/")
 #+END_SRC
-** which-key 快捷键
-+ [[https://github.com/justbur/emacs-which-key][which-key]] 插件将提示快捷键
+** which-key 快捷键提示
 #+BEGIN_SRC emacs-lisp
 (use-package which-key
-  :ensure t
-  :init (which-key-mode))
+  :load-path "~/.emacs.d/site-lisp/which-key/"
+  :config
+  (which-key-mode 1))
 #+END_SRC
 ** init-tools.el 文件尾
 #+BEGIN_SRC emacs-lisp
@@ -2277,34 +2081,29 @@ DIR is the location of the output."
 
 ;;; Code:
 #+END_SRC
-** ivy-bibtex
+** ivy-bibtex 读取 Zotero 信息
 #+BEGIN_SRC emacs-lisp
-(setq zot_bib '("~/research/LFH/TeX/ref.bib"
-                ; Zotero 用 Better BibTeX 导出的 .bib 文件. 可以是多个文件
-                "~/research/MAGE/TeX/ref.bib")
-      ; Zotero 的 ZotFile 同步文件夹
-      zot_pdf "~/MEGA/Zotero-Library"
-      ; 自定义的 org-roam 文献笔记目录
-      org_refs "~/org/roam/ref/" )
-
-(use-package ivy-bibtex ; 这里也可以用 ivy-bibtex 替换 helm-bibtex
+(use-package ivy-bibtex
   :ensure t
   :custom
-  (bibtex-completion-notes-path org_refs)
-  (bibtex-completion-bibliography zot_bib)
-  (bibtex-completion-library-path zot_pdf))
+  (bibtex-completion-bibliography '("~/Thesis/ITM/TeX/ref.bib"
+                                    "~/Thesis/LFH/TeX/ref.bib"
+                                    "~/Thesis/Fusion/TeX/ref.bib"
+                                    ))
+  (bibtex-completion-library-path "~/MEGA/Zotero-Library")
+  (bibtex-completion-notes-path "~/org/roam/interleave/"))
 #+END_SRC
-** org-roam-bibtex
+** org-roam-bibtex 读取 iby-bibtex 的信息并绑定 orb 快捷键
 #+BEGIN_SRC emacs-lisp
 (use-package org-roam-bibtex
   :ensure t
-  :hook (org-roam-mode . org-roam-bibtex-mode)i
+  :hook (org-roam-mode . org-roam-bibtex-mode)
   :bind (("C-c n k" . orb-insert-link)
          ("C-c n a" . orb-note-actions))
   :custom
-  ; 与上面 helm-bibtex/ivy-bibtex 的选择保持一致
+  ; 使用 ivy-bibtex 作为文献搜索界面
   (orb-insert-interface 'ivy-bibtex)
-  ; 默认使用标题, 但是论文的标题一般很长, 不适合作为笔记链接的名字
+  ; 使用引用键名作为笔记链接的标题
   (orb-insert-link-description 'citekey)
   (orb-preformat-keywords
    '("citekey" "title" "url" "author-or-editor" "keywords" "file"))
@@ -2341,87 +2140,24 @@ DIR is the location of the output."
 
 ;; org-roam 笔记模板
 (setq org-roam-capture-templates
-             '(("d" "default" plain "- tag :: \n %?" ; 普及模板
-                :target
-                (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title} \n")
-                :unnarrowed t)
-               ("r" "bibliography reference in pdfs" plain ; 文献模板
-                "#+FILETAGS: reading research \n - tags :: %^{keywords} \n* %^{title}\n:PROPERTIES:\n:Custom_ID: %^{citekey}\n:URL: %^{url}\n:AUTHOR: %^{author-or-editor}\n:NOTER_DOCUMENT: ~/MEGA/Zotero-Library/%^{citekey}.pdf\n:NOTER_PAGE:\n:END:"      
-                :target
-                (file+head "ref/${citekey}.org" "#+title: ${title}\n"))))
+      '(("d" "默认模板" plain
+         "- tag :: \n %?"
+         :target
+         (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title} \n")
+         :unnarrowed t)
+        ("r" "文献笔记" plain
+         "#+FILETAGS: reading research \n - tags :: %^{keywords} \n* %^{title}\n:PROPERTIES:\n:interleave_url: /home/mawen/MEGA/Zotero-Library/%^{citekey}.pdf\n:interleave_page_note: 1\n:END:"      
+         :target
+         (file+head "ref/${citekey}.org" "#+title: ${title}\n"))))
 #+END_SRC
-** org-noter
-*** pdf-tools
-**** Windows
-- 借助 =M-x package-list-packages= 从 =melpa-stable= 安装 =pdf-tools=
-- 使用 =scoop= 安装 =msys2=
-- 打开 =msys2= 下的 =mingw64.exe= 执行
-  - =pacman -S mingw-w64-x86_64-texlive-full=
-  - =pacman -S mingw-w64-x86_64-emacs-pdf-tools-server=
-- 将 =E:\Scoop\apps\msys2\current\mingw64\bin= 添加到环境变量
-- 执行 =pdf-tools-install=
-**** Arch Linux
-- 执行 =yay -S emacs-pdf-tools-git=
-#+BEGIN_SRC emacs-lisp
-(use-package pdf-tools
-  :mode ("\\.pdf\\'" . pdf-view-mode)                           ;; pdf 文件默认打开方式
-  :bind
-  (:map pdf-view-mode-map
-        ("d" . pdf-view-next-page-command)                      ;; 向后翻页
-        ("a" . pdf-view-previous-page-command)                  ;; 向前翻页
-        ("s" . pdf-view-scroll-up-or-next-page)                 ;; 向下滑动
-        ("w" . pdf-view-scroll-down-or-previous-page)           ;; 向上滑动
-   :map pdf-history-minor-mode-map
-        ("b" . pdf-history-backward)
-   :map pdf-annot-minor-mode-map
-        ("C-a a" . pdf-annot-add-highlight-markup-annotation)
-        ("C-a s" . pdf-annot-add-squiggly-markup-annotation)
-        ("C-a u" . pdf-annot-add-underline-markup-annotation)
-        ("C-a d" . pdf-annot-delete))
-  :custom
-  (pdf-view-midnight-colors '("#000000" . "#9bCD9b"))           ;; 夜间模式设置绿色底色
-  (native-comp-deferred-compilation-deny-list '(".*pdf.*"))     ;; 禁用 =pdf-tools= 有关文件的本地编译
-  :config
-  (require 'pdf-annot)                                          ;; 设置 pdf-annot-minor-mode-map
-  (require 'pdf-history)                                        ;; 设置 pdf-history-minor-mode-map
-  (add-hook 'pdf-view-mode-hook 'pdf-view-midnight-minor-mode)  ;; 默认夜间模式
-  (add-hook 'pdf-view-mode-hook 'pdf-view-fit-width-to-window)  ;; 打开PDF时自动缩放
-  (pdf-tools-install))
-#+END_SRC
-*** org-noter
-#+BEGIN_SRC emacs-lisp
-(use-package org-noter
-  :ensure t
-  :defer t
-  :bind
-  ;; 与org-roam配合，打开org-noter的快捷键
-  (("C-c n n" . org-noter)
-   ;; 加入左手键位
-   :map org-noter-doc-mode-map
-   ("e" . org-noter-insert-note)
-   ("M-e" . org-noter-insert-precise-note))
-  :custom
-  ;; 选中文字后插入笔记自动高亮
-  (org-noter-highlight-selected-text t)
-  ;; 默认笔记路径。设置后从 pdf 文件中使用 =org-noter= 命令，会自动在该墓中寻找与文件同名的 =.org= 笔记文件
-  (org-noter-notes-search-path '("~/org/roam/ref/"))
-  ;; 将文档和笔记分割为两个大小相等的窗口
-  (org-noter-doc-split-fraction '(0.5 . 0.5))
-  ;; 自动保存上次阅读位置
-  (org-noter-auto-save-last-location t)
-  ;; 修改长/短文本标准，默认为80
-  (org-noter-max-short-selected-text-length 20)
-  ;; 默认短标题格式
-  (org-noter-default-heading-title "第 $p$ 页的笔记"))
-#+END_SRC
-*** org-download
+** org-download
 #+BEGIN_SRC emacs-lisp
 ;; 对于Windows系统，需要安装ImageMagick，并保证magick.exe在PATH变量的路径中
 ;;; 用msys2安装: pacman -S mingw-w64-x86_64-imagemagick
 (use-package org-download
   :ensure async ;; 因为不是从melpa安装，需要手动保证async安装
   :defer t ;; 延迟加载
-  :load-path "~/.emacs.d/lisp/"
+  :load-path "~/.emacs.d/site-lisp/org-download/"
   :bind
   (:map org-mode-map
         ("C-M-y" . org-download-clipboard)) ;; 绑定从剪贴板粘贴截图的快捷键
@@ -2431,51 +2167,52 @@ DIR is the location of the output."
   ;; 用同级 ./img 目录放置截图文件
   (setq-default org-download-image-dir "./img"))
 #+END_SRC
-*** LaTeX
-**** TeX Core
+** LaTeX
+*** TeX Core
 #+BEGIN_SRC emacs-lisp
-;; 打开 TeX 文件时应执行的命令
-(defun my-latex-hook ()
-  (turn-on-cdlatex)          ;; 加载cdlatex
-  (turn-on-reftex)           ;; 加载reftex
-  (prettify-symbols-mode t)  ;; 加载prettify-symbols-mode
-  (outline-minor-mode)       ;; 加载outline-mode
-  (outline-hide-body))       ;; 打开文件时只显示章节标题
+  ;; 打开 TeX 文件时应执行的命令
+  (defun my-latex-hook ()
+    (turn-on-cdlatex)          ;; 加载cdlatex
+    (turn-on-reftex)           ;; 加载reftex
+    (prettify-symbols-mode t)  ;; 加载prettify-symbols-mode
+    (outline-minor-mode)       ;; 加载outline-mode
+    (outline-hide-body))       ;; 打开文件时只显示章节标题
 
-;; tex
-;; @source https://github.com/jwiegley/use-package/issues/379#issuecomment-246161500
-(use-package tex
-  :defer t
-  :ensure auctex
-  :custom
-  ;; 对新文件自动解析 (usepackage, bibliograph, newtheorem) 等信息
-  (TeX-parse-selt t)
-  (TeX-PDF-mode t)
-  ;; 正向与反向搜索设置
-  (TeX-source-correlate-mode t)
-  (TeX-source-correlate-method 'synctex)
-  ;; 使用pdf-tools打开PDF
-  (TeX-view-program-selection '((output-pdf "PDF Tools")))
-  :config
-  (setq TeX-auto-save t)
-  ;; 编译时问询主文件名称
-  (setq-default TeX-master t)                               
-  ;; 编译后更新pdf文件
-  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
-  ;; 加载LaTeX模式设置
-  (add-hook 'LaTeX-mode-hook 'my-latex-hook)
-  ;; XeLaTeX 支持
-  (add-hook 'LaTeX-mode-hook (lambda()
-  (add-to-list 'TeX-command-list '("XeLaTeX" "%`xelatex%(mode)%' %t" TeX-run-TeX nil t))
-  (setq TeX-save-query  nil )
-  (setq TeX-show-compilation t))))
+  ;; tex
+  ;; @source https://github.com/jwiegley/use-package/issues/379#issuecomment-246161500
+  (use-package tex
+    :defer t
+    :ensure auctex
+    :custom
+    ;; 对新文件自动解析 (usepackage, bibliograph, newtheorem) 等信息
+    (TeX-parse-selt t)
+    (TeX-PDF-mode t)
+    ;; 正向与反向搜索设置
+    (TeX-source-correlate-mode t)
+    (TeX-source-correlate-method 'synctex)
+    ;; 使用 eaf-pdf-viewer 打开PDF
+    (TeX-view-program-selection '((output-pdf "eaf")))
+    :config
+    (setq TeX-auto-save t)
+    ;; 编译时问询主文件名称
+    (setq-default TeX-master t)                               
+    ;; 编译后更新pdf文件
+    (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+    ;; 加载LaTeX模式设置
+    (add-hook 'LaTeX-mode-hook 'my-latex-hook)
+    ;; XeLaTeX 支持
+    (add-hook 'LaTeX-mode-hook (lambda()
+                                 (add-to-list 'TeX-command-list '("XeLaTeX" "%`xelatex --synctex=1%(mode)%' %t" TeX-run-TeX nil t))
+                                 (add-to-list 'TeX-view-program-list '("eaf" eaf-pdf-synctex-forward-view))
+                                 (setq TeX-save-query nil
+                                       TeX-show-compilation t))))
 #+END_SRC
-**** cdLaTeX
+*** cdLaTeX
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 (require 'cdlatex)
 #+END_SRC
-**** Prettify
+*** Prettify
 #+BEGIN_SRC emacs-lisp
 ;; customize prettify
 ;; https://en.wikipedia.org/wiki/Mathematical_operators_and_symbols_in_Unicode
@@ -2592,40 +2329,6 @@ DIR is the location of the output."
   (setq sdcv-tooltip-border-width 2)
   )
 #+END_SRC
-** company-english-helper 写单词
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path "~/.emacs.d/site-lisp/company-english-helper/")
-(require 'company-english-helper)
-
-(use-package company-english-helper
-  :bind
-  (("\e\e w w" . toggle-company-english-helper))
-  )
-#+END_SRC
-** popweb
-- [[https://github.com/manateelazycat/popweb][popweb]] 由懒猫开发，显示弹出窗口。用途之一是英译中。
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path "~/.emacs.d/site-lisp/popweb/")
-(setq popweb-python-command "/usr/bin/python")
-;; Proxy
-(setq popweb-proxy-type "http")
-(setq popweb-proxy-host "127.0.0.1")
-(setq popweb-proxy-port "7890")
-;; Font size
-(setq popweb-zoom-factor 0.5)
-;; Scaled to emacs
-(setq popweb-url-web-window-width-scale 0.8)
-(setq popweb-url-web-window-height-scale 0.15)
-
-;; LaTeX preview functionality
-(add-to-list 'load-path "~/.emacs.d/site-lisp/popweb/extension/latex")
-(require 'popweb-latex)
-(add-hook 'latex-mode-hook #'popweb-latex-mode)
-
-;; Chinese-English translation popup
-(add-to-list 'load-path "~/.emacs.d/site-lisp/popweb/extension/dict") ;
-(require 'popweb-dict) 
-#+END_SRC
 ** init-english.el 文件尾
 #+BEGIN_SRC emacs-lisp
 (provide 'init-english)
@@ -2645,62 +2348,91 @@ DIR is the location of the output."
 #+END_SRC
 ** emacs-application-framework
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-application-framework/")
-(require 'eaf)
-;;; 配置 EAF 代理
-(setq eaf-proxy-type "http")
-(setq eaf-proxy-host "127.0.0.1")
-(setq eaf-proxy-port "7890")
-;; 配置 EAF 依赖的 Python 环境
-(setq eaf-python-command "/usr/bin/python")
+  (add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-application-framework/")
+  (require 'eaf)
 
-;; eaf-browser
-(require 'eaf-browser)
-(setq eaf-browser-continue-where-left-off t)
-(setq eaf-browser-enable-adblocker t)
-(setq browse-url-browser-function 'eaf-open-browser)
+  ;;; eaf general settings
+  (setq eaf-python-command "/usr/bin/python")
 
-;; eaf-rss-reader
-;;; 一些优质RSS订阅源
-;;; https://manateelazycat.github.io/feed.xml          ;; manateeLazyCat
-;;; https://superliooon.com/feed/                      ;; 即凉
-;;; http://blindwith.science/index.xml                 ;; Blind with Science
-;;; https://remacs.cc/index.xml                        ;; remacs的世界
-;;; https://www.bmpi.dev/index.xml                     ;; BMPI
-;;; http://www.ruanyifeng.com/blog/atom.xml            ;; Ruan YiFeng
-;;; https://emacstalk.codeberg.page/podcast/index.xml  ;; EmacsTalk
-;;; https://arxiv.org/rss/cs.CV                        ;; ArXiv CV
-;;; https://sachachua.com/blog/feed/                   ;; Sacha Chua
-;;; https://byvoid.com/zhs/feed.xml                    ;; byvoid
-;;; https://www.skyue.com/feed                         ;; skyue
-;;; https://einverne.github.io/feed.xml                ;; Verne
-;;; https://liujiacai.net/atom.xml                     ;; 刘家财
-;;; https://planet.emacslife.com/                      ;; Alvaro Ramirez
-;;; https://leovan.me/index.xml                        ;; 范叶亮
-(require 'eaf-rss-reader)
+  ;;; eaf-proxy
+  (setq eaf-proxy-type "http")
+  (setq eaf-proxy-host "127.0.0.1")
+  (setq eaf-proxy-port "7890")
 
-;; eaf-git
-(require 'eaf-git)
-;; eaf-pdf-viewer
-;;; (require 'eaf-pdf-viewer)
-;; eaf-image-viewer
-(require 'eaf-image-viewer)
-;; eaf-video-player
-(require 'eaf-video-player)
-;; eaf-music-player
-(require 'eaf-music-player)
-(setq eaf-music-default-file "~/MEGA/Music/songs")
+  ;;; eaf-browser
+  (require 'eaf-browser)
+  (setq eaf-browser-continue-where-left-off t)
+  (setq eaf-browser-enable-adblocker t)
+  (setq browse-url-browser-function 'eaf-open-browser)
 
-;; eaf-terminal
-(require 'eaf-terminal)
-;; eaf-file-manager
-(require 'eaf-file-manager)
-;; eaf-system-monitor
-(require 'eaf-system-monitor)
-;; eaf-markdown-previewer
-(require 'eaf-markdown-previewer)
-;; eaf-org-previewer
-(require 'eaf-org-previewer)
+  ;;; eaf-rss-reader
+  ;; 一些优质RSS订阅源
+  ;; https://manateelazycat.github.io/feed.xml           manateeLazyCat
+  ;; https://superliooon.com/feed/                       即凉
+  ;; http://blindwith.science/index.xml                  Blind with Science
+  ;; https://remacs.cc/index.xml                         remacs的世界
+  ;; https://www.bmpi.dev/index.xml                      BMPI
+  ;; http://www.ruanyifeng.com/blog/atom.xml             Ruan YiFeng
+  ;; https://emacstalk.codeberg.page/podcast/index.xml   EmacsTalk
+  ;; https://arxiv.org/rss/cs.CV                         ArXiv CV
+  ;; https://sachachua.com/blog/feed/                    Sacha Chua
+  ;; https://byvoid.com/zhs/feed.xml                     byvoid
+  ;; https://www.skyue.com/feed                          skyue
+  ;; https://einverne.github.io/feed.xml                 Verne
+  ;; https://liujiacai.net/atom.xml                      刘家财
+  ;; https://planet.emacslife.com/                       Alvaro Ramirez
+  ;; https://leovan.me/index.xml                         范叶亮
+  (require 'eaf-rss-reader)
+
+  ;;; eaf-git
+  (require 'eaf-git)
+
+  ;;; eaf-pdf-viewer
+  (require 'eaf-pdf-viewer)
+  ;; 配置 eaf-interleave, 配合使用 eaf-pdf-viewer 和 org-mode
+  ;; https://github.com/emacs-eaf/emacs-application-framework/blob/master/extension/eaf-interleave.el
+  (require 'eaf-interleave)
+  (add-hook 'eaf-browser-hook 'eaf-interleave-app-mode)
+  (add-hook 'eaf-pdf-viewer-hook 'eaf-interleave-app-mode)
+  (add-hook 'org-mode-hook 'eaf-interleave-mode)
+  (with-eval-after-load 'eaf-interleave
+    (define-key eaf-interleave-mode-map (kbd "M-.") 'eaf-interleave-sync-current-note)
+    (define-key eaf-interleave-mode-map (kbd "M-p") 'eaf-interleave-sync-previous-note)
+    (define-key eaf-interleave-mode-map (kbd "M-n") 'eaf-interleave-sync-next-note)
+    (define-key eaf-interleave-app-mode-map (kbd "C-c M-o") 'eaf-interleave-open-notes-file)
+    (define-key eaf-interleave-app-mode-map (kbd "C-c M-i") 'eaf-interleave-add-note)    
+    (define-key eaf-interleave-app-mode-map (kbd "C-c M-q") 'eaf-interleave-quit))
+  ;; 默认笔记路径, 自动在该目录中寻找同名 org 文件
+  (setq eaf-interleave-org-notes-dir-list '("~/org/roam/interleave"))
+  ;; 分隔文档和笔记
+  (setq eaf-interleave-split-direction 'vertical
+	eaf-interleave-split-lines 20
+	eaf-interleave-disable-narrowing t)
+
+  ;;; eaf-image-viewer
+  (require 'eaf-image-viewer)
+
+  ;;; eaf-js-video-player
+  (require 'eaf-js-video-player)
+
+  ;;; eaf-music-player
+  (require 'eaf-music-player)
+  (setq eaf-music-default-file "~/MEGA/Music/songs")
+
+  ;;; eaf-pyqterminal
+  (require 'eaf-pyqterminal)
+
+  ;;; eaf-file-manager
+  (require 'eaf-file-manager)
+
+  ;;; eaf-system-monitor
+  (require 'eaf-system-monitor)
+
+  ;;; eaf-markdown-previewer
+  (require 'eaf-markdown-previewer)
+
+  ;;; eaf-org-previewer
+  (require 'eaf-org-previewer)
 #+END_SRC
 ** init-eaf.el 文件尾
 #+BEGIN_SRC emacs-lisp

@@ -33,7 +33,9 @@ class SearchFileWords:
         self.search_files = set()
         self.search_content_dict = {}
         self.search_words_thread = None
-        
+
+        (self.max_number, ) = get_emacs_vars(["acm-backend-search-file-words-max-number"])
+
         self.search_words_queue = queue.Queue()
         self.search_words_dispatcher_thread = threading.Thread(target=self.search_dispatcher)
         self.search_words_dispatcher_thread.start()
@@ -69,15 +71,19 @@ class SearchFileWords:
 
         self.index_file(filepath, content)
 
-    def change_file(self, filepath, base64_string):
-        import base64
-        try:
-            content = base64.b64decode(base64_string).decode("utf-8")
-        except UnicodeDecodeError:
-            print('ignore non utf-8 file: %s' % filepath)
+    def change_buffer(self, buffer_name, start_pos, end_pos, change_text):
+        start_pos = epc_arg_transformer(start_pos)
+        end_pos = epc_arg_transformer(end_pos)
+
+        if len(start_pos) == 0 or len(end_pos) == 0:
             return
 
-        self.index_file(filepath, content)
+        if buffer_name in self.search_content_dict:
+            content = rebuild_content_from_diff(self.search_content_dict[buffer_name], start_pos, end_pos, change_text)
+        else:
+            content = get_emacs_func_result('get-buffer-content', buffer_name, True)
+
+        self.index_file(buffer_name, content)
 
     def close_file(self, filepath):
         if filepath in self.files:
@@ -114,8 +120,7 @@ class SearchFileWords:
                 
                 candidates = list(map(lambda word: prefix[:-len(search_prefix)] + word, candidates))
                 
-
-            eval_in_emacs("lsp-bridge-search-backend--record-items", "file-words", candidates[:min(3, len(candidates))])
+            eval_in_emacs("lsp-bridge-search-backend--record-items", "file-words", candidates[:min(self.max_number, len(candidates))])
         except:
             logger.error(traceback.format_exc())
             
@@ -131,10 +136,6 @@ class SearchFileWords:
         
         return candidates
             
-    def rebuild_cache(self):
-        if len(self.search_files) > 0:
-            self.search_words_queue.put("search_words")
-    
     def search_dispatcher(self):
         try:
             while True:

@@ -167,11 +167,6 @@
   :type 'integer
   :group 'acm)
 
-(defcustom acm-markdown-render-font-height 130
-  "Font size for hover tooltip."
-  :type 'integer
-  :group 'acm)
-
 (defcustom acm-frame-background-dark-color "#191a1b"
   "The frame background color for dark theme."
   :type 'string
@@ -1093,7 +1088,7 @@ The key of candidate will change between two LSP results."
 
       ;; Then remapping background and height of `markdown-code-face' to same as acm doc buffer.
       (face-remap-add-relative 'markdown-code-face :background (face-attribute 'default :background acm-menu-frame))
-      (face-remap-add-relative 'markdown-code-face :height acm-markdown-render-font-height)))
+      ))
 
   (read-only-mode 0)
 
@@ -1127,7 +1122,7 @@ The key of candidate will change between two LSP results."
       )))
 
 (defun acm-in-comment-p (&optional state)
-  (if (and (featurep 'treesit) (treesit-parser-list))
+  (if (and (featurep 'treesit) (treesit-available-p) (treesit-parser-list))
       ;; Avoid use `acm-current-parse-state' when treesit is enable.
       ;; `beginning-of-defun' is very expensive function will slow down completion menu.
       ;; We use `treesit-node-type' directly if treesit is enable.
@@ -1142,7 +1137,7 @@ The key of candidate will change between two LSP results."
           )))))
 
 (defun acm-in-string-p (&optional state)
-  (if (and (featurep 'treesit) (treesit-parser-list))
+  (if (and (featurep 'treesit) (treesit-available-p) (treesit-parser-list))
       ;; Avoid use `acm-current-parse-state' when treesit is enable.
       ;; `beginning-of-defun' is very expensive function will slow down completion menu.
       ;; We use `treesit-node-type' directly if treesit is enable.
