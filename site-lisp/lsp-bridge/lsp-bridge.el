@@ -385,6 +385,10 @@ Then LSP-Bridge will start by gdb, please send new issue with `*lsp-bridge*' buf
   "Default LSP server for C#, you can choose `omnisharp-mono' or `omnisharp-dotnet'."
   :type 'string)
 
+(defcustom lsp-bridge-nix-lsp-server "rnix-lsp"
+  "Default LSP server for nix, you can choose `rnix-lsp' or `nil'."
+  :type 'string)
+
 (defcustom lsp-bridge-use-wenls-in-org-mode nil
   "Use `wen' lsp server in org-mode, default is disable.")
 
@@ -433,7 +437,7 @@ Then LSP-Bridge will start by gdb, please send new issue with `*lsp-bridge*' buf
     (dockerfile-mode .                                                           "docker-langserver")
     (d-mode .                                                                    "serve-d")
     ((fortran-mode f90-mode) .                                                   "fortls")
-    (nix-mode .                                                                  "rnix-lsp")
+    (nix-mode .                                                                  lsp-bridge-nix-lsp-server)
     (ess-r-mode .                                                                "rlanguageserver")
     (graphql-mode .                                                              "graphql-lsp")
     (swift-mode .                                                                "swift-sourcekit")
@@ -509,18 +513,19 @@ Then LSP-Bridge will start by gdb, please send new issue with `*lsp-bridge*' buf
     vhdl-mode-hook
     typst-mode-hook
     graphql-mode-hook
-
     c-ts-mode-hook
     c++-ts-mode-hook
     cmake-ts-mode-hook
     elixir-ts-mode-hook
     toml-ts-mode-hook
     css-ts-mode-hook
+    java-ts-mode-hook
     js-ts-mode-hook
     json-ts-mode-hook
     python-ts-mode-hook
     bash-ts-mode-hook
     typescript-ts-mode-hook
+    tsx-ts-mode-hook
     go-ts-mode-hook
     yaml-ts-mode-hook
     )
@@ -1435,6 +1440,16 @@ So we build this macro to restore postion after code format."
 (defun lsp-bridge-monitor-after-save ()
   (lsp-bridge-call-file-api "save_file" (buffer-name)))
 
+(defcustom lsp-bridge-find-def-fallback-function nil
+  "Fallback for find definition failure."
+  :type 'function
+  :group 'lsp-bridge)
+
+(defcustom lsp-bridge-find-ref-fallback-function nil
+  "Fallback for find referecences failure."
+  :type 'function
+  :group 'lsp-bridge)
+
 (defvar-local lsp-bridge-jump-to-def-in-other-window nil)
 
 (defun lsp-bridge-find-def ()
@@ -1496,12 +1511,22 @@ So we build this macro to restore postion after code format."
   (interactive)
   (lsp-bridge-call-file-api "find_references" (lsp-bridge--position)))
 
-(defun lsp-bridge-references--popup (references-content references-counter)
+(defun lsp-bridge-find-def-fallback (position)
+  (message "[LSP-Bridge] No definition found.")
+  (if (functionp lsp-bridge-find-def-fallback-function)
+      (funcall lsp-bridge-find-def-fallback-function position)))
+
+(defun lsp-bridge-find-ref-fallback (position)
+  (message "[LSP-Bridge] No references found.")
+  (if (functionp lsp-bridge-find-ref-fallback-function)
+      (funcall lsp-bridge-find-ref-fallback-function position)))
+
+(defun lsp-bridge-references--popup (references-content references-counter position)
   (if (> references-counter 0)
       (progn
         (lsp-bridge-ref-popup references-content references-counter)
         (message "[LSP-Bridge] Found %s references" references-counter))
-    (message "[LSP-Bridge] No references found.")))
+    (lsp-bridge-find-ref-fallback position)))
 
 (defun lsp-bridge-rename ()
   (interactive)
@@ -1636,6 +1661,13 @@ So we build this macro to restore postion after code format."
   :type 'function
   :group 'lsp-bridge)
 
+(defcustom lsp-bridge-signature-show-with-frame-position "bottom-right"
+  "The popup position of signature frame.
+
+Default is `bottom-right', you can choose other value: `top-left', `top-right', `bottom-left', 'point'."
+  :type 'string
+  :group 'lsp-bridge)
+
 (defcustom lsp-bridge-signature-buffer " *lsp-bridge-signature*"
   "Buffer for display signature information."
   :type 'string
@@ -1658,7 +1690,11 @@ So we build this macro to restore postion after code format."
 
         (acm-frame-new lsp-bridge-signature-frame
                        lsp-bridge-signature-buffer
-                       "lsp bridge signature frame"))
+                       "lsp bridge signature frame"
+                       nil
+                       nil
+                       lsp-bridge-signature-show-with-frame-position
+                       ))
     (lsp-bridge-hide-signature-tooltip)))
 
 (defun lsp-bridge-signature-help--update (help-infos help-index)
@@ -1751,12 +1787,15 @@ So we build this macro to restore postion after code format."
     (acm-run-idle-func acm-backend-elisp-symbols-update-timer lsp-bridge-elisp-symbols-update-idle 'lsp-bridge-elisp-symbols-update)
 
     (when (or (lsp-bridge-has-lsp-server-p)
-              ;; init acm backend for org babel
-              (and lsp-bridge-enable-org-babel (eq major-mode 'org-mode)))
+              ;; Init acm backend for org babel, and need elimination org temp buffer.
+              (and lsp-bridge-enable-org-babel 
+                   (eq major-mode 'org-mode)
+                   (not (lsp-bridge-is-org-temp-buffer-p))))
       ;; When user open buffer by `ido-find-file', lsp-bridge will throw `FileNotFoundError' error.
       ;; So we need save buffer to disk before enable `lsp-bridge-mode'.
-      (unless (lsp-bridge-is-remote-file)
-        (unless (file-exists-p (buffer-file-name))
+      (when (not (lsp-bridge-is-remote-file))
+        (when (and (buffer-file-name)
+                   (not (file-exists-p (buffer-file-name))))
           (save-buffer)))
 
       (setq-local acm-backend-lsp-completion-trigger-characters nil)
@@ -1778,6 +1817,12 @@ So we build this macro to restore postion after code format."
     ;; Flag `lsp-bridge-is-starting' make sure only call `lsp-bridge-start-process' once.
     (unless lsp-bridge-is-starting
       (lsp-bridge-start-process))))
+
+(defun lsp-bridge-is-org-temp-buffer-p ()
+  (or (string-match "\*org-src-fontification:" (buffer-name))
+      (string-match "\*Org Src" (buffer-name))
+      (string-match ".org-src-babel" (buffer-name))
+      (equal "*Capture*" (buffer-name))))
 
 (defun lsp-bridge--disable ()
   "Disable LSP Bridge mode."

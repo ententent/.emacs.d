@@ -1625,7 +1625,7 @@ DIR is the location of the output."
            :sitemap-format-entry taingram--sitemap-dated-entry-format)
 
           ("static"
-           :base-directory "~/org/docs/blog/"
+           :base-directory "~/org/docs/blog/static/"
            :base-extension "css\\|js\\|txt\\|jpg\\|gif\\|png"
            :recursive t
            :publishing-directory  "~/pages/"
@@ -1643,7 +1643,7 @@ DIR is the location of the output."
             :html-link-org-files-as-html t
             :auto-sitemap t
             :sitemap-function posts-rss-feed
-            :sitemap-title "Wen Ma's Blog"
+            :sitemap-title "mawen.codeberg.page"
             :sitemap-filename "rss.org"
             :sitemap-style list
             :sitemap-sort-files anti-chronologically
@@ -1796,9 +1796,6 @@ DIR is the location of the output."
 ;; On Windows, after downloading the fonts, one needs to manually install them
 ;; M-x package-install RET all-the-icons
 ;; restart-emacs, M-x all-the-icons-install-fonts
-(setq url-proxy-services
-      '(("http" . "127.0.0.1:7890")
-        ("https" . "127.0.0.1:7890")))
 (use-package all-the-icons
   :if (display-graphic-p))
 
@@ -2014,6 +2011,9 @@ DIR is the location of the output."
   :interpreter ("python3" . python-mode))
 #+END_SRC
 ** LSP Language Server
+- 安装依赖
+  - =pip3 install epc orjson sexpdata six paramiko=
+  - =sudo pacman -S pyright ruff-lsp=
 #+BEGIN_SRC emacs-lisp
 (setq lsp-bridge-python-lsp-server "pyright")
 ;; specify environment to run epc
@@ -2027,10 +2027,10 @@ DIR is the location of the output."
   :ensure t
   :defer t
   :config
-  (setenv "WORKON_HOME" (expand-file-name "~/miniconda3/envs"))
+  (setenv "WORKON_HOME" (expand-file-name "~/.conda/envs"))
   (pyvenv-mode t)
-  ;; (add-hook 'python-mode-hook
-  ;;           (lambda () (pyvenv-workon "dev")))
+  (add-hook 'python-mode-hook
+            (lambda () (pyvenv-workon "dev")))
 )
 #+END_SRC
 *** 配合 lsp-bridge
@@ -2346,11 +2346,6 @@ DIR is the location of the output."
   ;;; eaf general settings
   (setq eaf-python-command "/usr/bin/python")
 
-  ;;; eaf-proxy
-  (setq eaf-proxy-type "http")
-  (setq eaf-proxy-host "127.0.0.1")
-  (setq eaf-proxy-port "7890")
-
   ;;; eaf-browser
   (require 'eaf-browser)
   (setq eaf-browser-continue-where-left-off t)
@@ -2375,9 +2370,6 @@ DIR is the location of the output."
   ;; https://planet.emacslife.com/                       Alvaro Ramirez
   ;; https://leovan.me/index.xml                         范叶亮
   (require 'eaf-rss-reader)
-
-  ;;; eaf-git
-  (require 'eaf-git)
 
   ;;; eaf-pdf-viewer
   (require 'eaf-pdf-viewer)
@@ -2413,12 +2405,10 @@ DIR is the location of the output."
 
   ;;; eaf-pyqterminal
   (require 'eaf-pyqterminal)
+  (setq eaf-pyqterminal-font-family "JetBrainsMono Nerd Font")
 
   ;;; eaf-file-manager
   (require 'eaf-file-manager)
-
-  ;;; eaf-system-monitor
-  (require 'eaf-system-monitor)
 
   ;;; eaf-markdown-previewer
   (require 'eaf-markdown-previewer)
@@ -2454,16 +2444,21 @@ DIR is the location of the output."
 (setq mind-wave-auto-change-title nil) ; 避免与auto-save插件的冲突
 #+END_SRC
 *** 代理
-:PROPERTIES:
-:HEADER-ARGS: :tangle no
-:END:
-- 参考 [[https://emacs-china.org/t/mind-wave-chatgpt-api-emacs-ai/23881/127?u=ententent][emacs-china]] 上的回答, 修改 =mind-wave= 源码 =~/.emacs.d/mind-wave/mind-wave.py=
-#+BEGIN_SRC python
-import os
-os.environ["http_proxy"]="http://127.0.0.1:7890"
-os.environ["https_proxy"]="http://127.0.0.1:7890"
-#+END_SRC
-- 可参考 [[https://manateelazycat.github.io/proxy/2022/10/23/best-proxy.html][最佳代理实践 - manateelazycat]] 进行代理优化
+- 安装 [[https://github.com/zzzgydi/clash-verge][Clash Verge]] 客户端 =sudo pacman -S clash-verge=
+- 配置 clash-verge
+  - 导入机场 URL
+  - 设置端口号为 1080，让 proxy-ns 可以对接机场
+- 配置 SwitchyOmega
+  - 代理协议 Socks5
+  - 代理服务器 127.0.0.1
+  - 代理端口 1080
+- 配置 proxy-ns 命令行代理
+  - =yay -S proxy-ns=
+  - =sudo systemctl enable --now proxy-nsd@main.service=
+  - 在 =/etc/proxy-nsd/main.conf= 文件中找到 =ENABLE_IPV6= 选项，设置为 =ENABLE_IPV6=0=
+- 更改特定应用的启动网络配置
+  - 以 Emacs 为例，找到 =/usr/share/applications/emacs.desktop= 中的 =Exec= 字段，在字段开头加上 =proxy-ns=
+  - 此时 Emacs 从启动器启动后就会自动应用代理网络，包括 Emacs 所启动的子进程
 *** 功能
 **** 对话模式
 **** 多行输入
@@ -2473,10 +2468,6 @@ os.environ["https_proxy"]="http://127.0.0.1:7890"
 **** 模型选择
 ** org-ai
 #+BEGIN_SRC emacs-lisp
-(setq url-proxy-services
-      '(("http"  . "127.0.0.1:7890")
-        ("https" . "127.0.0.1:7890")))
-
 (use-package org-ai
   :ensure t
   :bind (("C-c q" . org-ai-prompt)

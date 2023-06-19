@@ -7,10 +7,6 @@
 (require 'mind-wave)
 (setq mind-wave-auto-change-title nil) ; 避免与auto-save插件的冲突
 
-(setq url-proxy-services
-      '(("http"  . "127.0.0.1:7890")
-        ("https" . "127.0.0.1:7890")))
-
 (use-package org-ai
   :ensure t
   :bind (("C-c q" . org-ai-prompt)
