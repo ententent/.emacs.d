@@ -80,42 +80,42 @@
   ;; 用同级 ./img 目录放置截图文件
   (setq-default org-download-image-dir "./img"))
 
-  ;; 打开 TeX 文件时应执行的命令
-  (defun my-latex-hook ()
-    (turn-on-cdlatex)          ;; 加载cdlatex
-    (turn-on-reftex)           ;; 加载reftex
-    (prettify-symbols-mode t)  ;; 加载prettify-symbols-mode
-    (outline-minor-mode)       ;; 加载outline-mode
-    (outline-hide-body))       ;; 打开文件时只显示章节标题
+;; 打开 TeX 文件时应执行的命令
+(defun my-latex-hook ()
+  (turn-on-cdlatex)          ;; 加载cdlatex
+  (turn-on-reftex)           ;; 加载reftex
+  (prettify-symbols-mode t)  ;; 加载prettify-symbols-mode
+  (outline-minor-mode)       ;; 加载outline-mode
+  (outline-hide-body))       ;; 打开文件时只显示章节标题
 
-  ;; tex
-  ;; @source https://github.com/jwiegley/use-package/issues/379#issuecomment-246161500
-  (use-package tex
-    :defer t
-    :ensure auctex
-    :custom
-    ;; 对新文件自动解析 (usepackage, bibliograph, newtheorem) 等信息
-    (TeX-parse-selt t)
-    (TeX-PDF-mode t)
-    ;; 正向与反向搜索设置
-    (TeX-source-correlate-mode t)
-    (TeX-source-correlate-method 'synctex)
-    ;; 使用 eaf-pdf-viewer 打开PDF
-    (TeX-view-program-selection '((output-pdf "eaf")))
-    :config
-    (setq TeX-auto-save t)
-    ;; 编译时问询主文件名称
-    (setq-default TeX-master t)                               
-    ;; 编译后更新pdf文件
-    (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
-    ;; 加载LaTeX模式设置
-    (add-hook 'LaTeX-mode-hook 'my-latex-hook)
-    ;; XeLaTeX 支持
-    (add-hook 'LaTeX-mode-hook (lambda()
-                                 (add-to-list 'TeX-command-list '("XeLaTeX" "%`xelatex --synctex=1%(mode)%' %t" TeX-run-TeX nil t))
-                                 (add-to-list 'TeX-view-program-list '("eaf" eaf-pdf-synctex-forward-view))
-                                 (setq TeX-save-query nil
-                                       TeX-show-compilation t))))
+;; tex
+;; @source https://github.com/jwiegley/use-package/issues/379#issuecomment-246161500
+(use-package tex
+  :defer t
+  :ensure auctex
+  :custom
+  ;; 对新文件自动解析 (usepackage, bibliograph, newtheorem) 等信息
+  (TeX-parse-selt t)
+  (TeX-PDF-mode t)
+  ;; 正向与反向搜索设置
+  (TeX-source-correlate-mode t)
+  (TeX-source-correlate-method 'synctex)
+  ;; 使用 eaf-pdf-viewer 打开PDF
+  (TeX-view-program-selection '((output-pdf "eaf")))
+  :config
+  (setq TeX-auto-save t)
+  ;; 编译时问询主文件名称
+  (setq-default TeX-master t)                               
+  ;; 编译后更新pdf文件
+  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+  ;; 加载LaTeX模式设置
+  (add-hook 'LaTeX-mode-hook 'my-latex-hook)
+  ;; XeLaTeX 支持
+  (add-hook 'LaTeX-mode-hook (lambda()
+                               (add-to-list 'TeX-command-list '("XeLaTeX" "%`xelatex --synctex=1%(mode)%' %t" TeX-run-TeX nil t))
+                               (add-to-list 'TeX-view-program-list '("eaf" eaf-pdf-synctex-forward-view))
+                               (setq TeX-save-query nil
+                                     TeX-show-compilation t))))
 
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 (require 'cdlatex)
