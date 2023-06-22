@@ -5,11 +5,22 @@
 
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/site-lisp/lazycat-theme"))
 (require 'lazycat-theme)
-(lazycat-theme-load-dark)
+
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/site-lisp/circadian"))
+(require 'circadian)
+(setq calendar-latitude 40.0)
+(setq calendar-longitude 116.3)
+;; (setq circadian-themes '((:sunrise . lazycat-light)
+;;                          (:sunset  . lazycat-dark)))
+(setq circadian-themes '((:sunrise . operandi)
+                         (:sunset  . vivendi)))
+(circadian-setup)
 
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/site-lisp/awesome-tray"))
 (require 'awesome-tray)
 (awesome-tray-mode 1)
+
+(setq mode-line-format nil)
 
 ;; sudo mv * /usr/share/fonts/truetype
 ;; sudo fc-cache -f -v

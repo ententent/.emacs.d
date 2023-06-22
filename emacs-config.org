@@ -149,17 +149,30 @@
 #+END_SRC
 ** 主题配置
 - 主要使用由懒猫开发的一系列插件
-**** [[https://github.com/manateelazycat/lazycat-theme][lazycat-theme]]
+*** [[https://github.com/manateelazycat/lazycat-theme][lazycat-theme]]
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/site-lisp/lazycat-theme"))
 (require 'lazycat-theme)
-(lazycat-theme-load-dark)
 #+END_SRC
-**** [[https://github.com/manateelazycat/awesome-tray][awesome-tray]]
+*** [[https://github.com/guidoschmidt/circadian.el/tree/main][circadian]] 根据 daytime 切换主题
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/site-lisp/circadian"))
+(require 'circadian)
+(setq calendar-latitude 40.0)
+(setq calendar-longitude 116.3)
+;; (setq circadian-themes '((:sunrise . lazycat-light)
+;;                          (:sunset  . lazycat-dark)))
+(setq circadian-themes '((:sunrise . operandi)
+                         (:sunset  . vivendi)))
+(circadian-setup)
+#+END_SRC
+*** [[https://github.com/manateelazycat/awesome-tray][awesome-tray]]
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/site-lisp/awesome-tray"))
 (require 'awesome-tray)
 (awesome-tray-mode 1)
+
+(setq mode-line-format nil)
 #+End_SRC
 ** 字体配置
 - 参考链接[[https://emacs-china.org/t/emacs/22193][为emacs正确配置英文、中文、符号字体的正确方式？]]
