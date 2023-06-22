@@ -1132,6 +1132,12 @@
                               ))
   )
 #+END_SRC
+** org-mode 表格对齐
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path "~/.emacs.d/site-lisp/valign/")
+(require 'valign)
+(add-hook 'org-mode-hook #'valign-mode)
+#+END_SRC
 ** org-mode 任务管理
 *** org-habit 习惯管理
 #+BEGIN_SRC emacs-lisp
@@ -2369,6 +2375,7 @@ DIR is the location of the output."
   ;; https://liujiacai.net/atom.xml                      刘家财
   ;; https://planet.emacslife.com/                       Alvaro Ramirez
   ;; https://leovan.me/index.xml                         范叶亮
+  ;; https://evex.one/index.xml                          EXEC
   (require 'eaf-rss-reader)
 
   ;;; eaf-pdf-viewer
