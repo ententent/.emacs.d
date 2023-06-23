@@ -29,6 +29,13 @@
   (setq default-input-method "rime"
         rime-show-candidate 'posframe))
 
+(use-package wraplish
+  :load-path "~/.emacs.d/site-lisp/wraplish/"
+  :hook
+  ((markdown-mode org-mode) . wraplish-mode)
+  :config
+  (setq wraplish-add-space-after-chinese-punctuation t))
+
 (provide 'init-tools)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init-tools.el ends here

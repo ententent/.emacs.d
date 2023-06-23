@@ -1776,7 +1776,7 @@ DIR is the location of the output."
   :config
   (which-key-mode 1))
 #+END_SRC
-** emacs-rime
+** emacs-rime 内置输入法
 #+BEGIN_SRC emacs-lisp
 (use-package rime
   :load-path "~/.emacs.d/site-lisp/emacs-rime/"
@@ -1789,6 +1789,15 @@ DIR is the location of the output."
               :internal-border-width 10))
   (setq default-input-method "rime"
         rime-show-candidate 'posframe))
+#+END_SRC
+** wraplish 添加空格
+#+BEGIN_SRC emacs-lisp
+(use-package wraplish
+  :load-path "~/.emacs.d/site-lisp/wraplish/"
+  :hook
+  ((markdown-mode org-mode) . wraplish-mode)
+  :config
+  (setq wraplish-add-space-after-chinese-punctuation t))
 #+END_SRC
 ** init-tools.el 文件尾
 #+BEGIN_SRC emacs-lisp
