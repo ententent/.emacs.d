@@ -10,10 +10,8 @@
 (require 'circadian)
 (setq calendar-latitude 40.0)
 (setq calendar-longitude 116.3)
-;; (setq circadian-themes '((:sunrise . lazycat-light)
-;;                          (:sunset  . lazycat-dark)))
-(setq circadian-themes '((:sunrise . operandi)
-                         (:sunset  . vivendi)))
+(setq circadian-themes '((:sunrise . lazycat-light)
+                         (:sunset . lazycat-dark)))
 (circadian-setup)
 
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/site-lisp/awesome-tray"))
@@ -217,12 +215,13 @@
 (use-package dashboard
   :ensure t
   :config
-  (setq dashboard-banner-logo-title "Welcome to Emacs!") ;; 个性签名，随读者喜好设置
+  (setq dashboard-startup-banner 'logo)
+  (setq dashboard-banner-logo-title "Happy Hacking")
   (setq dashboard-projects-backend 'projectile)
-  (setq dashboard-startup-banner 'official)
-  (setq dashboard-items '((recents  . 5)
+  (setq dashboard-center-content t)
+  (setq dashboard-items '((recents  . 10)
 			              (bookmarks . 5)
-			              (projects . 10)))
+			              (projects . 5)))
   (dashboard-setup-startup-hook))
 
 (provide 'init-ui)

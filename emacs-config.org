@@ -160,10 +160,8 @@
 (require 'circadian)
 (setq calendar-latitude 40.0)
 (setq calendar-longitude 116.3)
-;; (setq circadian-themes '((:sunrise . lazycat-light)
-;;                          (:sunset  . lazycat-dark)))
-(setq circadian-themes '((:sunrise . operandi)
-                         (:sunset  . vivendi)))
+(setq circadian-themes '((:sunrise . lazycat-light)
+                         (:sunset . lazycat-dark)))
 (circadian-setup)
 #+END_SRC
 *** [[https://github.com/manateelazycat/awesome-tray][awesome-tray]]
@@ -382,12 +380,13 @@
 (use-package dashboard
   :ensure t
   :config
-  (setq dashboard-banner-logo-title "Welcome to Emacs!") ;; 个性签名，随读者喜好设置
+  (setq dashboard-startup-banner 'logo)
+  (setq dashboard-banner-logo-title "Happy Hacking")
   (setq dashboard-projects-backend 'projectile)
-  (setq dashboard-startup-banner 'official)
-  (setq dashboard-items '((recents  . 5)
+  (setq dashboard-center-content t)
+  (setq dashboard-items '((recents  . 10)
 			              (bookmarks . 5)
-			              (projects . 10)))
+			              (projects . 5)))
   (dashboard-setup-startup-hook))
 #+END_SRC
 ** init-ui.el 文件尾
@@ -2004,6 +2003,21 @@ DIR is the location of the output."
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/site-lisp/color-rg/")
 (require 'color-rg)
+#+END_SRC
+** evil
+#+BEGIN_SRC emacs-lisp
+(unless (package-installed-p 'evil)
+  (package-install 'evil))
+(require 'evil)
+(evil-mode 1)
+
+;; 适配 org-mode
+(setq org-adapt-indentation t)
+(define-key evil-normal-state-map (kbd "<tab>") 'org-cycle)
+
+;; 适配 treemacs / dashboard
+(evil-set-initial-state 'treemacs-mode 'emacs)
+(evil-set-initial-state 'dashboard-mode 'emacs)
 #+END_SRC
 ** init-dev.el 文件尾
 #+BEGIN_SRC emacs-lisp

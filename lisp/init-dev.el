@@ -187,6 +187,19 @@
 (add-to-list 'load-path "~/.emacs.d/site-lisp/color-rg/")
 (require 'color-rg)
 
+(unless (package-installed-p 'evil)
+  (package-install 'evil))
+(require 'evil)
+(evil-mode 1)
+
+;; 适配 org-mode
+(setq org-adapt-indentation t)
+(define-key evil-normal-state-map (kbd "<tab>") 'org-cycle)
+
+;; 适配 treemacs / dashboard
+(evil-set-initial-state 'treemacs-mode 'emacs)
+(evil-set-initial-state 'dashboard-mode 'emacs)
+
 (provide 'init-dev)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init-dev.el ends here
