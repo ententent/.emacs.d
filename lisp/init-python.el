@@ -18,8 +18,8 @@
   :config
   (setenv "WORKON_HOME" (expand-file-name "~/.conda/envs"))
   (pyvenv-mode t)
-  (add-hook 'python-mode-hook
-            (lambda () (pyvenv-workon "dev")))
+  ;; (add-hook 'python-mode-hook
+  ;;           (lambda () (pyvenv-workon "dev")))
 )
 
 (defun local/lsp-bridge-get-single-lang-server-by-project (project-path filepath)

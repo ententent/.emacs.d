@@ -192,6 +192,10 @@
 (require 'evil)
 (evil-mode 1)
 
+;; 按键设置
+;;; eval 下使用 C-e 到行尾
+(define-key evil-normal-state-map (kbd "C-e") 'move-end-of-line)
+
 ;; 适配 org-mode
 (setq org-adapt-indentation t)
 (define-key evil-normal-state-map (kbd "<tab>") 'org-cycle)

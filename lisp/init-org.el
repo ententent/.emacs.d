@@ -886,8 +886,7 @@ This function makes sure that dates are aligned for easy reading."
         "<link rel=\"stylesheet\" type=\"text/css\" href=\"/css/style.css\" />
          <script src=\"js/copy.js\"></script> "))
 
-; RSS Feed
-(add-to-list 'load-path "~/.emacs.d/lisp/")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/ox-rss/")
 (require 'ox-rss)
 
 (defun posts-rss-feed (title list)

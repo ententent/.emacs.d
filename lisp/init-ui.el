@@ -26,7 +26,7 @@
 ;; https://einverne.github.io/post/2015/10/install-fonts-under-linux.html
 
 ;; 默认字体和字号 @ https://fonts.google.com/specimen/Fira+Mono
-(set-face-attribute 'default nil :font "Fira Mono" :height 135)
+(set-face-attribute 'default nil :font "Source Code Pro" :height 125)
 ;; 中文默认字体 @ https://mrswolf.github.io/my-manjaro-log/
 (set-fontset-font "fontset-default" 'han "Kaiti")
 ;; 汉字间距显示问题
