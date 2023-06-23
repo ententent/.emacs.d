@@ -17,6 +17,18 @@
   :config
   (which-key-mode 1))
 
+(use-package rime
+  :load-path "~/.emacs.d/site-lisp/emacs-rime/"
+  :config
+  (setq rime-user-data-dir "~/.local/share/fcitx5/rime")
+  (setq rime-posframe-properties
+        (list :background-color "#333333"
+              :foreground-color "#dcdccc"
+              :font "Source Code Pro"
+              :internal-border-width 10))
+  (setq default-input-method "rime"
+        rime-show-candidate 'posframe))
+
 (provide 'init-tools)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init-tools.el ends here
